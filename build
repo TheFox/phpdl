@@ -1,0 +1,17 @@
+#!/bin/sh
+# Created @ 16.10.2010 by TheFox
+
+export LOG DATE
+#LOG=/var/log/scripts/.log
+DATE=`date +"%Y/%m/%d %H:%M:%S"`
+NAME="phpdl"
+VERSION="0.1.0"
+TARF="$NAME-$VERSION.tar"
+GZIPF="$TARF.gz"
+
+#echo "$DATE $USER" >> $LOG
+rm -f $TARF $GZIPF
+tar -vcf $TARF cache install lib styles tpl build index.php LICENSE README
+gzip $TARF
+
+# EOF
