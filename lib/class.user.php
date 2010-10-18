@@ -34,6 +34,10 @@ class user{
 		}
 	}
 	
+	function get($item){
+		return $this->user[$item];
+	}
+	
 	function set($item, $value){
 		$this->user[$item] = $value;
 	}
