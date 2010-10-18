@@ -42,6 +42,8 @@ $CONFIG = array(
 	
 	'HTML_HEAD_EXT' => '',
 	
+	'WGET' => '/usr/bin/wget',
+	
 );
 
 # Extended config
