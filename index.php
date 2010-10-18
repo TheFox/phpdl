@@ -33,8 +33,8 @@ switch($a){
 	
 	case 'dlpacketEdit':
 		
-		$tpl = 'default.tpl';
-		$cacheId = 'default';
+		$tpl = $a.'.tpl';
+		$cacheId = $a;
 		if(!$smarty->isCached($tpl, $cacheId)){
 			smartyAssignStd($smarty);
 			
@@ -69,7 +69,7 @@ switch($a){
 			// Add new
 		}
 		
-		header('Location: ?');
+		//header('Location: ?');
 		
 	break;
 	
