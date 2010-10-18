@@ -12,7 +12,7 @@
 				<td>
 					<table border="1" cellpadding="5" cellspacing="5" width="100%">
 						<tr>
-							<td width="120">
+							<td width="120" valign="top">
 								<span id="navigation">
 									<a href="?">Stack</a><br />
 									<a href="?a=dlpacketEdit">Add Packet</a><br />
