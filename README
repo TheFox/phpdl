@@ -3,6 +3,8 @@
 PHP Downloader
 	for rapidshare.com & co.
 
-
+Description
+	PHP Downloader (or PHPDL) is a webbased download manager for rapidshare.com links. You
+	can install PHPDL on your webserver and manage the downloads over the web interface.
 
 # EOF
