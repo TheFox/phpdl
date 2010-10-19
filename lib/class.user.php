@@ -23,18 +23,18 @@
 class user{
 	
 	var $dbh;
+	var $dbhConfig;
 	var $user; // User infos from db.
+	var $userChanges;
 	
-	public $id;
-	public $isActive;
 	public $isGuest;
 	
-	function __construct($dbh){
+	function __construct($dbHost, $dbName, $dbUser, $dbPass){
 		
-		$this->dbh = $dbh;
-		$this->user =  array();
-		$this->id = 0;
-		$this->isActive = false;
+		$this->dbh = null;
+		$this->dbhConfig = array('DB_HOST' => $dbHost, 'DB_NAME' => $dbName, 'DB_USER' => $dbUser, 'DB_PASS' => $dbPass);
+		$this->user = array();
+		$this->userChanges = array();
 		$this->isGuest = true;
 		
 	}
@@ -45,15 +45,51 @@ class user{
 			user from db.
 		*/
 		
-		if($this->dbh){
+		if($sessionId != ''){
+			$this->_dbhCheck();
 			
+			$res = mysql_query("select id from users where sessionId like '$sessionId' limit 1;", $this->dbh);
+			if($res){
+				$row = mysql_fetch_assoc($res);
+				if(isset($row['id']))
+					$this->loadByUserId($row['id']);
+			}
 		}
 	}
 	
-	function loadByUserId($uid){
-		if($this->dbh){
-			
+	function loadByLoginAndPassword($login, $password){
+		// Login
+		
+		$this->_dbhCheck();
+		
+		$res = mysql_query("select id from users where login like '$login' and password = '$password' limit 1;", $this->dbh);
+		if($res){
+			$row = mysql_fetch_assoc($res);
+			if(isset($row['id']))
+				if($this->loadByUserId($row['id'])){
+					list($usec, $sec) = explode(' ', microtime());
+					$sessionId = md5($_SERVER['REMOTE_ADDR'].rand(1, 999999).((float)$usec + (float)$sec));
+					$this->set('sessionId', $sessionId);
+					$this->save();
+				}	
 		}
+		return $this->get('sessionId') != '';
+	}
+	
+	function loadByUserId($uid){
+		$this->_dbhCheck();
+		
+		$res = mysql_query("select id, login, password, sessionId, ctime from users where id = '$uid' limit 1;", $this->dbh);
+		if($res){
+			$row = mysql_fetch_assoc($res);
+			if(isset($row['id'])){
+				foreach($row as $key => $val)
+					$this->user[$key] = $val;
+				$this->isGuest = false;
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	function get($item){
@@ -62,25 +98,51 @@ class user{
 	
 	function set($item, $value){
 		$this->user[$item] = $value;
+		$this->userChanges[$item] = true;
 	}
 	
 	function save(){
 		// Save the user to the db.
 		
-		if($this->dbh && count($this->user)){
-			
+		$this->_dbhCheck();
+		
+		$userChangesLen = count($this->userChanges);
+		if($userChangesLen){
+			$n = 0;
+			$sql = "update users set ";
+			foreach($this->userChanges as $key => $val){
+				$sql .= "$key = '".$this->get($key)."'";
+				$n++;
+				if($n < $userChangesLen)
+					$sql .= ', ';
+			}
+			$sql .= " where id = '".$this->get('id')."' limit 1;";
+			mysql_query($sql, $this->dbh);
 		}
 	}
 	
+	
 	// Internal functions.
-	function _isActive(){
-		if(isset($this->user['password']))
-			if($this->user['password'] != '' && $this->user['password'] != 'x')
-				$this->isActive = true;
+	
+	function _dbhCheck(){
+		if(!$this->dbh && $this->dbhConfig['DB_HOST'] != '' && $this->dbhConfig['DB_NAME'] != '' && $this->dbhConfig['DB_USER'] != '' && $this->dbhConfig['DB_PASS'] != ''){
+			$this->dbh = @mysql_connect($this->dbhConfig['DB_HOST'], $this->dbhConfig['DB_USER'], $this->dbhConfig['DB_PASS']);
+			if(!$this->dbh)
+				die('no connection to database');
+			@mysql_select_db($this->dbhConfig['DB_NAME'], $this->dbh);
+		}
+	}
+	
+	function _dbhClose(){
+		if($this->dbh){
+			@mysql_close($this->dbh);
+			$this->dbh = null;
+		}
 	}
 	
 	function __destruct(){
 		// __destruct
+		$this->_dbhClose();
 	}
 	
 };

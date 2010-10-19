@@ -32,7 +32,7 @@ $a = $_GET['a'];
 $id = (int)$_GET['id'];
 $smarty = smartyNew();
 
-$user = new user(dbConnect());
+$user = new user($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 $user->loadBySessionId($_COOKIE['userSessionId']);
 
 
@@ -54,8 +54,21 @@ if($user->isGuest){
 		break;
 		
 		case 'loginExec':
-			$dbh = dbConnect();
-			dbClose($dbh);
+			/*$dbh = dbConnect();
+			dbClose($dbh);*/
+			
+			$login = checkInput($_POST['login'], 'a-z0-9_', 32);
+			$password = md5($CONFIG['USER_PASSWORD_SALT'].$_POST['password']);
+			
+			
+			$loginuser = new user($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+			if($loginuser->loadByLoginAndPassword($login, $password))
+				setcookie('userSessionId', $loginuser->get('sessionId'), mktime() + $CONFIG['USER_SESSION_TTL']);
+			else
+				setcookie('userSessionId', 'x', mktime());
+			
+			print "$login|$password|".$loginuser->get('sessionId')."|".(mktime() + $CONFIG['USER_SESSION_TTL']);
+			
 			//header('Location: ?');
 		break;
 		
@@ -74,7 +87,7 @@ else{
 				smartyAssignStd($smarty);
 				
 				$dbh = dbConnect();
-				$packets = getDbTable($dbh, 'packets', "where _user = '".$user->id."'");
+				$packets = getDbTable($dbh, 'packets', "where _user = '".$user->get('id')."'");
 				#$files = 
 				dbClose($dbh);
 				
