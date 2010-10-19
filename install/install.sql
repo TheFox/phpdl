@@ -1,4 +1,4 @@
--- Created @ 2010/10/18 20:07:06 by TheFox@fox21.at
+-- Created @ 2010/10/19 21:04:41 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -25,10 +25,15 @@ DROP TABLE IF EXISTS `files`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `files` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `_user` int(11) NOT NULL,
   `_packet` int(11) NOT NULL,
   `uri` text NOT NULL,
   `ctime` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `_user` (`_user`),
+  KEY `_packet` (`_packet`),
+  KEY `_user_2` (`_user`),
+  KEY `_packet_2` (`_packet`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -61,8 +66,10 @@ CREATE TABLE `users` (
   `password` varchar(32) NOT NULL,
   `sessionId` varchar(32) NOT NULL COMMENT 'md5 hex',
   `ctime` int(11) NOT NULL COMMENT 'Create time',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `login` (`login`),
+  KEY `sessionId` (`sessionId`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -74,4 +81,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-18 20:07:06
+-- Dump completed on 2010-10-19 21:04:41
