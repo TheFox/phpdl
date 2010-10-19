@@ -7,13 +7,17 @@ class user{
 	var $dbh;
 	var $user; // User infos from db.
 	
-	public $userActive;
+	public $id;
+	public $isActive;
+	public $isGuest;
 	
 	function __construct($dbh){
 		
 		$this->dbh = $dbh;
 		$this->user =  array();
-		$this->userActive = false;
+		$this->id = 0;
+		$this->isActive = false;
+		$this->isGuest = true;
 		
 	}
 	
@@ -54,7 +58,7 @@ class user{
 	function _isActive(){
 		if(isset($this->user['password']))
 			if($this->user['password'] != '' && $this->user['password'] != 'x')
-				$this->userActive = true;
+				$this->isActive = true;
 	}
 	
 	function __destruct(){
