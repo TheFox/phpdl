@@ -124,32 +124,27 @@ function smartyAssignMenu(&$smarty, $current){
 function dbConnect(){
 	global $CONFIG;
 	
-	$dbh = @mysqli_connect($CONFIG['DB_HOST'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+	$dbh = @mysql_connect($CONFIG['DB_HOST'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 	if(!$dbh)
 		error('no connection to database', true);
 	
-	$sel = @mysqli_select_db($dbh, $CONFIG['DB_NAME']);
+	$sel = @mysql_select_db($CONFIG['DB_NAME'], $dbh);
 	if(!$sel)
 		error('can\'t select database '.$CONFIG['DB_NAME'], true);
 	
 	return $dbh;
 }
 
-function dbClose($dbh = null){
-	
-	if($dbh == null)
-		mysql_close();
-	else
-		mysqli_close($dbh);
-	
+function dbClose(){
+	mysql_close();
 }
 
 function getDbTable($dbh, $table, $where = ''){
 	$rv = array();
 	$sql = "select * from $table $where;";
-	$res = mysqli_query($dbh, $sql);
+	$res = mysql_query($sql, $dbh);
 	if($res){
-		while($row = mysqli_fetch_assoc($res))
+		while($row = mysql_fetch_assoc($res))
 			$rv[$row['id']] = $row;
 	}
 	else
