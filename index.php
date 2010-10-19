@@ -1,7 +1,7 @@
 <?php
 
 /*
-	Created @ 16.03.2010 by TheFox@fox21.at
+	Created @ 15.10.2010 by TheFox@fox21.at
 	Version: 0.1.0
 	Copyright (c) 2010 TheFox
 	
