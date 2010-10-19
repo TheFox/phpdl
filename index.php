@@ -67,9 +67,10 @@ if($user->isGuest){
 			else
 				setcookie('userSessionId', 'x', mktime());
 			
-			print "$login|$password|".$loginuser->get('sessionId')."|".(mktime() + $CONFIG['USER_SESSION_TTL']);
+			#print "$login|$password|".$loginuser->get('sessionId')."|".(mktime() + $CONFIG['USER_SESSION_TTL']);
 			
-			//header('Location: ?');
+			header('Location: ?');
+			
 		break;
 		
 	}
