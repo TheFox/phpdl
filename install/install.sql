@@ -1,4 +1,4 @@
--- Created @ 2010/10/19 22:05:04 by TheFox@fox21.at
+-- Created @ 2010/10/19 22:05:51 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -31,9 +31,7 @@ CREATE TABLE `files` (
   `ctime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `_user` (`_user`),
-  KEY `_packet` (`_packet`),
-  KEY `_user_2` (`_user`),
-  KEY `_packet_2` (`_packet`)
+  KEY `_packet` (`_packet`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -81,4 +79,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-19 22:05:04
+-- Dump completed on 2010-10-19 22:05:51
