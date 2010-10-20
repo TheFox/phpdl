@@ -61,9 +61,12 @@ $CONFIG = array(
 	'HTML_HEAD_EXT' => '',
 	
 	'WGET' => '/usr/bin/wget',
+	'BROWSER_USERAGENT' => 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10',
 	
 	'USER_PASSWORD_SALT' => 'put your unique phrase here',
 	'USER_SESSION_TTL' => 3600 * 24 * 365,
+	
+	
 	
 );
 
