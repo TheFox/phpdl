@@ -1,4 +1,4 @@
--- Created @ 2010/10/19 22:06:12 by TheFox@fox21.at
+-- Created @ 2010/10/20 19:45:13 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -28,10 +28,14 @@ CREATE TABLE `files` (
   `_user` int(11) NOT NULL,
   `_packet` int(11) NOT NULL,
   `uri` text NOT NULL,
+  `isDownloading` enum('0','1') NOT NULL DEFAULT '0',
+  `isFinished` enum('0','1') NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `_user` (`_user`),
-  KEY `_packet` (`_packet`)
+  KEY `_packet` (`_packet`),
+  KEY `isDownloading` (`isDownloading`),
+  KEY `isFinished` (`isFinished`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -46,8 +50,13 @@ CREATE TABLE `packets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `_user` int(11) NOT NULL,
   `name` varchar(256) NOT NULL,
+  `isDownloading` enum('0','1') NOT NULL DEFAULT '0',
+  `isFinished` enum('0','1') NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `_user` (`_user`),
+  KEY `isDownloading` (`isDownloading`),
+  KEY `isFinished` (`isFinished`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -79,4 +88,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-19 22:06:12
+-- Dump completed on 2010-10-20 19:45:14
