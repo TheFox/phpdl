@@ -1,4 +1,4 @@
--- Created @ 2010/10/21 19:27:43 by TheFox@fox21.at
+-- Created @ 2010/10/21 22:13:12 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -30,7 +30,7 @@ CREATE TABLE `files` (
   `uri` text NOT NULL,
   `isDownloading` enum('0','1') NOT NULL DEFAULT '0',
   `isFinished` enum('0','1') NOT NULL DEFAULT '0',
-  `ctime` int(11) NOT NULL,
+  `ctime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `_user` (`_user`),
   KEY `_packet` (`_packet`),
@@ -52,7 +52,7 @@ CREATE TABLE `packets` (
   `name` varchar(256) NOT NULL,
   `isDownloading` enum('0','1') NOT NULL DEFAULT '0',
   `isFinished` enum('0','1') NOT NULL DEFAULT '0',
-  `ctime` int(11) NOT NULL,
+  `ctime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `_user` (`_user`),
   KEY `isDownloading` (`isDownloading`),
@@ -72,7 +72,7 @@ CREATE TABLE `users` (
   `login` varchar(32) NOT NULL,
   `password` varchar(32) NOT NULL,
   `sessionId` varchar(32) NOT NULL COMMENT 'md5 hex',
-  `ctime` int(11) NOT NULL COMMENT 'Create time',
+  `ctime` int(11) NOT NULL DEFAULT '0' COMMENT 'Create time',
   PRIMARY KEY (`id`),
   KEY `login` (`login`),
   KEY `sessionId` (`sessionId`)
@@ -88,7 +88,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-21 19:27:43
+-- Dump completed on 2010-10-21 22:13:12
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -118,7 +118,10 @@ CREATE TABLE `och` (
   `name` varchar(32) NOT NULL,
   `phpPath` varchar(256) NOT NULL,
   `searchPattern` varchar(256) NOT NULL,
-  `ctime` int(11) NOT NULL,
+  `ssl` enum('0','1') NOT NULL DEFAULT '0',
+  `user` varchar(256) NOT NULL,
+  `password` varchar(256) NOT NULL,
+  `ctime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -129,7 +132,7 @@ CREATE TABLE `och` (
 
 LOCK TABLES `och` WRITE;
 /*!40000 ALTER TABLE `och` DISABLE KEYS */;
-INSERT INTO `och` VALUES (1,'RapidShare.com','och.rapidshare-com.php','rapidshare.com\\/files\\/',1287612321);
+INSERT INTO `och` VALUES (1,'RapidShare.com','och.rapidshare-com.php','rapidshare.com\\/files\\/','1','','',1287612321);
 /*!40000 ALTER TABLE `och` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -142,4 +145,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-21 19:27:43
+-- Dump completed on 2010-10-21 22:13:13
