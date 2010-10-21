@@ -20,6 +20,9 @@
 	along with PHPDL.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+if(!defined('ANTIHACK')) die('Hacking attempt.');
+
+
 class user{
 	
 	var $dbh;
