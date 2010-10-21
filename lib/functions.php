@@ -178,4 +178,8 @@ function checkInput($val, $pattern, $len = -1){
 	return $val;
 }
 
+function wget($bin, $uri, $o){
+	system($bin.' -O '.$o.' "'.$uri.'"');
+}
+
 ?>

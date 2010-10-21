@@ -11,7 +11,7 @@ GZIPF="$TARF.gz"
 
 #echo "$DATE $USER" >> $LOG
 rm -f $TARF $GZIPF
-tar -vcf $TARF cache install lib styles tpl build index.php LICENSE README
+tar -vcf $TARF cache install lib styles tpl build tmp downloads index.php stack.php wget.php LICENSE README
 gzip $TARF
 
 # EOF
