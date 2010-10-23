@@ -39,12 +39,12 @@ function containerExec($content){
 	$IV_HEX  = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
 	$KEY_HEX = '8C35192D964DC3182C6F84F3252239EB4A320D2500000000';
 	
-	$iv = hex2str($IV_HEX);
-	$key = hex2str($KEY_HEX);
+	$iv = hex2bin($IV_HEX);
+	$key = hex2bin($KEY_HEX);
 	$iv2 = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $iv, MCRYPT_MODE_ECB, '0000000000000000');
 	
 	
-	$content = hex2str($content);
+	$content = hex2bin($content);
 	$links = explode("\r\n", $content);
 	$out = '';
 	

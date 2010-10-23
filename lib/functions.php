@@ -182,7 +182,7 @@ function wget($bin, $uri, $o){
 	system($bin.' -O '.$o.' "'.$uri.'"');
 }
 
-function hex2str($hexstr) {
+function hex2bin($hexstr) {
 	$hexstr = str_replace(' ', '', $hexstr);
 	$retstr = @pack('H*', $hexstr);
 	return $retstr;
