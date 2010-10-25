@@ -25,7 +25,7 @@ if(!defined('ANTIHACK')) die('Hacking attempt.');
 include_once('class.dlfile.php');
 
 
-class dlPacket{
+class dlpacket{
 	
 	var $dbh;
 	
