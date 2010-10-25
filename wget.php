@@ -34,27 +34,27 @@ if(count($argv) >= 2){
 	
 	$dbh = dbConnect();
 	$files = getDbTable($dbh, 'files', "where id = '$fileId' limit 1");
-	$och = getDbTable($dbh, 'och');
+	$hosters = getDbTable($dbh, 'hosters');
 	dbClose($dbh);
 	
 	if(count($files)){
 		$file = $files[$fileId];
 		print "uri: ".$file['uri']."\n";
 		
-		$thisOch = null;
-		foreach($och as $id => $thisOch)
-			if(preg_match('/'.$thisOch['searchPattern'].'/i', $file['uri']))
+		$thisHoster = null;
+		foreach($hosters as $id => $thisHoster)
+			if(preg_match('/'.$thisHoster['searchPattern'].'/i', $file['uri']))
 				break;
 		
-		if($thisOch){
-			include_once('./lib/och/'.$thisOch['phpPath']);
+		if($thisHoster){
+			include_once('./lib/hoster/'.$thisHoster['phpPath']);
 			
-			if(function_exists('ochExec'))
-				@ochExec($file['uri'], $thisOch);
+			if(function_exists('hosterExec'))
+				@hosterExec($file['uri'], $thisHoster);
 			
 		}
 		else
-			print "no och found\n";
+			print "no hoster found\n";
 		
 	}
 	else

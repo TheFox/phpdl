@@ -23,18 +23,18 @@
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 
-function ochExec($uri, $thisOch){
+function hosterExec($uri, $thisHoster){
 	global $CONFIG;
 	$retval = false;
 	
-	print "och.rapidshare-com.php ochExec '$uri'\n";
+	print "hoster.rapidshare-com.php hosterExec '$uri'\n";
 	if(preg_match('/files\/([^\/]*)\/(.*)/i', $uri, $res)){
 		#var_export($res);
 		$fileid = $res[1];
 		$filename = $res[2];
 		
-		$protocol = 'http'.($thisOch['ssl'] ? 's' : '');
-		$path = "cgi-bin/rsapi.cgi?sub=download_v1&fileid=$fileid&filename=$filename&login=".$thisOch['user']."&password=".$thisOch['password'];
+		$protocol = 'http'.($thisHoster['ssl'] ? 's' : '');
+		$path = "cgi-bin/rsapi.cgi?sub=download_v1&fileid=$fileid&filename=$filename&login=".$thisHoster['user']."&password=".$thisHoster['password'];
 		$url = "$protocol://api.rapidshare.com/$path";
 		
 		print "link '$url'\n";
