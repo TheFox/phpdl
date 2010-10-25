@@ -1,4 +1,4 @@
--- Created @ 2010/10/21 22:13:43 by TheFox@fox21.at
+-- Created @ 2010/10/25 20:18:49 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -28,14 +28,12 @@ CREATE TABLE `files` (
   `_user` int(11) NOT NULL,
   `_packet` int(11) NOT NULL,
   `uri` text NOT NULL,
-  `isDownloading` enum('0','1') NOT NULL DEFAULT '0',
-  `isFinished` enum('0','1') NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL DEFAULT '0',
+  `stime` int(11) NOT NULL DEFAULT '0',
+  `ftime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `_user` (`_user`),
-  KEY `_packet` (`_packet`),
-  KEY `isDownloading` (`isDownloading`),
-  KEY `isFinished` (`isFinished`)
+  KEY `_packet` (`_packet`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -52,6 +50,7 @@ CREATE TABLE `packets` (
   `name` varchar(256) NOT NULL,
   `isDownloading` enum('0','1') NOT NULL DEFAULT '0',
   `isFinished` enum('0','1') NOT NULL DEFAULT '0',
+  `archive` enum('0','1') NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `_user` (`_user`),
@@ -88,7 +87,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-21 22:13:43
+-- Dump completed on 2010-10-25 20:18:49
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -107,13 +106,13 @@ CREATE TABLE `users` (
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `och`
+-- Table structure for table `hosters`
 --
 
-DROP TABLE IF EXISTS `och`;
+DROP TABLE IF EXISTS `hosters`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `och` (
+CREATE TABLE `hosters` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(32) NOT NULL,
   `phpPath` varchar(256) NOT NULL,
@@ -127,13 +126,13 @@ CREATE TABLE `och` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `och`
+-- Dumping data for table `hosters`
 --
 
-LOCK TABLES `och` WRITE;
-/*!40000 ALTER TABLE `och` DISABLE KEYS */;
-INSERT INTO `och` VALUES (1,'RapidShare.com','och.rapidshare-com.php','rapidshare.com\\/files\\/','1','','',1287612321);
-/*!40000 ALTER TABLE `och` ENABLE KEYS */;
+LOCK TABLES `hosters` WRITE;
+/*!40000 ALTER TABLE `hosters` DISABLE KEYS */;
+INSERT INTO `hosters` VALUES (1,'RapidShare.com','och.rapidshare-com.php','rapidshare.com\\/files\\/','1','','',1287612321);
+/*!40000 ALTER TABLE `hosters` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -145,4 +144,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-21 22:13:43
+-- Dump completed on 2010-10-25 20:18:50
