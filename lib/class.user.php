@@ -22,23 +22,24 @@
 
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
+include_once('class.dbh.php');
 
-class user{
-	
-	var $dbh;
-	var $dbhConfig;
-	var $user; // User infos from db.
-	var $userChanges;
+
+class user extends dbh{
 	
 	public $isGuest;
 	
+	
 	function __construct($dbHost, $dbName, $dbUser, $dbPass){
 		
+		#print "user.__construct<br>\n";
 		$this->dbh = null;
-		$this->dbhConfig = array('DB_HOST' => $dbHost, 'DB_NAME' => $dbName, 'DB_USER' => $dbUser, 'DB_PASS' => $dbPass);
-		$this->user = array();
-		$this->userChanges = array();
+		$this->dbhConfig = array('DB_HOST' => $dbHost, 'DB_NAME' => $dbName, 'DB_USER' => $dbUser, 'DB_PASS' => $dbPass, 'DB_TABLE' => 'users');
+		$this->data = array();
+		$this->dataChanges = array();
+		
 		$this->isGuest = true;
+		
 		
 	}
 	
@@ -48,7 +49,8 @@ class user{
 			user from db.
 		*/
 		
-		if($sessionId != ''){
+		#print "dbh.loadBySessionId $sessionId<br>\n";
+		if(strlen($sessionId) == 32){ # must be a md5 hex.
 			$this->_dbhCheck();
 			
 			$res = mysql_query("select id from users where sessionId like '$sessionId' limit 1;", $this->dbh);
@@ -63,6 +65,7 @@ class user{
 	function loadByLoginAndPassword($login, $password){
 		// Login
 		
+		#print "dbh.loadByLoginAndPassword <br>\n";
 		$this->_dbhCheck();
 		
 		$res = mysql_query("select id from users where login like '$login' and password = '$password' limit 1;", $this->dbh);
@@ -80,71 +83,12 @@ class user{
 	}
 	
 	function loadByUserId($uid){
-		$this->_dbhCheck();
-		
-		$res = mysql_query("select id, login, password, sessionId, ctime from users where id = '$uid' limit 1;", $this->dbh);
-		if($res){
-			$row = mysql_fetch_assoc($res);
-			if(isset($row['id'])){
-				foreach($row as $key => $val)
-					$this->user[$key] = $val;
-				$this->isGuest = false;
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	function get($item){
-		return $this->user[$item];
-	}
-	
-	function set($item, $value){
-		$this->user[$item] = $value;
-		$this->userChanges[$item] = true;
-	}
-	
-	function save(){
-		// Save the user to the db.
-		
-		$this->_dbhCheck();
-		
-		$userChangesLen = count($this->userChanges);
-		if($userChangesLen){
-			$n = 0;
-			$sql = "update users set ";
-			foreach($this->userChanges as $key => $val){
-				$sql .= "$key = '".$this->get($key)."'";
-				$n++;
-				if($n < $userChangesLen)
-					$sql .= ', ';
-			}
-			$sql .= " where id = '".$this->get('id')."' limit 1;";
-			mysql_query($sql, $this->dbh);
-		}
-	}
-	
-	
-	// Internal functions.
-	
-	function _dbhCheck(){
-		if(!$this->dbh && $this->dbhConfig['DB_HOST'] != '' && $this->dbhConfig['DB_NAME'] != '' && $this->dbhConfig['DB_USER'] != '' && $this->dbhConfig['DB_PASS'] != ''){
-			$this->dbh = @mysql_connect($this->dbhConfig['DB_HOST'], $this->dbhConfig['DB_USER'], $this->dbhConfig['DB_PASS']);
-			if(!$this->dbh)
-				die('no connection to database');
-			@mysql_select_db($this->dbhConfig['DB_NAME'], $this->dbh);
-		}
-	}
-	
-	function _dbhClose(){
-		if($this->dbh){
-			@mysql_close($this->dbh);
-			$this->dbh = null;
-		}
+		$retval = $this->loadById($uid);
+		$this->isGuest = !$retval;
+		return $retval;
 	}
 	
 	function __destruct(){
-		// __destruct
 		$this->_dbhClose();
 	}
 	
