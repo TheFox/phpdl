@@ -22,14 +22,36 @@
 
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
+include_once('class.dbh.php');
 
-class dlFile{
+
+$DLFILE_ERROR_NO_ERROR = 0;
+$DLFILE_ERROR_UNKOWN = 1;
+$DLFILE_ERROR_NO_FREE_SLUTS = 2; # yes, sluts! rs response "All free download slots are full".
+$DLFILE_ERROR_MD5_FAILED = 3;
+
+function getDlFileErrorMsg($errno){
 	
-	var $dbh;
+	if($errno == 0)
+		return 'DLFILE_ERROR_NO_ERROR';
+	if($errno == 1)
+		return 'DLFILE_ERROR_UNKOWN';
+	if($errno == 2)
+		return 'DLFILE_ERROR_NO_FREE_SLUTS';
+	if($errno == 3)
+		return 'DLFILE_ERROR_MD5_FAILED';
 	
-	function __construct($dbh){
+	return '';
+}
+
+class dlfile extends dbh{
+	
+	function __construct($dbHost, $dbName, $dbUser, $dbPass){
 		
-		$this->dbh = $dbh;
+		$this->dbh = null;
+		$this->dbhConfig = array('DB_HOST' => $dbHost, 'DB_NAME' => $dbName, 'DB_USER' => $dbUser, 'DB_PASS' => $dbPass, 'DB_TABLE' => 'files');
+		$this->data = array();
+		$this->dataChanges = array();
 		
 	}
 	
