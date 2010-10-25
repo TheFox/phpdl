@@ -25,6 +25,7 @@ if(isset($_SERVER['SERVER_ADDR'])) die('Hacking attempt.');
 
 include_once('./lib/config.php');
 include_once('./lib/functions.php');
+include_once('./lib/class.dlfile.php');
 
 
 if(count($argv) >= 2){
@@ -33,32 +34,41 @@ if(count($argv) >= 2){
 	print "file id: $fileId\n";
 	
 	$dbh = dbConnect();
-	$files = getDbTable($dbh, 'files', "where id = '$fileId' limit 1");
+	$file = new dlfile($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 	$hosters = getDbTable($dbh, 'hosters');
 	dbClose($dbh);
 	
-	if(count($files)){
-		$file = $files[$fileId];
-		print "uri: ".$file['uri']."\n";
+	if($file->loadById($fileId)){
+		#$file = $files[$fileId];
+		print "uri: '".$file->get('uri')."'\n";
 		
 		$thisHoster = null;
 		foreach($hosters as $id => $thisHoster)
-			if(preg_match('/'.$thisHoster['searchPattern'].'/i', $file['uri']))
+			if(preg_match('/'.$thisHoster['searchPattern'].'/i', $file->get('uri')))
 				break;
 		
 		if($thisHoster){
-			include_once('./lib/hoster/'.$thisHoster['phpPath']);
-			
-			if(function_exists('hosterExec'))
-				@hosterExec($file['uri'], $thisHoster);
-			
+			print "hoster found\n";
+			$libThisHosterPath = './lib/hoster/'.$thisHoster['phpPath'];
+			if(file_exists($libThisHosterPath)){
+				include_once($libThisHosterPath);
+				print "hoster plugin loaded\n";
+				
+				if(function_exists('hosterExec'))
+					hosterExec($file, $thisHoster);
+				
+				print "hoster plugin: hosterExec done\n";
+			}
+			else
+				print "ERROR: '$libThisHosterPath' not found\n";
 		}
 		else
-			print "no hoster found\n";
+			print "ERROR: no hoster found\n";
+		
 		
 	}
 	else
-		print "file not found\n";
+		print "ERROR: file not found\n";
 	
 	
 }
