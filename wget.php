@@ -30,7 +30,10 @@ include_once('./lib/class.dlfile.php');
 
 if(count($argv) >= 2){
 	
-	$fileId = $argv[1];
+	$fileId = (int)$argv[1];
+	if(!$fileId)
+		exit();
+	
 	print "file id: $fileId\n";
 	
 	$dbh = dbConnect();
