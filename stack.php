@@ -67,8 +67,9 @@ while(true){
 								print "\tno next file\n";
 						}
 						else{
-							print "\tall files finished ".$packet->filesUnfinished()."\n";
+							print "\tall files finished\n";
 							$packet->save('ftime', mktime());
+							$packet->md5Verify();
 						}
 					}
 				}
