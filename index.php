@@ -94,12 +94,18 @@ else{
 				$users = getDbTable($dbh, 'users');
 				#$packets = getDbTable($dbh, 'packets', "where _user = '".$user->get('id')."'");
 				$packets = getDbTable($dbh, 'packets', "where archive = '0'");
-				dbClose($dbh);
+				
 				
 				$stack = '';
 				foreach($packets as $packetId => $packet){
+					
+					$res = mysql_fetch_assoc(mysql_query("select count(id) c from `files` where _packet = ".$packet['id']." and error != '0'", $dbh));
+					$errors = $res['c'];
+					
 					$class = '';
-					if($packet['stime'])
+					if($errors)
+						$class = 'packetHasError';
+					elseif($packet['stime'])
 						$class = 'packetIsDownloading';
 					
 					$stack .= '
@@ -114,6 +120,8 @@ else{
 					';
 				}
 				$smarty->assign('stack', $stack);
+				
+				dbClose($dbh);
 				
 			}
 			$smarty->display($tpl, $cacheId);

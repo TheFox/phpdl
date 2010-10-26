@@ -86,4 +86,8 @@ img{
 	background-color: #00ff00;
 }
 
+.packetHasError{
+	background-color: #ff0000;
+}
+
 /* EOF */
