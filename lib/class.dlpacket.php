@@ -22,21 +22,76 @@
 
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
+include_once('class.dbh.php');
 include_once('class.dlfile.php');
 
 
-class dlpacket{
+class dlpacket extends dbh{
 	
-	var $dbh;
+	var $files;
 	
-	function __construct($dbh){
+	function __construct($dbHost, $dbName, $dbUser, $dbPass){
+		#print "packet.__construct\n";
+		$this->dbh = null;
+		$this->dbhConfig = array('DB_HOST' => $dbHost, 'DB_NAME' => $dbName, 'DB_USER' => $dbUser, 'DB_PASS' => $dbPass, 'DB_TABLE' => 'packets');
+		$this->data = array();
+		$this->dataChanges = array();
 		
-		$this->dbh = $dbh;
+	}
+	
+	function loadFiles(){
+		#print "packet.loadFiles\n";
+		$res = mysql_query("select id from files where _packet = ".$this->data['id'].";", $this->dbh);
+		while($row = mysql_fetch_assoc($res)){
+			#print "packet.loadFiles ".$row['id']."\n";
+			$newfile = new dlfile($this->dbhConfig['DB_HOST'], $this->dbhConfig['DB_NAME'], $this->dbhConfig['DB_USER'], $this->dbhConfig['DB_PASS']);
+			$newfile->loadById($row['id']);
+			$this->files[$row['id']] = $newfile;
+		}
+		return $this->filesC();
+	}
+	
+	function filesC(){
+		#print "packet.filesC ".count(($this->files))."\n";
+		return count(array_keys($this->files));
+	}
+	
+	function fileErrors(){
+		$this->_dbhCheck();
 		
+		$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$this->data['id']." and error != '0';", $this->dbh));
+		return (int)$res['c'];
+	}
+	
+	function filesUnfinished(){
+		$this->_dbhCheck();
+		
+		$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$this->data['id']." and ftime = '0';", $this->dbh));
+		return (int)$res['c'];
+	}
+	
+	function getFileNextUnfinished(){
+		foreach($this->files as $id => $file)
+			if(!$file->get('stime') && !$file->get('ftime'))
+				return $file;
+		return null;
+	}
+	
+	function md5Verify(){
+		$v = true;
+		foreach($this->files as $id => $file)
+			if(!$file->get('md5Verified')){
+				$v = false;
+				break;
+			}
+		if($v)
+			$this->save('md5Verified', 1);
 	}
 	
 	function __destruct(){
 		// __destruct
+		#print "packet.__destruct ".$this->data['id']."\n";
+		$this->_dbhClose();
 	}
 	
 };
