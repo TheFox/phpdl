@@ -82,3 +82,8 @@ img{
 	text-align: center;
 }
 
+.packetIsDownloading{
+	background-color: #00ff00;
+}
+
+/* EOF */

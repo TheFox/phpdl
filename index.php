@@ -37,6 +37,8 @@ $user->loadBySessionId($_COOKIE['userSessionId']);
 
 
 if($user->isGuest){
+	
+	// Only for non-loggedin users.
 	switch($a){
 		
 		default:
@@ -77,7 +79,7 @@ if($user->isGuest){
 }
 else{
 	
-	// Only for non-loggedin users.
+	
 	switch($a){
 		
 		default:
@@ -87,12 +89,31 @@ else{
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
 				
+				
 				$dbh = dbConnect();
-				$packets = getDbTable($dbh, 'packets', "where _user = '".$user->get('id')."'");
-				#$files = 
+				$users = getDbTable($dbh, 'users');
+				#$packets = getDbTable($dbh, 'packets', "where _user = '".$user->get('id')."'");
+				$packets = getDbTable($dbh, 'packets', "where archive = '0'");
 				dbClose($dbh);
 				
-				$smarty->assign('content', '');
+				$stack = '';
+				foreach($packets as $packetId => $packet){
+					$class = '';
+					if($packet['stime'])
+						$class = 'packetIsDownloading';
+					
+					$stack .= '
+						<tr>
+							<td class="'.$class.'">'.$packet['id'].'</td>
+							<td class="'.$class.'">'.$users[$packet['_user']]['login'].'</td>
+							<td class="'.$class.'">'.$packet['name'].'</td>
+							<td class="'.$class.'">'.date($CONFIG['DATE_FORMAT'], $packet['ctime']).'</td>
+							<td class="'.$class.'">'.($packet['stime'] ? date($CONFIG['DATE_FORMAT'], $packet['stime']) : 'waiting').'</td>
+							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : ($packet['stime'] ? 'downloading' : '&nbsp;')).'</td>
+						</tr>
+					';
+				}
+				$smarty->assign('stack', $stack);
 				
 			}
 			$smarty->display($tpl, $cacheId);
