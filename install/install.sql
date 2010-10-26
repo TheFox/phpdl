@@ -1,4 +1,4 @@
--- Created @ 2010/10/26 20:24:20 by TheFox@fox21.at
+-- Created @ 2010/10/26 23:14:14 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -29,6 +29,8 @@ CREATE TABLE `files` (
   `_packet` int(11) NOT NULL,
   `uri` text NOT NULL,
   `md5` varchar(32) NOT NULL,
+  `md5Verified` enum('0','1') NOT NULL DEFAULT '0',
+  `size` bigint(20) NOT NULL DEFAULT '0',
   `error` smallint(4) NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL DEFAULT '0',
   `stime` int(11) NOT NULL DEFAULT '0',
@@ -51,6 +53,7 @@ CREATE TABLE `packets` (
   `_user` int(11) NOT NULL,
   `name` varchar(256) NOT NULL,
   `archive` enum('0','1') NOT NULL DEFAULT '0',
+  `md5Verified` enum('0','1') NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL DEFAULT '0',
   `stime` int(11) NOT NULL DEFAULT '0',
   `ftime` int(11) NOT NULL DEFAULT '0',
@@ -87,7 +90,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-26 20:24:20
+-- Dump completed on 2010-10-26 23:14:14
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -144,4 +147,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-26 20:24:20
+-- Dump completed on 2010-10-26 23:14:14
