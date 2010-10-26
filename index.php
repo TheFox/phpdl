@@ -26,6 +26,7 @@ define('ANTIHACK', 1);
 include_once('./lib/config.php');
 include_once('./lib/functions.php');
 include_once('./lib/class.user.php');
+include_once('./lib/class.dlfile.php');
 
 
 $a = $_GET['a'];
@@ -99,13 +100,13 @@ else{
 				$stack = '';
 				foreach($packets as $packetId => $packet){
 					
-					$res = mysql_fetch_assoc(mysql_query("select count(id) c from `files` where _packet = ".$packet['id']." and error != '0'", $dbh));
+					$res = mysql_fetch_assoc(mysql_query("select count(id) c from `files` where _packet = ".$packet['id']." and error != '".$DLFILE_ERROR_NO_ERROR."'", $dbh));
 					$errors = $res['c'];
 					
 					$class = '';
 					if($errors)
 						$class = 'packetHasError';
-					elseif($packet['stime'])
+					elseif($packet['stime'] && !$packet['ftime'])
 						$class = 'packetIsDownloading';
 					
 					$stack .= '
@@ -116,6 +117,7 @@ else{
 							<td class="'.$class.'">'.date($CONFIG['DATE_FORMAT'], $packet['ctime']).'</td>
 							<td class="'.$class.'">'.($packet['stime'] ? date($CONFIG['DATE_FORMAT'], $packet['stime']) : 'waiting').'</td>
 							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : ($packet['stime'] ? 'downloading' : '&nbsp;')).'</td>
+							<td class="'.$class.'">'.($packet['md5Verified'] ? 'y' : '&nbsp;').'</td>
 						</tr>
 					';
 				}
