@@ -57,6 +57,7 @@ class dlfile extends dbh{
 	
 	function __destruct(){
 		// __destruct
+		$this->_dbhClose();
 	}
 	
 };
