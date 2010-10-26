@@ -53,10 +53,14 @@ class dbh{
 		return false;
 	}
 	
-	function save(){
+	function save($item = null, $value = null){
 		
-		#print "dbh.save\n";
+		
 		$this->_dbhCheck();
+		#print "dbh.save '$item' = '$value'\n";
+		if($item && $value)
+			$this->set($item, $value);
+		
 		
 		$dataChangesLen = count($this->dataChanges);
 		if($dataChangesLen){
