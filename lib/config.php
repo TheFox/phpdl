@@ -66,7 +66,7 @@ $CONFIG = array(
 	'USER_PASSWORD_SALT' => 'put your unique phrase here',
 	'USER_SESSION_TTL' => 3600 * 24 * 365,
 	
-	'SLOTS' => 1,
+	'DL_SLOTS' => 1,
 	
 );
 
