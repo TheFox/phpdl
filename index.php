@@ -160,12 +160,28 @@ else{
 		
 		case 'dlpacketEditSave':
 			
+			$name = checkInput($_POST['name'], 'a-zA-Z0-9._-', 256);
+			$urlsstr = $_POST['urls'];
+			$urlsstr = str_replace("\r", '', $urlsstr);
+			
+			$urls =  array();
+			foreach(preg_split("/\n/s", $urlsstr) as $url)
+				if($url != '')
+					$urls[] = urlencode($url);
+			
+			$dbh = dbConnect();
 			if($id){
 				// Edit
 			}
 			else{
 				// Add new
+				mysql_query("insert into packets(_user, name, ctime) values ('".$user->get('id')."', '$name', '".mktime()."');", $dbh);
+				$pid = mysql_insert_id($dbh);
+				foreach($urls as $url)
+					#print "insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$pid', '$url', '".mktime()."');<br>";
+					mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$pid', '$url', '".mktime()."');", $dbh);
 			}
+			dbClose($dbh);
 			
 			//header('Location: ?');
 			

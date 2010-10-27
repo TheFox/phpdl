@@ -9,7 +9,7 @@
 		</tr>
 		<tr>
 			<td>Links</td>
-			<td><textarea name="files"></textarea></td>
+			<td><textarea name="urls"></textarea></td>
 		</tr>
 		<tr>
 			<td colspan="2"><input type="submit" value="Save" /></td>
