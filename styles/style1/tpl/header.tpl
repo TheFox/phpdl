@@ -15,7 +15,7 @@
 							<td width="120" valign="top">
 								<span id="navigation">
 									<a href="?">Stack</a><br />
-									<a href="?a=dlpacketEdit">Add Packet</a><br />
+									<a href="?a=dlpacketEdit">Add</a><br />
 								</span>
 							</td>
 							<td class="content">

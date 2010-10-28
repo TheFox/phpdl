@@ -26,6 +26,7 @@ define('ANTIHACK', 1);
 include_once('./lib/config.php');
 include_once('./lib/functions.php');
 include_once('./lib/class.user.php');
+include_once('./lib/class.dlpacket.php');
 include_once('./lib/class.dlfile.php');
 
 
@@ -113,7 +114,7 @@ else{
 						<tr>
 							<td class="'.$class.'">'.$packet['id'].'</td>
 							<td class="'.$class.'">'.$users[$packet['_user']]['login'].'</td>
-							<td class="'.$class.'">'.$packet['name'].'</td>
+							<td class="'.$class.'"><a href="?a=dlpacketEdit&amp;id='.$packet['id'].'">'.$packet['name'].'</a></td>
 							<td class="'.$class.'">'.date($CONFIG['DATE_FORMAT'], $packet['ctime']).'</td>
 							<td class="'.$class.'">'.($packet['stime'] ? date($CONFIG['DATE_FORMAT'], $packet['stime']) : 'waiting').'</td>
 							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : ($packet['stime'] ? 'downloading' : '&nbsp;')).'</td>
@@ -137,20 +138,34 @@ else{
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
 				
+				$error = '';
+				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+				if($packet->loadById($id))
+					if($user->get('id') != $packet->get('_user'))
+						$error .= 'This packet is owned by another user.<br />';
+				
 				$dbh = dbConnect();
-				dbClose($dbh);
+				$files = getDbTable($dbh, 'files', "where _packet = '$id' order by id");
 				
 				$filesOut = '';
 				if($id){
 					// Edit
-				}
-				else{
-					// Add new
+					$packet = mysql_fetch_assoc(mysql_query("select * from packets where id = '$id' limit 1;"));
+					$smarty->assign('nameValue', $packet['name']);
+					$smarty->assign('nameDisabled', 'disabled="disabled"');
+					foreach($files as $fileId => $file)
+						$filesOut .= $file['uri']."\n";
 				}
 				
+				dbClose($dbh);
 				
 				$smarty->assign('id', $id);
 				$smarty->assign('files', $filesOut);
+				$smarty->assign('error', $error != '' ? '
+					<tr>
+						<td colspan="2" class="packetHasError">'.$error.'</td>
+					</tr>
+				' : '');
 				
 			}
 			$smarty->display($tpl, $cacheId);
@@ -172,18 +187,50 @@ else{
 			$dbh = dbConnect();
 			if($id){
 				// Edit
+				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+				if($packet->loadById($id)){
+					
+					if($user->get('id') != $packet->get('_user'))
+						exit();
+					
+					$files = getDbTable($dbh, 'files', "where _packet = '$id'");
+					foreach($files as $fileId => $file)
+						foreach($urls as $urlNum => $url)
+							if($file['uri'] == $url){
+								$files[$fileId]['__hold'] = true;
+								break;
+							}
+					
+					foreach($files as $fileId => $file)
+						if(!isset($file['__hold']))
+							mysql_query("delete from files where id = '".$file['id']."' limit 1;", $dbh);
+					
+					// Add new
+					foreach($urls as $urlNum => $url){
+						$found = false;
+						foreach($files as $fileId => $file)
+							if($file['uri'] == $url){
+								$found = true;
+								break;
+							}
+						
+						if(!$found)
+							mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$id', '$url', '".mktime()."');", $dbh);
+						
+					}
+					
+				}
 			}
 			else{
 				// Add new
 				mysql_query("insert into packets(_user, name, ctime) values ('".$user->get('id')."', '$name', '".mktime()."');", $dbh);
 				$pid = mysql_insert_id($dbh);
 				foreach($urls as $url)
-					#print "insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$pid', '$url', '".mktime()."');<br>";
 					mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$pid', '$url', '".mktime()."');", $dbh);
 			}
 			dbClose($dbh);
 			
-			//header('Location: ?');
+			header('Location: ?');
 			
 		break;
 		
