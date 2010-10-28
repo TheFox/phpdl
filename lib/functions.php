@@ -135,20 +135,21 @@ function dbConnect(){
 	return $dbh;
 }
 
-function dbClose(){
-	mysql_close();
+function dbClose($dbh){
+	if($dbh)
+		if(!@mysql_close($dbh))
+			error("mysql_close error", true);
 }
 
 function getDbTable($dbh, $table, $where = ''){
 	$rv = array();
 	$sql = "select * from $table $where;";
 	$res = mysql_query($sql, $dbh);
-	if($res){
+	if($res)
 		while($row = mysql_fetch_assoc($res))
 			$rv[$row['id']] = $row;
-	}
 	else
-		error("mysqli_query error: '$sql'", true, 1);
+		error("mysql_query error: '$sql'", true, 1);
 	
 	return $rv;
 }
