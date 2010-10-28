@@ -1,4 +1,4 @@
--- Created @ 2010/10/26 23:14:14 by TheFox@fox21.at
+-- Created @ 2010/10/28 20:14:27 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -90,7 +90,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-26 23:14:14
+-- Dump completed on 2010-10-28 20:14:28
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -147,4 +147,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-26 23:14:14
+-- Dump completed on 2010-10-28 20:14:28
