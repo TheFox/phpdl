@@ -14,6 +14,7 @@ Install
 	3. Set up your mysql server.
 	4. Set up your mysql access in lib/config.php.
 	5. Import install/install.sql to your database.
+		mysql --user=phpdl --password=7NuW5RCtuGDEazHz --default_character_set utf8 --database=phpdl < install/install.sql
 	6. ./install/install.sh
 
 # EOF
