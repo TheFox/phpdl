@@ -9,7 +9,7 @@
 		<td>ctime</td>
 		<td>stime</td>
 		<td>ftime</td>
-		<td>verified</td>
+		<td>status</td>
 	</tr>
 	{$stack}
 </table>

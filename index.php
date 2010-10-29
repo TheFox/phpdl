@@ -110,15 +110,25 @@ else{
 					elseif($packet['stime'] && !$packet['ftime'])
 						$class = 'packetIsDownloading';
 					
+					$status = array();
+					if($packet['md5Verified'])
+						$status[] = 'verified';
+					if(!$packet['stime'])
+						$status[] = 'waiting';
+					elseif($packet['stime'] && !$packet['ftime'])
+						$status[] = 'downloading';
+					elseif($packet['stime'] && $packet['ftime'])
+						$status[] = 'finished';
+					
 					$stack .= '
 						<tr>
 							<td class="'.$class.'">'.$packet['id'].'</td>
 							<td class="'.$class.'">'.$users[$packet['_user']]['login'].'</td>
 							<td class="'.$class.'"><a href="?a=dlpacketEdit&amp;id='.$packet['id'].'">'.$packet['name'].'</a></td>
 							<td class="'.$class.'">'.date($CONFIG['DATE_FORMAT'], $packet['ctime']).'</td>
-							<td class="'.$class.'">'.($packet['stime'] ? date($CONFIG['DATE_FORMAT'], $packet['stime']) : 'waiting').'</td>
-							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : ($packet['stime'] ? 'downloading' : '&nbsp;')).'</td>
-							<td class="'.$class.'">'.($packet['md5Verified'] ? 'y' : '&nbsp;').'</td>
+							<td class="'.$class.'">'.($packet['stime'] ? date($CONFIG['DATE_FORMAT'], $packet['stime']) : '&nbsp;').'</td>
+							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : '&nbsp;').'</td>
+							<td class="'.$class.'">'.join(', ', $status).'</td>
 						</tr>
 					';
 				}
