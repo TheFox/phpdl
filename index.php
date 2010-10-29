@@ -192,7 +192,7 @@ else{
 			$urls =  array();
 			foreach(preg_split("/\n/s", $urlsstr) as $url)
 				if($url != '')
-					$urls[] = urlencode($url);
+					$urls[] = preg_replace('/["\']/', '', $url);
 			
 			$dbh = dbConnect();
 			if($id){
