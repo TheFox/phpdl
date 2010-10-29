@@ -8,4 +8,10 @@ Description
 	similar). You can install PHPDL on your webserver and manage the downloads over the web interface.
 	In the background there is a other script running which is downloading the files.
 
+Install
+	1. git clone git://github.com/TheFox/phpdl.git phpdl
+	2. cd phpdl
+	3. Setup your mysql server.
+	4. ./install/install.sh
+
 # EOF
