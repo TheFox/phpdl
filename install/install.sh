@@ -10,7 +10,7 @@ DATE=`date +"%Y/%m/%d %H:%M:%S"`
 echo install
 pwd
 
-mkdir cache tmp
+mkdir cache tmp downloads
 chmod 777 cache tmp
 
 echo done
