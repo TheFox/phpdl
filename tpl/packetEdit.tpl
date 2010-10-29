@@ -19,6 +19,10 @@
 			<td><input type="text" name="source" value="{$source}" /></td>
 		</tr>
 		<tr>
+			<td width="120">Password</td>
+			<td><input type="text" name="password" value="{$password}" /></td>
+		</tr>
+		<tr>
 			<td colspan="2">{$save}</td>
 		</tr>
 	</table>
