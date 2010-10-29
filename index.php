@@ -33,6 +33,7 @@ include_once('./lib/class.dlfile.php');
 $a = $_GET['a']; # action
 $sa = checkInput($_GET['sa'], 'a-z0-9', 32); # subaction
 $id = (int)$_GET['id'];
+$noredirect = (int)$_GET['noredirect'] == 1;
 $smarty = smartyNew();
 
 $user = new user($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
@@ -129,7 +130,7 @@ else{
 							<td class="'.$class.'">'.($packet['stime'] ? date($CONFIG['DATE_FORMAT'], $packet['stime']) : '&nbsp;').'</td>
 							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : '&nbsp;').'</td>
 							<td class="'.$class.'">'.join(', ', $status).'</td>
-							<td class="'.$class.'"><input id="button'.$packet['id'].'" type="button" value="-" onClick="packetDel('.$packet['id'].');" /></td>
+							<td class="'.$class.'" align="center">'.($packet['_user'] == $user->get('id') ? '<input id="packetArchiveButton'.$packet['id'].'" type="button" value="-" onClick="packetArchive('.$packet['id'].');" />' : '').'</td>
 						</tr>
 					';
 				}
@@ -252,6 +253,27 @@ else{
 			dbClose($dbh);
 			
 			header('Location: ?');
+			
+		break;
+		
+		case 'packetArchive':
+			
+			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+			if($packet->loadById($id)){
+				
+				if($user->get('id') != $packet->get('_user') || $packet->filesDownloading())
+					exit();
+				
+				#mysql_query("delete from files where _packet = '$id';");
+				#mysql_query("delete from packets where id = '$id' limit 1;");
+				
+				mysql_query("update packets set archive = '1' where id = '$id' limit 1;");
+				
+			}
+			
+			
+			if(!$noredirect)
+				header('Location: ?');
 			
 		break;
 		

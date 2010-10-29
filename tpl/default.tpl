@@ -3,19 +3,20 @@
 
 <script type="text/javascript">
 	
-	function packetDel(id){
-		var button = $('#button' + id);
+	function packetArchive(id){
+		var button = $('#packetArchiveButton' + id);
 		button.hide();
 		$.ajax({
 			type: 'GET',
-			url: '?a=packetDel&id=' + id + '&noredirect=1',
+			url: '?a=packetArchive&id=' + id + '&noredirect=1',
 			success: function(){
-				$('#tr' + id).hide();
-				$('#tr' + id).remove();
+				var packetTr = $('#packetTr' + id);
+				packetTr.hide();
+				packetTr.remove();
 				
 				var div = $('<div>');
-				div.css('background-color', '#00cc00');
-				div.html('Packet (' + id + ') successfully deleted.');
+				div.css('background-color', '#00ff00');
+				div.html('Packet (' + id + ') successfully archived.');
 				div.hide();
 				$('#status').append(div);
 				div.slideDown('slow', function(){
@@ -41,7 +42,7 @@
 		<td>stime</td>
 		<td>ftime</td>
 		<td>status</td>
-		<td>del</td>
+		<td>archive</td>
 	</tr>
 	{$stack}
 </table>
