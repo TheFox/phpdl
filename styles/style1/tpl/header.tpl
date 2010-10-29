@@ -19,7 +19,7 @@
 									<br />
 									Tools<br />
 									<a href="?a=container&amp;c=rsdf">RSDF</a><br />
-									<a href="?a=container&amp;c=rsdf">DLC</a><br />
+									<a href="?a=container&amp;c=dlc">DLC</a><br />
 								</span>
 							</td>
 							<td class="content">
