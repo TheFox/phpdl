@@ -166,6 +166,8 @@ else{
 					
 						$smarty->assign('nameValue', $packet->get('name'));
 						$smarty->assign('nameDisabled', 'disabled="disabled"');
+						$smarty->assign('source', $packet->get('source'));
+						
 						if($packet->loadFiles())
 							foreach($packet->files as $fileId => $file)
 								$filesOut .= $file->get('uri')."\n";
@@ -206,6 +208,8 @@ else{
 				if($url != '')
 					$urls[] = preg_replace('/["\']/', '', $url);
 			
+			$source = preg_replace('/["\']/', '', $_POST['source']);
+			
 			$dbh = dbConnect();
 			if($id){
 				// Edit
@@ -241,11 +245,13 @@ else{
 						
 					}
 					
+					mysql_query("update packets set source = '$source' where id = '$id' limit 1;");
+					
 				}
 			}
 			else{
 				// Add new
-				mysql_query("insert into packets(_user, name, ctime) values ('".$user->get('id')."', '$name', '".mktime()."');", $dbh);
+				mysql_query("insert into packets(_user, name, source, ctime) values ('".$user->get('id')."', '$name', '$source', '".mktime()."');", $dbh);
 				$pid = mysql_insert_id($dbh);
 				foreach($urls as $url)
 					mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$pid', '$url', '".mktime()."');", $dbh);

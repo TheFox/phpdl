@@ -28,7 +28,7 @@ $CONFIG = array(
 	'DB_HOST' => 'localhost',
 	'DB_NAME' => 'phpdl',
 	'DB_USER' => 'phpdl',
-	'DB_PASS' => '7NuW5RCtuGDEazHz',
+	'DB_PASS' => '7NuW5RCtuGDEazHz', # TODO: clean for stable version.
 	
 	'SITE_HOST' => '',
 	'SITE_NAME' => 'PHP Downloader',

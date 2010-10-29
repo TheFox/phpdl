@@ -15,6 +15,10 @@
 			<td><textarea name="urls" rows="20" cols="60">{$files}</textarea></td>
 		</tr>
 		<tr>
+			<td width="120">Source (URL, ...)</td>
+			<td><input type="text" name="source" value="{$source}" /></td>
+		</tr>
+		<tr>
 			<td colspan="2">{$save}</td>
 		</tr>
 	</table>
