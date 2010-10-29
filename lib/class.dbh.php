@@ -98,7 +98,7 @@ class dbh{
 		$this->dbh = @mysql_connect($this->dbhConfig['DB_HOST'], $this->dbhConfig['DB_USER'], $this->dbhConfig['DB_PASS']);
 		if(!$this->dbh)
 			die('ERROR: no connection to database [1]');
-		@mysql_select_db($this->dbhConfig['DB_NAME'], $this->dbh);
+		mysql_select_db($this->dbhConfig['DB_NAME'], $this->dbh);
 	}
 	
 	function _dbhCheck(){

@@ -77,7 +77,7 @@ class user extends dbh{
 					$sessionId = md5($_SERVER['REMOTE_ADDR'].rand(1, 999999).((float)$usec + (float)$sec));
 					$this->set('sessionId', $sessionId);
 					$this->save();
-				}	
+				}
 		}
 		return $this->get('sessionId') != '';
 	}
