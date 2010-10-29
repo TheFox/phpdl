@@ -11,7 +11,9 @@ Description
 Install
 	1. git clone git://github.com/TheFox/phpdl.git phpdl
 	2. cd phpdl
-	3. Setup your mysql server.
-	4. ./install/install.sh
+	3. Set up your mysql server.
+	4. Set up your mysql access in lib/config.php.
+	5. Import install/install.sql to your database.
+	6. ./install/install.sh
 
 # EOF
