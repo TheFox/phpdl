@@ -95,8 +95,7 @@ else{
 				$dbh = dbConnect();
 				$users = getDbTable($dbh, 'users');
 				#$packets = getDbTable($dbh, 'packets', "where _user = '".$user->get('id')."'");
-				$packets = getDbTable($dbh, 'packets', "where archive = '0'");
-				
+				$packets = getDbTable($dbh, 'packets', "where archive = '0' order by id");
 				
 				$stack = '';
 				foreach($packets as $packetId => $packet){
@@ -140,32 +139,37 @@ else{
 				
 				$error = '';
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
-				if($packet->loadById($id))
-					if($user->get('id') != $packet->get('_user'))
-						$error .= 'This packet is owned by another user.<br />';
-				
-				$dbh = dbConnect();
-				$files = getDbTable($dbh, 'files', "where _packet = '$id' order by id");
 				
 				$filesOut = '';
 				if($id){
 					// Edit
-					$packet = mysql_fetch_assoc(mysql_query("select * from packets where id = '$id' limit 1;"));
-					$smarty->assign('nameValue', $packet['name']);
-					$smarty->assign('nameDisabled', 'disabled="disabled"');
-					foreach($files as $fileId => $file)
-						$filesOut .= $file['uri']."\n";
+					if($packet->loadById($id)){
+						if($user->get('id') != $packet->get('_user'))
+							$error .= '<li>This packet is owned by another user.</li>';
+						if($packet->filesDownloading())
+							$error .= '<li>You can not modify a downloading packet.</li>';
+						if($packet->get('ftime'))
+							$error .= '<li>You can not modify a finished packet.</li>';
+					
+						$smarty->assign('nameValue', $packet->get('name'));
+						$smarty->assign('nameDisabled', 'disabled="disabled"');
+						if($packet->loadFiles())
+							foreach($packet->files as $fileId => $file)
+								$filesOut .= $file->get('uri')."\n";
+					}
 				}
-				
-				dbClose($dbh);
 				
 				$smarty->assign('id', $id);
 				$smarty->assign('files', $filesOut);
-				$smarty->assign('error', $error != '' ? '
-					<tr>
-						<td colspan="2" class="packetHasError">'.$error.'</td>
-					</tr>
-				' : '');
+				if($error != ''){
+					$smarty->assign('error', '<ul>'.$error.'</ul>');
+				}
+				else{
+					$smarty->assign('formBegin', '<form action="?a=dlpacketEditSave&amp;id='.$id.'" method="post">');
+					$smarty->assign('formEnd', '</form>');
+					$smarty->assign('save', '<input type="submit" value="Save" />');
+					
+				}
 				
 			}
 			$smarty->display($tpl, $cacheId);
@@ -176,6 +180,9 @@ else{
 		case 'dlpacketEditSave':
 			
 			$name = checkInput($_POST['name'], 'a-zA-Z0-9._-', 256);
+			if($name == '')
+				$name = 'noname';
+			
 			$urlsstr = $_POST['urls'];
 			$urlsstr = str_replace("\r", '', $urlsstr);
 			
@@ -190,7 +197,7 @@ else{
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				if($packet->loadById($id)){
 					
-					if($user->get('id') != $packet->get('_user'))
+					if($user->get('id') != $packet->get('_user') || $packet->filesDownloading() || $packet->get('ftime'))
 						exit();
 					
 					$files = getDbTable($dbh, 'files', "where _packet = '$id'");

@@ -70,6 +70,13 @@ class dlpacket extends dbh{
 		return (int)$res['c'];
 	}
 	
+	function filesDownloading(){
+		$this->_dbhCheck();
+		
+		$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$this->data['id']." and stime != '0' and ftime = '0';", $this->dbh));
+		return (int)$res['c'];
+	}
+	
 	function getFileNextUnfinished(){
 		foreach($this->files as $id => $file)
 			if(!$file->get('stime') && !$file->get('ftime'))
