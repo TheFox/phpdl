@@ -30,7 +30,8 @@ include_once('./lib/class.dlpacket.php');
 include_once('./lib/class.dlfile.php');
 
 
-$a = $_GET['a'];
+$a = $_GET['a']; # action
+$sa = checkInput($_GET['sa'], 'a-z0-9', 32); # subaction
 $id = (int)$_GET['id'];
 $smarty = smartyNew();
 
@@ -158,6 +159,8 @@ else{
 								$filesOut .= $file->get('uri')."\n";
 					}
 				}
+				else
+					$filesOut = $_POST['files'];
 				
 				$smarty->assign('id', $id);
 				$smarty->assign('files', $filesOut);
@@ -238,6 +241,58 @@ else{
 			dbClose($dbh);
 			
 			header('Location: ?');
+			
+		break;
+		
+		case 'container':
+			
+			$container = checkInput($_GET['c'], 'a-z0-9', 8);
+			$containerLibPath = './lib/container/container.'.$container.'.php';
+			
+			$tpl = $a.'.tpl';
+			$cacheId = $a;
+			if(!$smarty->isCached($tpl, $cacheId)){
+				smartyAssignStd($smarty);
+				
+				$error = '';
+				if(!file_exists($containerLibPath))
+					$error .= '<li>Container path "'.$containerLibPath.'" does not exist.</li>';
+				
+				$smarty->assign('container', $container);
+				$smarty->assign('error', $error != '' ? '
+					<tr>
+						<td colspan="2" class="msgError"><ul>'.$error.'</ul></td>
+					</tr>
+				' : '');
+				
+				if($sa == 'exec'){
+					if(file_exists($containerLibPath)){
+						include_once($containerLibPath);
+						
+						$content = $_POST['content'];
+						$contentPlain = '';
+						
+						if($content == '')
+							if(isset($_FILES['file']))
+								if($_FILES['file']['size'] > 0 && $_FILES['file']['error'] == 0)
+									$content = file_get_contents($_FILES['file']['tmp_name']);
+						
+						if($content != '')
+							$contentPlain = containerExec($content);
+						
+						$smarty->assign('contentPlain', $contentPlain != '' ? '
+							<tr><td colspan="2">&nbsp;</td></tr>
+							
+							<form action="?a=dlpacketEdit" method="post">
+								<tr><td colspan="2"><textarea name="files" rows="20" cols="60">'.$contentPlain.'</textarea></td></tr>
+								<tr><td colspan="2"><input type="submit" value="Assume to a new packet"></td></tr>
+							</form>
+						' : '');
+					}
+				}
+				
+			}
+			$smarty->display($tpl, $cacheId);
 			
 		break;
 		

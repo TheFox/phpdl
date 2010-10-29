@@ -16,6 +16,10 @@
 								<span id="navigation">
 									<a href="?">Stack</a><br />
 									<a href="?a=dlpacketEdit">Add</a><br />
+									<br />
+									Tools<br />
+									<a href="?a=container&amp;c=rsdf">RSDF</a><br />
+									<a href="?a=container&amp;c=rsdf">DLC</a><br />
 								</span>
 							</td>
 							<td class="content">
