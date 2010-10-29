@@ -121,14 +121,15 @@ else{
 						$status[] = 'finished';
 					
 					$stack .= '
-						<tr>
+						<tr id="packetTr'.$packet['id'].'">
 							<td class="'.$class.'">'.$packet['id'].'</td>
 							<td class="'.$class.'">'.$users[$packet['_user']]['login'].'</td>
-							<td class="'.$class.'"><a href="?a=dlpacketEdit&amp;id='.$packet['id'].'">'.$packet['name'].'</a></td>
+							<td class="'.$class.'"><a href="?a=packetEdit&amp;id='.$packet['id'].'">'.$packet['name'].'</a></td>
 							<td class="'.$class.'">'.date($CONFIG['DATE_FORMAT'], $packet['ctime']).'</td>
 							<td class="'.$class.'">'.($packet['stime'] ? date($CONFIG['DATE_FORMAT'], $packet['stime']) : '&nbsp;').'</td>
 							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : '&nbsp;').'</td>
 							<td class="'.$class.'">'.join(', ', $status).'</td>
+							<td class="'.$class.'"><input id="button'.$packet['id'].'" type="button" value="-" onClick="packetDel('.$packet['id'].');" /></td>
 						</tr>
 					';
 				}
@@ -141,7 +142,7 @@ else{
 			
 		break;
 		
-		case 'dlpacketEdit':
+		case 'packetEdit':
 			
 			$tpl = $a.'.tpl';
 			$cacheId = $a;
@@ -178,7 +179,7 @@ else{
 					$smarty->assign('error', '<ul>'.$error.'</ul>');
 				}
 				else{
-					$smarty->assign('formBegin', '<form action="?a=dlpacketEditSave&amp;id='.$id.'" method="post">');
+					$smarty->assign('formBegin', '<form action="?a=packetEditSave&amp;id='.$id.'" method="post">');
 					$smarty->assign('formEnd', '</form>');
 					$smarty->assign('save', '<input type="submit" value="Save" />');
 					
@@ -190,7 +191,7 @@ else{
 			
 		break;
 		
-		case 'dlpacketEditSave':
+		case 'packetEditSave':
 			
 			$name = checkInput($_POST['name'], 'a-zA-Z0-9._-', 256);
 			if($name == '')
@@ -291,7 +292,7 @@ else{
 							$contentPlain = containerExec($content);
 						
 						$smarty->assign('contentPlain', $contentPlain != '' ? '
-							<form action="?a=dlpacketEdit" method="post">
+							<form action="?a=packetEdit" method="post">
 								<tr><td colspan="2"><textarea name="files" rows="20" cols="60">'.$contentPlain.'</textarea></td></tr>
 								<tr><td colspan="2"><input type="submit" value="Assume to a new packet"></td></tr>
 							</form>

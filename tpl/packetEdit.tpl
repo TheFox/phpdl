@@ -1,4 +1,4 @@
-<!-- BEGIN OF dlpacketEdit.tpl //-->
+<!-- BEGIN OF packetEdit.tpl //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 {$formBegin}
@@ -21,4 +21,4 @@
 {$formEnd}
 
 {include file="{$siteStyleTplDir}/footer.tpl"}
-<!-- END OF dlpacketEdit.tpl //-->
+<!-- END OF packetEdit.tpl //-->

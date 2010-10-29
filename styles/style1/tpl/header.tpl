@@ -15,7 +15,7 @@
 							<td width="120" valign="top">
 								<span id="navigation">
 									<a href="?">Stack</a><br />
-									<a href="?a=dlpacketEdit">Add</a><br />
+									<a href="?a=packetEdit">Add</a><br />
 									<br />
 									Tools<br />
 									<a href="?a=container&amp;c=rsdf">RSDF</a><br />

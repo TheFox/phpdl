@@ -87,8 +87,8 @@ while(true){
 	dbClose($dbh);
 	
 	
-	print "sleep 1\n\n";
-	sleep(1);
+	print "sleep 5\n\n";
+	sleep(5);
 }
 
 ?>
