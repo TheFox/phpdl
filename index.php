@@ -281,12 +281,11 @@ else{
 							$contentPlain = containerExec($content);
 						
 						$smarty->assign('contentPlain', $contentPlain != '' ? '
-							<tr><td colspan="2">&nbsp;</td></tr>
-							
 							<form action="?a=dlpacketEdit" method="post">
 								<tr><td colspan="2"><textarea name="files" rows="20" cols="60">'.$contentPlain.'</textarea></td></tr>
 								<tr><td colspan="2"><input type="submit" value="Assume to a new packet"></td></tr>
 							</form>
+							<tr><td colspan="2">&nbsp;</td></tr>
 						' : '');
 					}
 				}

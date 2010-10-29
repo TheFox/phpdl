@@ -3,6 +3,7 @@
 
 
 <table border="1" cellpadding="0" cellspacing="4" width="100%">
+	{$contentPlain}
 	<form action="?a=container&amp;sa=exec&amp;c={$container}" method="post" enctype="multipart/form-data">
 	{$error}
 	<tr>
@@ -21,7 +22,6 @@
 		<td colspan="2"><input type="submit" value="Open" /></td>
 	</tr>
 	</form>
-	{$contentPlain}
 </table>
 
 
