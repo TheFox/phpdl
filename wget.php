@@ -31,10 +31,15 @@ include_once('./lib/class.dlfile.php');
 if(count($argv) >= 2){
 	
 	$fileId = (int)$argv[1];
+	$downloadDir = '';
+	
 	if(!$fileId)
 		exit();
+	if(isset($argv[2]))
+		$downloadDir = $argv[2];
 	
 	print "file id: $fileId\n";
+	print "download dir: '$downloadDir'\n";
 	
 	$dbh = dbConnect();
 	$file = new dlfile($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
@@ -57,8 +62,11 @@ if(count($argv) >= 2){
 				include_once($libThisHosterPath);
 				print "hoster plugin loaded\n";
 				
-				if(function_exists('hosterExec'))
-					hosterExec($file, $thisHoster);
+				if(function_exists('hosterExec')){
+					$filePath = hosterExec($file, $thisHoster);
+					if($filePath != '' && $downloadDir != '')
+						rename($filePath, $downloadDir.'/'.basename($filePath));
+				}
 				
 				print "hoster plugin: hosterExec done\n";
 			}

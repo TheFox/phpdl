@@ -25,6 +25,7 @@ if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 function hosterExec($file, $thisHoster){
 	global $CONFIG;
+	$retval = '';
 	$rapidpro = $thisHoster['user'] != '' && $thisHoster['password'] != '';
 	
 	print "hoster.rapidshare-com.php hosterExec '".$file->get('uri')."'\n";
@@ -92,8 +93,11 @@ function hosterExec($file, $thisHoster){
 					$file->set('error', $error);
 					print "ERROR: ".getDlFileErrorMsg($error)."\n";
 				}
-				else
-					rename($tmpfile, './downloads/'.$filename);
+				else{
+					$newfilePath = './downloads/'.$filename;
+					rename($tmpfile, $newfilePath);
+					$retval = $newfilePath;
+				}
 				
 				$file->set('size', $size);
 				
@@ -108,6 +112,8 @@ function hosterExec($file, $thisHoster){
 		}
 		#unlink($tmp);
 	}
+	
+	return $retval;
 }
 
 ?>

@@ -47,10 +47,12 @@ while(true){
 				print "packet ".$packet->get('id')."\n";
 				if(!$packet->fileErrors() && !$packet->get('ftime')){
 					if($packet->loadFiles()){
+						
 						if($packet->filesUnfinished()){
 							
-							if(!$packet->get('stime'))
+							if(!$packet->get('stime')){
 								$packet->save('stime', mktime());
+							}
 							
 							if($nextfile = $packet->getFileNextUnfinished()){
 								$nextfile->set('error', $DLFILE_ERROR_NO_ERROR);
@@ -58,8 +60,13 @@ while(true){
 								$nextfile->set('ftime', 0);
 								$nextfile->save();
 								
+								$packetDownloadDir = 'downloads/'.$packet->get('id').'.'.strtolower($packet->get('name'));
+								$packetDownloadDir = str_replace(' ', '.', $packetDownloadDir);
+								if(!file_exists($packetDownloadDir))
+									mkdir($packetDownloadDir);
+								
 								print "\tstart download ".$nextfile->get('id')."\n";
-								system('php wget.php '.$nextfile->get('id').' &> /dev/null &');
+								system('php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" &> /dev/null &');
 								
 								break;
 							}
