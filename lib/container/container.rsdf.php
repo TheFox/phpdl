@@ -39,14 +39,12 @@ function containerExec($content){
 	$IV_HEX  = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
 	$KEY_HEX = '8C35192D964DC3182C6F84F3252239EB4A320D2500000000';
 	
-	$iv = hex2bin($IV_HEX);
 	$key = hex2bin($KEY_HEX);
-	$iv2 = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $iv, MCRYPT_MODE_ECB, '0000000000000000');
+	$iv2 = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, hex2bin($IV_HEX), MCRYPT_MODE_ECB, '0000000000000000');
 	
 	
 	$content = hex2bin($content);
 	$links = explode("\r\n", $content);
-	$out = '';
 	
 	foreach($links as $link){
 		if(strlen($link) != 0){
@@ -54,7 +52,7 @@ function containerExec($content){
 			$dec = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $b64, MCRYPT_MODE_CFB, $iv2);
 			$dec = substr($dec, strpos($dec, '/files/')); # Ugly solution - lol ;P
 			if($dec != '')
-				$out .= "http://rapidshare.com$dec\n";
+				$retval .= "http://rapidshare.com$dec\n";
 			
 		}
 	}
