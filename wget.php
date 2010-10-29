@@ -62,7 +62,7 @@ if(count($argv) >= 2){
 				include_once($libThisHosterPath);
 				print "hoster plugin loaded\n";
 				
-				if(function_exists('hosterExec')){
+				if(function_exists('hosterExec') && preg_match('/^http:/', $file->get('uri'))){
 					$filePath = hosterExec($file, $thisHoster);
 					if($filePath != '' && $downloadDir != '')
 						rename($filePath, $downloadDir.'/'.basename($filePath));
