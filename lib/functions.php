@@ -25,7 +25,7 @@
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 // Smarty >= 3.0b8
-include_once('smarty/Smarty-3.0rc4/Smarty.class.php');
+include_once('smarty/smarty.php');
 
 if(file_exists('./config.php'))
 	include_once('./config.php');
