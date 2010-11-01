@@ -198,6 +198,8 @@ else{
 							$error .= '<li>You can not modify a downloading packet.</li>';
 						if($packet->get('ftime'))
 							$error .= '<li>You can not modify a finished packet.</li>';
+						if($packet->get('archive'))
+							$error .= '<li>This packet is archived.</li>';
 					
 						$smarty->assign('nameValue', $packet->get('name'));
 						$smarty->assign('nameDisabled', 'disabled="disabled"');
@@ -288,10 +290,11 @@ else{
 			}
 			else{
 				// Add new
-				mysql_query("insert into packets(_user, name, source, password, ctime) values ('".$user->get('id')."', '$name', '$source', '$password', '".mktime()."');", $dbh);
+				mysql_query("insert into packets(_user, name, archive, source, password, ctime) values ('".$user->get('id')."', '$name', '1', '$source', '$password', '".mktime()."');", $dbh);
 				$pid = mysql_insert_id($dbh);
 				foreach($urls as $url)
 					mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$pid', '$url', '".mktime()."');", $dbh);
+				mysql_query("update packets set archive = '0' where id = '$pid' limit 1;");
 			}
 			dbClose($dbh);
 			
