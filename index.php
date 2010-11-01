@@ -234,7 +234,8 @@ else{
 		
 		case 'packetEditSave':
 			
-			$name = checkInput($_POST['name'], 'a-zA-Z0-9._-', 256);
+			$name = checkInput($_POST['name'], 'a-zA-Z0-9._ -', 256);
+			$name = str_replace(' ', '-', $name);
 			if($name == '')
 				$name = 'noname';
 			
