@@ -12,7 +12,7 @@ GZIPF="$TARF.gz"
 
 #echo "$DATE $USER" >> $LOG
 rm -f $TARF $GZIPF
-tar -vcf $TARF install lib styles tpl img build index.php stack.php wget.php LICENSE README
+tar -vcf $TARF install lib styles tpl img build startstack index.php stack.php wget.php LICENSE README
 gzip $TARF
 
 # EOF
