@@ -33,7 +33,7 @@
 </script>
 
 <table border="1">
-	<tr><td colspan="8"><div id="status"></div></td></tr>
+	<tr><td colspan="8"><div id="status">{$status}</div></td></tr>
 	<tr>
 		<td>id</td>
 		<td>user</td>
