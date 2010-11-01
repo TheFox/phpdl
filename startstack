@@ -1,0 +1,10 @@
+#!/bin/sh
+# Created @ 01.11.2010 by TheFox@fox21.at
+
+export DATE
+DATE=`date +"%Y%m%d"`
+
+
+php stack.php 1>> log/stack.$DATE.log 2>>&1 &
+
+# EOF
