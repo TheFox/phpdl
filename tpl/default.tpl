@@ -30,6 +30,15 @@
 		});
 	}
 	
+	$(document).ready(function(){
+		
+		// autorefresh
+		setTimeout(function(){
+			document.location.href = '?';
+		}, 30000);
+		
+	});
+	
 </script>
 
 <table border="1">
