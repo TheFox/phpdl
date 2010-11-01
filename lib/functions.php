@@ -137,8 +137,7 @@ function dbConnect(){
 
 function dbClose($dbh){
 	if($dbh)
-		if(!@mysql_close($dbh))
-			error("mysql_close error", true);
+		@mysql_close($dbh);
 }
 
 function getDbTable($dbh, $table, $where = ''){
