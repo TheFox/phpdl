@@ -23,7 +23,7 @@
 define('ANTIHACK', 1);
 
 
-$SESSION_TTL = 3600 * 24 * 10;
+$SESSION_TTL = 900;
 $SMARTY_PATH = '../lib/smarty/smarty.php';
 $CONFIG_PATH = '../lib/config.php';
 $CONFIG_TPL_PATH = 'config.php.tpl';
