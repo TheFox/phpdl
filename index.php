@@ -308,7 +308,7 @@ else{
 			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 			if($packet->loadById($id)){
 				
-				if($user->get('id') != $packet->get('_user') || $packet->filesDownloading())
+				if($user->get('id') != $packet->get('_user'))
 					exit();
 				
 				#mysql_query("delete from files where _packet = '$id';");
