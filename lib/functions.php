@@ -53,7 +53,7 @@ function error($text, $fatal = false, $level = 0){
 function smartyNew(){
 	global $CONFIG;
 	
-	$smarty = new Smarty;
+	$smarty = new Smarty();
 	$smarty->debugging = $CONFIG['SMARTY_DEBUG'];
 	$smarty->caching = $CONFIG['SMARTY_CACHING'];
 	$smarty->cache_lifetime = $CONFIG['SMARTY_CACHE_LIFETIME'];

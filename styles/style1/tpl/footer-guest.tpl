@@ -1,4 +1,4 @@
-<!-- BEGIN OF footer.tpl //-->
+<!-- BEGIN OF footer-guest.tpl //-->
 				</td>
 			</tr>
 			<tr>
@@ -16,4 +16,4 @@
 		</table>
 	</body>
 </html>
-<!-- END OF footer.tpl //-->
+<!-- END OF footer-guest.tpl //-->

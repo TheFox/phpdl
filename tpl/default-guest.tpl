@@ -1,10 +1,10 @@
-<!-- BEGIN OF default.tpl //-->
+<!-- BEGIN OF default-guest.tpl //-->
 {include file="{$siteStyleTplDir}/header-guest.tpl"}
 
 <form action="?a=loginExec" method="post">
 	<table border="1">
 		<tr>
-			<td>Login</td>
+			<td width="120">Login</td>
 			<td><input type="text" name="login" /></td>
 		</tr>
 		<tr>
@@ -18,4 +18,4 @@
 </form>
 
 {include file="{$siteStyleTplDir}/footer-guest.tpl"}
-<!-- END OF default.tpl //-->
+<!-- END OF default-guest.tpl //-->

@@ -25,10 +25,19 @@ if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 $CONFIG = array(
 	
-	'DB_HOST' => 'localhost',
-	'DB_NAME' => 'phpdl',
-	'DB_USER' => 'phpdl',
-	'DB_PASS' => '7NuW5RCtuGDEazHz', # TODO: clean for stable version.
+	'PHPDL_VERSION' => '0.1.0',
+	'PHPDL_INSTALLED' => {$PHPDL_INSTALLED},
+	
+	'DB_HOST' => '{$DB_HOST}',
+	'DB_NAME' => '{$DB_NAME}',
+	'DB_USER' => '{$DB_USER}',
+	'DB_PASS' => '{$DB_PASS}',
+	
+	'USER_PASSWORD_SALT' => 'put your unique phrase here',
+	'USER_SESSION_TTL' => 3600 * 24 * 365,
+	
+	'DL_SLOTS' => 1,
+	
 	
 	'SITE_HOST' => '',
 	'SITE_NAME' => 'PHP Downloader',
@@ -63,10 +72,7 @@ $CONFIG = array(
 	'WGET' => '/usr/bin/wget',
 	'BROWSER_USERAGENT' => 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10',
 	
-	'USER_PASSWORD_SALT' => 'put your unique phrase here',
-	'USER_SESSION_TTL' => 3600 * 24 * 365,
 	
-	'DL_SLOTS' => 1,
 	
 );
 

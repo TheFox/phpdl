@@ -2,7 +2,6 @@
 
 /*
 	Created @ 15.10.2010 by TheFox@fox21.at
-	Version: 0.1.0
 	Copyright (c) 2010 TheFox
 	
 	This file is part of PHPDL.
@@ -22,6 +21,12 @@
 */
 
 define('ANTIHACK', 1);
+
+
+if(file_exists('install')){
+	header('Location: install/install.php');
+	exit();
+}
 
 include_once('./lib/config.php');
 include_once('./lib/functions.php');
@@ -48,24 +53,28 @@ if($user->isGuest){
 		default:
 		case 'login':
 			
-			$tpl = 'default-guest.tpl';
+			$dbh = dbConnect();
+			$res = mysql_fetch_assoc(mysql_query("select count(id) c from users;", $dbh));
+			$count = $res['c'];
+			dbClose($dbh);
+			
+			if($count)
+				$tpl = 'default-guest.tpl';
+			else
+				$tpl = 'default-guest-superuseradd.tpl';
+			
 			$cacheId = 'default-guest';
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
-				
-				
 			}
 			$smarty->display($tpl, $cacheId);
 			
 		break;
 		
 		case 'loginExec':
-			/*$dbh = dbConnect();
-			dbClose($dbh);*/
 			
 			$login = checkInput($_POST['login'], 'a-z0-9_', 32);
 			$password = md5($CONFIG['USER_PASSWORD_SALT'].$_POST['password']);
-			
 			
 			$loginuser = new user($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 			if($loginuser->loadByLoginAndPassword($login, $password))
@@ -76,6 +85,32 @@ if($user->isGuest){
 			#print "$login|$password|".$loginuser->get('sessionId')."|".(mktime() + $CONFIG['USER_SESSION_TTL']);
 			
 			header('Location: ?');
+			
+		break;
+		
+		case 'superuserAddExec':
+			
+			$dbh = dbConnect();
+			$res = mysql_fetch_assoc(mysql_query("select count(id) c from users;", $dbh));
+			$count = $res['c'];
+			if($count)
+				die('Hacking attempt.');
+			
+			$login = checkInput($_POST['login'], 'a-z0-9_', 32);
+			$password = md5($CONFIG['USER_PASSWORD_SALT'].$_POST['password']);
+			
+			mysql_query("insert users(login, password, superuser, ctime) values ('$login', '$password', '1', '".mktime()."');");
+			
+			$tpl = 'default-guest-superuseradd-exec.tpl';
+			$cacheId = 'default-guest-superuseradd-exec';
+			if(!$smarty->isCached($tpl, $cacheId)){
+				smartyAssignStd($smarty);
+				
+				$smarty->assign('status', '<b><font color="#009900">User added.</font></b> Now you can <a href="?">log in</a> with this user.');
+			}
+			$smarty->display($tpl, $cacheId);
+			
+			dbClose($dbh);
 			
 		break;
 		
@@ -102,7 +137,7 @@ else{
 				$stack = '';
 				foreach($packets as $packetId => $packet){
 					
-					$res = mysql_fetch_assoc(mysql_query("select count(id) c from `files` where _packet = ".$packet['id']." and error != '".$DLFILE_ERROR_NO_ERROR."'", $dbh));
+					$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$packet['id']." and error != '".$DLFILE_ERROR_NO_ERROR."'", $dbh));
 					$errors = $res['c'];
 					
 					$class = '';

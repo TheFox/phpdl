@@ -23,6 +23,12 @@
 define('ANTIHACK', 1);
 if(isset($_SERVER['SERVER_ADDR'])) die('Hacking attempt.');
 
+
+if(file_exists('install')){
+	print "ERROR: You must first install PHPDL.\n";
+	exit();
+}
+
 include_once('./lib/config.php');
 include_once('./lib/functions.php');
 include_once('./lib/class.dlpacket.php');
