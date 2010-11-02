@@ -173,6 +173,7 @@ else{
 							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : '&nbsp;').'</td>
 							<td class="'.$class.'">'.join(', ', $status).'</td>
 							<td class="'.$class.'" align="center">'.($packet['_user'] == $user->get('id') ? '<input id="packetArchiveButton'.$packet['id'].'" type="button" value="-" onClick="packetArchive('.$packet['id'].');" />' : '').'</td>
+							<td class="'.$class.'"><a href="?a=packetInfo&amp;id='.$packet['id'].'">info</a></td>
 						</tr>
 					';
 				}
@@ -328,6 +329,37 @@ else{
 			
 			if(!$noredirect)
 				header('Location: ?');
+			
+		break;
+		
+		case 'packetInfo':
+			
+			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+			if($packet->loadById($id)){
+				
+				$filename = 'phpdl.'.$packet->get('id').'.'.$packet->get('name').'.txt';
+				
+				#header('Content-Type: application/octet-stream');
+				header('Content-Type: text/plain');
+				header('Content-Disposition: attachment; filename="'.$filename.'"');
+				
+				print "Name: ".$packet->get('name')."\n";
+				if($packet->get('source') != '')
+					print "Source: ".$packet->get('source')."\n";
+				if($packet->get('password') != '')
+					print "Password: ".$packet->get('password')."\n";
+				
+				if($packet->loadFiles()){
+					print "\n\n";
+					
+					foreach($packet->files as $fileId => $file)
+						print $file->get('uri')."\n";
+				}
+				
+				flush();
+			}
+			else
+				print "failed";
 			
 		break;
 		

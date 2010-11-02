@@ -42,7 +42,7 @@
 </script>
 
 <table border="1">
-	<tr><td colspan="8"><div id="status">{$status}</div></td></tr>
+	<tr><td colspan="9"><div id="status">{$status}</div></td></tr>
 	<tr>
 		<td>id</td>
 		<td>user</td>
@@ -52,6 +52,7 @@
 		<td>ftime</td>
 		<td>status</td>
 		<td>archive</td>
+		<td>info</td>
 	</tr>
 	{$stack}
 </table>
