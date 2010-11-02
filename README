@@ -8,9 +8,12 @@ Description
 	similar). You can install PHPDL on your webserver and manage the downloads over the web interface.
 	In the background there is a other script running which is downloading the files.
 
-Created with help from many libraries and frameworks including:
-	JQuery
-	Smarty
+Features
+	- Multiuser.
+	- Web interface. Manage your downloads from everywhere.
+	- RSDF files support.
+	- DLC files support.
+	- RapidShare.com (Free and Pro) support.
 
 Install
 	1. git clone git://github.com/TheFox/phpdl.git phpdl
@@ -19,5 +22,9 @@ Install
 	4. Run install/install.php in your browser.
 	5. After installation delete the "install" directory.
 	6. Run ./startstack in your terminal.
+
+Created with help from many libraries and frameworks including:
+	- JQuery
+	- Smarty
 
 # EOF
