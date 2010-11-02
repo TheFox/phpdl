@@ -86,6 +86,10 @@ img{
 	background-color: #00ff00;
 }
 
+.packetHasFinished{
+	background-color: #cccccc;
+}
+
 .packetHasError{
 	background-color: #ff0000;
 }

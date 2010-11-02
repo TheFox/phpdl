@@ -137,14 +137,22 @@ else{
 				$stack = '';
 				foreach($packets as $packetId => $packet){
 					
-					$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$packet['id']." and error != '".$DLFILE_ERROR_NO_ERROR."'", $dbh));
+					$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$packet['id']." and error != '".$DLFILE_ERROR_NO_ERROR."';", $dbh));
 					$errors = $res['c'];
+					
+					$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$packet['id'].";", $dbh));
+					$files = $res['c'];
+					$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$packet['id']." and stime != '0' and ftime != '0';", $dbh));
+					$filesFinished = $res['c'];
 					
 					$class = '';
 					if($errors)
 						$class = 'packetHasError';
 					elseif($packet['stime'] && !$packet['ftime'])
 						$class = 'packetIsDownloading';
+					elseif($packet['stime'] && $packet['ftime'])
+						$class = 'packetHasFinished';
+					
 					
 					$status = array();
 					if($packet['md5Verified'])
@@ -152,7 +160,7 @@ else{
 					if(!$packet['stime'])
 						$status[] = 'waiting';
 					elseif($packet['stime'] && !$packet['ftime'])
-						$status[] = 'downloading';
+						$status[] = 'downloading (~'.(int)($filesFinished / $files * 100).' %)';
 					elseif($packet['stime'] && $packet['ftime'])
 						$status[] = 'finished';
 					
