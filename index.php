@@ -172,8 +172,8 @@ else{
 							<td class="'.$class.'">'.($packet['stime'] ? date($CONFIG['DATE_FORMAT'], $packet['stime']) : '&nbsp;').'</td>
 							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : '&nbsp;').'</td>
 							<td class="'.$class.'">'.join(', ', $status).'</td>
-							<td class="'.$class.'" align="center">'.($packet['_user'] == $user->get('id') ? '<input id="packetArchiveButton'.$packet['id'].'" type="button" value="-" onClick="packetArchive('.$packet['id'].');" />' : '').'</td>
 							<td class="'.$class.'"><a href="?a=packetInfo&amp;id='.$packet['id'].'">info</a></td>
+							<td class="'.$class.'" align="center">'.($packet['_user'] == $user->get('id') ? '<input id="packetArchiveButton'.$packet['id'].'" type="button" value="-" onClick="packetArchive('.$packet['id'].');" />' : '').'</td>
 						</tr>
 					';
 				}

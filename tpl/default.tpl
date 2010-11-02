@@ -51,8 +51,8 @@
 		<td>stime</td>
 		<td>ftime</td>
 		<td>status</td>
-		<td>archive</td>
 		<td>info</td>
+		<td>archive</td>
 	</tr>
 	{$stack}
 </table>
