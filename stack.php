@@ -64,7 +64,15 @@ function main(){
 			while($row = mysql_fetch_assoc($res)){
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				if($packet->loadById($row['id'])){
+					
 					print "packet ".$packet->get('id')."\n";
+					
+					$packetDirBn = $packet->get('id').'.'.strtolower($packet->get('name'));
+					$packetDirBn = str_replace(' ', '.', $packetDirBn);
+					
+					$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
+					$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
+					
 					if(!$packet->fileErrors() && !$packet->get('ftime')){
 						if($packet->loadFiles()){
 							
@@ -80,10 +88,10 @@ function main(){
 									$nextfile->set('ftime', 0);
 									$nextfile->save();
 									
-									$packetDownloadDir = 'downloads/'.$packet->get('id').'.'.strtolower($packet->get('name'));
-									$packetDownloadDir = str_replace(' ', '.', $packetDownloadDir);
-									if(!file_exists($packetDownloadDir))
+									if(!file_exists($packetDownloadDir)){
 										mkdir($packetDownloadDir);
+										chmod($packetDownloadDir, 0755);
+									}
 									
 									print "\tstart download ".$nextfile->get('id')."\n";
 									system('php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" &> /dev/null &');
@@ -97,6 +105,8 @@ function main(){
 								print "\tall files finished\n";
 								$packet->save('ftime', mktime());
 								$packet->md5Verify();
+								
+								rename($packetDownloadDir, $packetFinishedDir);
 							}
 						}
 					}

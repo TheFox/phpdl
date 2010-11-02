@@ -31,15 +31,18 @@ include_once('./lib/class.dlfile.php');
 if(count($argv) >= 2){
 	
 	$fileId = (int)$argv[1];
-	$downloadDir = '';
+	$packetDownloadDir = '';
 	
 	if(!$fileId)
 		exit();
 	if(isset($argv[2]))
-		$downloadDir = $argv[2];
+		$packetDownloadDir = $argv[2];
+	
+	if($packetDownloadDir == '')
+		$packetDownloadDir = '.';
 	
 	print "file id: $fileId\n";
-	print "download dir: '$downloadDir'\n";
+	print "download dir: '$packetDownloadDir'\n";
 	
 	$dbh = dbConnect();
 	$file = new dlfile($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
@@ -63,9 +66,7 @@ if(count($argv) >= 2){
 				print "hoster plugin loaded\n";
 				
 				if(function_exists('hosterExec') && preg_match('/^http:/', $file->get('uri'))){
-					$filePath = hosterExec($file, $thisHoster);
-					if($filePath != '' && $downloadDir != '')
-						rename($filePath, $downloadDir.'/'.basename($filePath));
+					$filePath = hosterExec($file, $thisHoster, $packetDownloadDir);
 				}
 				
 				print "hoster plugin: hosterExec done\n";

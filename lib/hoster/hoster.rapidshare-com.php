@@ -23,7 +23,7 @@
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 
-function hosterExec($file, $thisHoster){
+function hosterExec($file, $thisHoster, $loadingDir){
 	global $CONFIG;
 	$retval = '';
 	$rapidpro = $thisHoster['user'] != '' && $thisHoster['password'] != '';
@@ -72,7 +72,7 @@ function hosterExec($file, $thisHoster){
 			$file->set('md5', $md5);
 			$file->save();
 			
-			$tmpfile = './downloads/.'.$filename;
+			$tmpfile = $loadingDir.'/.'.$filename;
 			wget($CONFIG['WGET'], $url, $tmpfile);
 			
 			if(file_exists($tmpfile)){
@@ -94,9 +94,11 @@ function hosterExec($file, $thisHoster){
 					print "ERROR: ".getDlFileErrorMsg($error)."\n";
 				}
 				else{
-					$newfilePath = './downloads/'.$filename;
+					
+					$newfilePath = $loadingDir.'/'.$filename;
 					rename($tmpfile, $newfilePath);
-					$retval = $newfilePath;
+					
+					$retval = $filename;
 				}
 				
 				$file->set('size', $size);
@@ -110,7 +112,7 @@ function hosterExec($file, $thisHoster){
 			$file->set('ftime', mktime());
 			$file->save();
 		}
-		#unlink($tmp);
+		unlink($tmp);
 	}
 	
 	return $retval;
