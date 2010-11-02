@@ -153,7 +153,6 @@ else{
 					elseif($packet['stime'] && $packet['ftime'])
 						$class = 'packetHasFinished';
 					
-					
 					$status = array();
 					if($packet['md5Verified'])
 						$status[] = 'verified';

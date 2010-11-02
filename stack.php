@@ -34,67 +34,98 @@ include_once('./lib/functions.php');
 include_once('./lib/class.dlpacket.php');
 include_once('./lib/class.dlfile.php');
 
+$PID_PATH = '.stack.php.pid';
 
-while(true){
+declare(ticks = 1);
+
+
+function main(){
+	global $CONFIG, $PID_PATH;
 	
-	$dbh = dbConnect();
 	
-	#$packets = getDbTable($dbh, 'packets', "where archive = '0'");
+	print "pid: ".posix_getpid()."\n";
 	
-	$resdls = mysql_fetch_assoc(mysql_query("select count(id) c from files where stime != '0' and ftime = '0';", $dbh));
-	if($resdls['c'] >= $CONFIG['DL_SLOTS']){
-		print "no free download slots\n";
-	}
-	else{
-		$res = mysql_query("select id from packets where archive = '0' order by id;", $dbh);
-		while($row = mysql_fetch_assoc($res)){
-			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
-			if($packet->loadById($row['id'])){
-				print "packet ".$packet->get('id')."\n";
-				if(!$packet->fileErrors() && !$packet->get('ftime')){
-					if($packet->loadFiles()){
-						
-						if($packet->filesUnfinished()){
+	$fh = fopen($PID_PATH, 'w');
+	fwrite($fh, posix_getpid());
+	fclose($fh);
+	
+	while(true){
+		
+		$dbh = dbConnect();
+		
+		#$packets = getDbTable($dbh, 'packets', "where archive = '0'");
+		
+		$resdls = mysql_fetch_assoc(mysql_query("select count(id) c from files where stime != '0' and ftime = '0';", $dbh));
+		if($resdls['c'] >= $CONFIG['DL_SLOTS']){
+			print "no free download slots\n";
+		}
+		else{
+			$res = mysql_query("select id from packets where archive = '0' order by id;", $dbh);
+			while($row = mysql_fetch_assoc($res)){
+				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+				if($packet->loadById($row['id'])){
+					print "packet ".$packet->get('id')."\n";
+					if(!$packet->fileErrors() && !$packet->get('ftime')){
+						if($packet->loadFiles()){
 							
-							if(!$packet->get('stime')){
-								$packet->save('stime', mktime());
+							if($packet->filesUnfinished()){
+								
+								if(!$packet->get('stime')){
+									$packet->save('stime', mktime());
+								}
+								
+								if($nextfile = $packet->getFileNextUnfinished()){
+									$nextfile->set('error', $DLFILE_ERROR_NO_ERROR);
+									$nextfile->set('stime', mktime());
+									$nextfile->set('ftime', 0);
+									$nextfile->save();
+									
+									$packetDownloadDir = 'downloads/'.$packet->get('id').'.'.strtolower($packet->get('name'));
+									$packetDownloadDir = str_replace(' ', '.', $packetDownloadDir);
+									if(!file_exists($packetDownloadDir))
+										mkdir($packetDownloadDir);
+									
+									print "\tstart download ".$nextfile->get('id')."\n";
+									system('php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" &> /dev/null &');
+									
+									break;
+								}
+								else
+									print "\tno next file\n";
 							}
-							
-							if($nextfile = $packet->getFileNextUnfinished()){
-								$nextfile->set('error', $DLFILE_ERROR_NO_ERROR);
-								$nextfile->set('stime', mktime());
-								$nextfile->set('ftime', 0);
-								$nextfile->save();
-								
-								$packetDownloadDir = 'downloads/'.$packet->get('id').'.'.strtolower($packet->get('name'));
-								$packetDownloadDir = str_replace(' ', '.', $packetDownloadDir);
-								if(!file_exists($packetDownloadDir))
-									mkdir($packetDownloadDir);
-								
-								print "\tstart download ".$nextfile->get('id')."\n";
-								system('php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" &> /dev/null &');
-								
-								break;
+							else{
+								print "\tall files finished\n";
+								$packet->save('ftime', mktime());
+								$packet->md5Verify();
 							}
-							else
-								print "\tno next file\n";
-						}
-						else{
-							print "\tall files finished\n";
-							$packet->save('ftime', mktime());
-							$packet->md5Verify();
 						}
 					}
 				}
+				unset($packet);
 			}
-			unset($packet);
 		}
+		dbClose($dbh);
+		
+		
+		print "sleep 5\n\n";
+		sleep(5);
 	}
-	dbClose($dbh);
-	
-	
-	print "sleep 5\n\n";
-	sleep(5);
 }
+
+function sigHandler($sig){
+	global $PID_PATH;
+	print "sigHandler $sig\n";
+	switch($sig){
+		case SIGTERM:
+			if(file_exists($PID_PATH)){
+				unlink($PID_PATH);
+				exit();
+			}
+		break;
+	}
+}
+
+pcntl_signal(SIGTERM, 'sigHandler');
+main();
 
 ?>
