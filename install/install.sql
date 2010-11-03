@@ -1,4 +1,4 @@
--- Created @ 2010/11/03 19:29:23 by TheFox@fox21.at
+-- Created @ 2010/11/03 19:32:19 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -78,6 +78,7 @@ CREATE TABLE `users` (
   `login` varchar(32) NOT NULL,
   `password` varchar(32) NOT NULL,
   `sessionId` varchar(32) NOT NULL COMMENT 'md5 hex',
+  `superuser` enum('0','1') NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL DEFAULT '0' COMMENT 'Create time',
   PRIMARY KEY (`id`),
   KEY `login` (`login`),
@@ -94,7 +95,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-03 19:29:24
+-- Dump completed on 2010-11-03 19:32:19
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -150,4 +151,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-03 19:29:24
+-- Dump completed on 2010-11-03 19:32:20
