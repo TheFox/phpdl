@@ -1,4 +1,4 @@
--- Created @ 2010/11/02 21:38:38 by TheFox@fox21.at
+-- Created @ 2010/11/03 19:29:23 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -20,7 +20,6 @@
 -- Table structure for table `files`
 --
 
-DROP TABLE IF EXISTS `files`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `files` (
@@ -47,7 +46,6 @@ CREATE TABLE `files` (
 -- Table structure for table `packets`
 --
 
-DROP TABLE IF EXISTS `packets`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `packets` (
@@ -73,7 +71,6 @@ CREATE TABLE `packets` (
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
@@ -97,7 +94,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-02 21:38:40
+-- Dump completed on 2010-11-03 19:29:24
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -119,7 +116,6 @@ CREATE TABLE `users` (
 -- Table structure for table `hosters`
 --
 
-DROP TABLE IF EXISTS `hosters`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `hosters` (
@@ -154,4 +150,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-02 21:38:40
+-- Dump completed on 2010-11-03 19:29:24
