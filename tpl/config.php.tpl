@@ -33,8 +33,8 @@ $CONFIG = array(
 	'DB_USER' => '{$DB_USER}',
 	'DB_PASS' => '{$DB_PASS}',
 	
-	'USER_PASSWORD_SALT' => 'put your unique phrase here',
-	'USER_SESSION_TTL' => 3600 * 24 * 365,
+	'USER_PASSWORD_SALT' => '{$USER_PASSWORD_SALT}',
+	'USER_SESSION_TTL' => {$USER_SESSION_TTL},
 	
 	'DL_SLOTS' => 1,
 	

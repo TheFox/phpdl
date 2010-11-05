@@ -107,17 +107,17 @@ switch($a){
 					<tr>
 						<td>Database Host</td>
 						<td><pre>$DB_HOST</pre></td>
-						<td><input type="text" name="DB_HOST" id="DB_HOST" value="<?php print isset($_SESSION['DB_HOST']) ? $_SESSION['DB_HOST'] : ''; ?>" /></td>
+						<td><input type="text" name="DB_HOST" id="DB_HOST" value="<?php print isset($_SESSION['DB_HOST']) ? $_SESSION['DB_HOST'] : 'localhost'; ?>" /></td>
 					</tr>
 					<tr>
 						<td>Database Name</td>
 						<td><pre>$DB_NAME</pre></td>
-						<td><input type="text" name="DB_NAME" id="DB_NAME" value="<?php print isset($_SESSION['DB_NAME']) ? $_SESSION['DB_NAME'] : ''; ?>" /></td>
+						<td><input type="text" name="DB_NAME" id="DB_NAME" value="<?php print isset($_SESSION['DB_NAME']) ? $_SESSION['DB_NAME'] : 'phpdl'; ?>" /></td>
 					</tr>
 					<tr>
 						<td>Database Username</td>
 						<td><pre>$DB_USER</pre></td>
-						<td><input type="text" name="DB_USER" id="DB_USER" value="<?php print isset($_SESSION['DB_USER']) ? $_SESSION['DB_USER'] : ''; ?>" /></td>
+						<td><input type="text" name="DB_USER" id="DB_USER" value="<?php print isset($_SESSION['DB_USER']) ? $_SESSION['DB_USER'] : 'phpdl'; ?>" /></td>
 					</tr>
 					<tr>
 						<td>Database Password</td>
@@ -285,6 +285,25 @@ switch($a){
 		</tr>
 		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr>
+			<td colspan="2">7. Misc variables (optional)</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>
+				<table border="0" cellpadding="3" cellspacing="3">
+					<tr>
+						<td><pre>$CONFIG['USER_PASSWORD_SALT']</pre></td>
+						<td><input type="text" name="USER_PASSWORD_SALT" value="<?php print rndstr(); ?>" /></td>
+					</tr>
+					<tr>
+						<td><pre>$CONFIG['USER_SESSION_TTL']</pre></td>
+						<td><input type="text" name="USER_SESSION_TTL" value="<?php print 3600 * 24 *365; ?>" /></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
 			<td colspan="2"><input type="submit" value="Save" /></td>
 		</tr>
 		<tr>
@@ -307,6 +326,8 @@ switch($a){
 		$DB_PASS = $_POST['DB_PASS'];
 		$WGET = $_POST['WGET'];
 		$PS = $_POST['PS'];
+		$USER_PASSWORD_SALT = $_POST['USER_PASSWORD_SALT'];
+		$USER_SESSION_TTL = $_POST['USER_SESSION_TTL'];
 		
 		if($smarty){
 			$smarty->debugging = false;
@@ -325,6 +346,8 @@ switch($a){
 			$smarty->assign('DB_PASS', $DB_PASS);
 			$smarty->assign('WGET', $WGET);
 			$smarty->assign('PS', $PS);
+			$smarty->assign('USER_PASSWORD_SALT', $USER_PASSWORD_SALT);
+			$smarty->assign('USER_SESSION_TTL', $USER_SESSION_TTL);
 			
 			$ok = false;
 			
@@ -394,6 +417,7 @@ switch($a){
 }
 
 function htmlHead(){
+	
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
@@ -470,10 +494,6 @@ function htmlHead(){
 				});
 			}
 			
-			function userAdd(){
-				
-			}
-			
 		</script>
 <?php
 }
@@ -490,9 +510,10 @@ function htmlInstallFinished(){
 		<b><font color="#009900">Installation OK.</font></b><br />
 		<br />
 		<ul>
-			<li>Now you must delete the "install" directory.</li>
+			<li><font color="#ff0000"><b>Delete the "install" directory!</b></font></li>
 			<li>Change the mode for lib/config.php to 644 (rw-r--r--).</li>
 			<li>Run ./startstack in your terminal. stack.php must always run.</li>
+			<li>Click <a href="..">here</a>.</li>
 		</ul>
 	';
 }
@@ -536,6 +557,20 @@ function pathCheck($progname){
 			$retval = $path.'/'.$progname;
 			break;
 		}
+	
+	return $retval;
+}
+
+function rndstr($len = 512){
+	$charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+*#-_:,;|>.<!$%&/()=?{}[]~';
+	$charsetLen = strlen($charset);
+	
+	$retval = '';
+	
+	for($i = 0; $i < $len; $i++){
+		$c = substr($charset, rand(0, $charsetLen - 1), 1);
+		$retval .= $c;
+	}
 	
 	return $retval;
 }
