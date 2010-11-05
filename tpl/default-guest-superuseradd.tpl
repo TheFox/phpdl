@@ -5,9 +5,7 @@
 	<table border="0">
 		<tr>
 			<td colspan="2">
-				This is your first run. Please add a superuser.<br />
-				For more security change <b>$CONFIG['USER_PASSWORD_SALT']</b> in lib/config.php<br /> before you add a new user. After the first user is created you can't<br />
-				change $CONFIG['USER_PASSWORD_SALT'].
+				This is your first run. Please add a superuser.
 			</td>
 		</tr>
 		<tr>

@@ -74,7 +74,7 @@ if($user->isGuest){
 		case 'loginExec':
 			
 			$login = checkInput($_POST['login'], 'a-z0-9_', 32);
-			$password = md5($CONFIG['USER_PASSWORD_SALT'].$_POST['password']);
+			$password = mkpasswd($CONFIG['USER_PASSWORD_SALT'], $_POST['password']);
 			
 			$loginuser = new user($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 			if($loginuser->loadByLoginAndPassword($login, $password))
@@ -97,7 +97,7 @@ if($user->isGuest){
 				die('Hacking attempt.');
 			
 			$login = checkInput($_POST['login'], 'a-z0-9_', 32);
-			$password = md5($CONFIG['USER_PASSWORD_SALT'].$_POST['password']);
+			$password = mkpasswd($CONFIG['USER_PASSWORD_SALT'], $_POST['password']);
 			
 			mysql_query("insert users(login, password, superuser, ctime) values ('$login', '$password', '1', '".mktime()."');");
 			

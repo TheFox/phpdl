@@ -188,4 +188,8 @@ function hex2bin($hexstr) {
 	return $retstr;
 }
 
+function mkpasswd($salt, $plainpw){
+	return md5('TheFox'.$salt.$plainpw);
+}
+
 ?>
