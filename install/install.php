@@ -307,7 +307,7 @@ switch($a){
 			<td colspan="2"><input type="submit" value="Save" /></td>
 		</tr>
 		<tr>
-			<td colspan="2" align="center"><small>Copyright &copy; 2010 <a href="http://fox21.at/">FOX21.at</a></small></td>
+			<td colspan="2" align="center"><small>Copyright &copy; 2010 <a href="http://fox21.at/">TheFox</a></small></td>
 		</tr>
 	</table>
 </form>
