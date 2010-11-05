@@ -64,7 +64,8 @@ switch($a){
 
 	default:
 		
-		
+		$WGET = pathCheck('wget');
+		$PS = pathCheck('ps');
 		
 		htmlHead();
 ?>
@@ -207,6 +208,27 @@ switch($a){
 		</tr>
 		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr>
+			<td colspan="2">6. Programs</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>
+				<table border="0" cellpadding="3" cellspacing="3">
+					<tr>
+						<td><pre>wget</pre></td>
+						<td><?php print $WGET != '' ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+						<td><input type="text" name="WGET" value="<?php print $WGET; ?>" /></td>
+					</tr>
+					<tr>
+						<td><pre>ps</pre></td>
+						<td><?php print $PS != '' ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+						<td><input type="text" name="PS" value="<?php print $PS; ?>" /></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
 			<td colspan="2"><input type="submit" value="Save" /></td>
 		</tr>
 		<tr>
@@ -227,7 +249,8 @@ switch($a){
 		$DB_NAME = $_POST['DB_NAME'];
 		$DB_USER = $_POST['DB_USER'];
 		$DB_PASS = $_POST['DB_PASS'];
-		
+		$WGET = $_POST['WGET'];
+		$PS = $_POST['PS'];
 		
 		if($smarty){
 			$smarty->debugging = false;
@@ -244,6 +267,8 @@ switch($a){
 			$smarty->assign('DB_NAME', $DB_NAME);
 			$smarty->assign('DB_USER', $DB_USER);
 			$smarty->assign('DB_PASS', $DB_PASS);
+			$smarty->assign('WGET', $WGET);
+			$smarty->assign('PS', $PS);
 			
 			$ok = false;
 			
@@ -410,8 +435,8 @@ function htmlInstallFinished(){
 		<br />
 		<ul>
 			<li>Now you must delete the "install" directory.</li>
-			<li>Change the mode for lib/config.php to 644.</li>
-			<li>Run ./startstack in your terminal.</li>
+			<li>Change the mode for lib/config.php to 644 (rw-r--r--).</li>
+			<li>Run ./startstack in your terminal. stack.php must always run.</li>
 		</ul>
 	';
 }
@@ -448,5 +473,15 @@ function dirWriteable($dir){
 	return $retval;
 }
 
+function pathCheck($progname){
+	$retval = '';
+	foreach(preg_split('/:/', $_SERVER['PATH']) as $path)
+		if(file_exists($path.'/'.$progname)){
+			$retval = $path.'/'.$progname;
+			break;
+		}
+	
+	return $retval;
+}
 
 ?>
