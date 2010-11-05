@@ -154,7 +154,7 @@ switch($a){
 		</tr>
 		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr>
-			<td colspan="2">4. Classes check</td>
+			<td colspan="2">4. Classes/Functions</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
@@ -163,6 +163,62 @@ switch($a){
 					<tr>
 						<td>Smarty Class</td>
 						<td><?php print $smarty ? '<b><font color="#009900">Loaded</font></b> ('.$smarty->_version.')' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>Smarty->isCached()</td>
+						<td><?php print method_exists($smarty, 'isCached') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>Smarty->assign()</td>
+						<td><?php print method_exists($smarty, 'assign') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>Smarty->display()</td>
+						<td><?php print method_exists($smarty, 'display') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>Smarty->fetch()</td>
+						<td><?php print method_exists($smarty, 'fetch') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>system()</td>
+						<td><?php print function_exists('system') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>chmod()</td>
+						<td><?php print function_exists('chmod') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>rename()</td>
+						<td><?php print function_exists('rename') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>unlink()</td>
+						<td><?php print function_exists('unlink') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>preg_split()</td>
+						<td><?php print function_exists('preg_split') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>pcntl_signal()</td>
+						<td><?php print function_exists('pcntl_signal') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>posix_getpid()</td>
+						<td><?php print function_exists('posix_getpid') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>mysql_query()</td>
+						<td><?php print function_exists('mysql_query') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>mysql_fetch_assoc()</td>
+						<td><?php print function_exists('mysql_fetch_assoc') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
+					<tr>
+						<td>mysql_insert_id()</td>
+						<td><?php print function_exists('mysql_insert_id') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
 					</tr>
 				</table>
 			</td>
