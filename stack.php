@@ -60,7 +60,7 @@ function main(){
 			print "no free download slots\n";
 		}
 		else{
-			$res = mysql_query("select id from packets where archive = '0' order by id;", $dbh);
+			$res = mysql_query("select id from packets where archive = '0' and ftime = '0' order by id;", $dbh);
 			while($row = mysql_fetch_assoc($res)){
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				if($packet->loadById($row['id'])){
@@ -73,7 +73,7 @@ function main(){
 					$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
 					$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
 					
-					if(!$packet->fileErrors() && !$packet->get('ftime')){
+					if(!$packet->fileErrors()){
 						if($packet->loadFiles()){
 							
 							if($packet->filesUnfinished()){

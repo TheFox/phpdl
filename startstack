@@ -5,6 +5,6 @@ export DATE
 DATE=`date +"%Y%m%d"`
 
 
-php stack.php 1>> log/stack.$DATE.log 2>>&1 &
+php stack.php 1>> log/stack.$DATE.log 2>> log/stack.$DATE.log &
 
 # EOF
