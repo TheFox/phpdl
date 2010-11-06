@@ -131,51 +131,49 @@ else{
 				
 				$dbh = dbConnect();
 				$users = getDbTable($dbh, 'users');
-				#$packets = getDbTable($dbh, 'packets', "where _user = '".$user->get('id')."'");
-				$packets = getDbTable($dbh, 'packets', "where archive = '0' order by id");
+				
+				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				
 				$stack = '';
-				foreach($packets as $packetId => $packet){
+				$res = mysql_query("select id from packets where archive = '0' order by id;", $dbh);
+				#foreach($packets as $packetId => $packet){
+				while($row = mysql_fetch_assoc($res)){
 					
-					$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$packet['id']." and error != '".$DLFILE_ERROR_NO_ERROR."';", $dbh));
-					$errors = $res['c'];
+					if($packet->reloadById($row['id'])){
 					
-					$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$packet['id'].";", $dbh));
-					$files = $res['c'];
-					$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$packet['id']." and stime != '0' and ftime != '0';", $dbh));
-					$filesFinished = $res['c'];
+						$trClass = '';
+						$status = array();
+						
+						if(!$packet->get('stime'))
+							$status[] = 'waiting';
+						elseif($packet->get('stime') && !$packet->get('ftime')){
+							$trClass = 'packetIsDownloading';
+							$status[] = 'downloading (~'.(int)($packet->filesFinished() / $packet->filesC() * 100).' %)';
+						}
+						elseif($packet->get('stime') && $packet->get('ftime')){
+							$trClass = 'packetHasFinished';
+							$status[] = 'finished';
+						}
+						if($packet->fileErrors())
+							$trClass = 'packetHasError';
+						if($packet->get('md5Verified'))
+							$status[] = 'verified';
+						
+						$stack .= '
+							<tr id="packetTr'.$packet->get('id').'">
+								<td class="'.$trClass.'">'.$packet->get('id').'</td>
+								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
+								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packet->get('id').'">'.$packet->get('name').'</a></td>
+								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
+								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
+								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
+								<td class="'.$trClass.'">'.join(', ', $status).'</td>
+								<td class="'.$trClass.'"><a href="?a=packetInfo&amp;id='.$packet->get('id').'">info</a></td>
+								<td class="'.$trClass.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveButton'.$packet->get('id').'" type="button" value="-" onClick="packetArchive('.$packet->get('id').');" />' : '').'</td>
+							</tr>
+						';
+					}
 					
-					$class = '';
-					if($errors)
-						$class = 'packetHasError';
-					elseif($packet['stime'] && !$packet['ftime'])
-						$class = 'packetIsDownloading';
-					elseif($packet['stime'] && $packet['ftime'])
-						$class = 'packetHasFinished';
-					
-					$status = array();
-					if($packet['md5Verified'])
-						$status[] = 'verified';
-					if(!$packet['stime'])
-						$status[] = 'waiting';
-					elseif($packet['stime'] && !$packet['ftime'])
-						$status[] = 'downloading (~'.(int)($filesFinished / $files * 100).' %)';
-					elseif($packet['stime'] && $packet['ftime'])
-						$status[] = 'finished';
-					
-					$stack .= '
-						<tr id="packetTr'.$packet['id'].'">
-							<td class="'.$class.'">'.$packet['id'].'</td>
-							<td class="'.$class.'">'.$users[$packet['_user']]['login'].'</td>
-							<td class="'.$class.'"><a href="?a=packetEdit&amp;id='.$packet['id'].'">'.$packet['name'].'</a></td>
-							<td class="'.$class.'">'.date($CONFIG['DATE_FORMAT'], $packet['ctime']).'</td>
-							<td class="'.$class.'">'.($packet['stime'] ? date($CONFIG['DATE_FORMAT'], $packet['stime']) : '&nbsp;').'</td>
-							<td class="'.$class.'">'.($packet['ftime'] ? date($CONFIG['DATE_FORMAT'], $packet['ftime']) : '&nbsp;').'</td>
-							<td class="'.$class.'">'.join(', ', $status).'</td>
-							<td class="'.$class.'"><a href="?a=packetInfo&amp;id='.$packet['id'].'">info</a></td>
-							<td class="'.$class.'" align="center">'.($packet['_user'] == $user->get('id') ? '<input id="packetArchiveButton'.$packet['id'].'" type="button" value="-" onClick="packetArchive('.$packet['id'].');" />' : '').'</td>
-						</tr>
-					';
 				}
 				$smarty->assign('stack', $stack);
 				
