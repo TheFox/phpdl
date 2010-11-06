@@ -53,6 +53,12 @@ class dbh{
 		return false;
 	}
 	
+	function reloadById($id){
+		$this->data = array();
+		$this->dataChanges = array();
+		return $this->loadById($id);
+	}
+	
 	function save($item = null, $value = null){
 		
 		
