@@ -414,6 +414,14 @@ else{
 			
 		break;
 		
+		case 'logoutExec':
+			
+			setcookie('userSessionId', 'x', mktime());
+			$user->save('sessionId', 'y');
+			header('Location: ?');
+			
+		break;
+		
 	}
 	
 }

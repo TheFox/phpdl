@@ -20,6 +20,8 @@
 									Tools<br />
 									<a href="?a=container&amp;c=rsdf">RSDF</a><br />
 									<a href="?a=container&amp;c=dlc">DLC</a><br />
+									<br />
+									<a href="?a=logoutExec">Logout</a><br />
 								</span>
 							</td>
 							<td class="content">
