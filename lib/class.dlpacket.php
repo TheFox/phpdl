@@ -57,9 +57,18 @@ class dlpacket extends dbh{
 	}
 	
 	function fileErrors(){
+		global $DLFILE_ERROR_NO_ERROR;
+		
 		$this->_dbhCheck();
 		
-		$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$this->data['id']." and error != '0';", $this->dbh));
+		$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$this->data['id']." and error != '$DLFILE_ERROR_NO_ERROR';", $this->dbh));
+		return (int)$res['c'];
+	}
+	
+	function filesFinished(){
+		$this->_dbhCheck();
+		
+		$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$this->data['id']." and stime != '0' and ftime != '0';", $this->dbh));
 		return (int)$res['c'];
 	}
 	
