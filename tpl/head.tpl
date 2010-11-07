@@ -15,7 +15,7 @@
 <link rel="stylesheet" type="text/css" href="{$siteStyleDir}/css/main.css" />
 <link rel="shortcut icon" type="image/x-icon" href="{$siteFavicon}" />
 
-<title>{$siteTitle}</title>
+<title>{$siteTitle} {$phpdlVersion}</title>
 
 <script type="text/javascript" src="lib/jquery/jquery-1.4.3.js"></script>
 

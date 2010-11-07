@@ -25,7 +25,7 @@ if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 $CONFIG = array(
 	
-	'PHPDL_VERSION' => '0.1.0',
+	'PHPDL_VERSION' => '0.2.0',
 	'PHPDL_INSTALLED' => {$PHPDL_INSTALLED},
 	
 	'DB_HOST' => '{$DB_HOST}',

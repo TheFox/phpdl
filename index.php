@@ -241,7 +241,7 @@ else{
 		case 'packetEditSave':
 			
 			$name = checkInput($_POST['name'], 'a-zA-Z0-9._ -', 256);
-			$name = str_replace(' ', '-', $name);
+			$name = str_replace(array(' ', 'ä', 'Ä', 'ü', 'Ü', 'ö', 'Ö', 'ß'), array('-', 'ae', 'Ae', 'ue', 'Ue', 'oe', 'Oe', 'ss'), $name);
 			if($name == '')
 				$name = 'noname';
 			
@@ -409,6 +409,232 @@ else{
 				
 			}
 			$smarty->display($tpl, $cacheId);
+			
+		break;
+		
+		case 'scheduler':
+			
+			$tpl = $a.'.tpl';
+			$cacheId = $a;
+			if(!$smarty->isCached($tpl, $cacheId)){
+				smartyAssignStd($smarty);
+				
+				$dbh = dbConnect();
+				$schedulerActive = abs(scheduler($dbh));
+				
+				$schedulerOut = '';
+				$res = mysql_query("select * from scheduler order by sortnr;", $dbh);
+				$schedulerNum = mysql_num_rows($res);
+				$schedulerC = 0;
+				while($sched = mysql_fetch_assoc($res)){
+					
+					$schedulerC++;
+					$move = '';
+					if($schedulerNum > 1){
+						if($schedulerC == 1)
+							$move = '<a href="?a=schedulerMove&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a>';
+						elseif($schedulerC <= $schedulerNum - 1)
+							$move = '<a href="?a=schedulerMove&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a> <a href="?a=schedulerMove&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+						else
+							$move = '<a href="?a=schedulerMove&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+						
+					}
+					
+					$trClass = '';
+					if($sched['id'] == $schedulerActive)
+						$trClass = 'schedulerActive';
+					
+					$schedulerOut .= '
+						<tr>
+							<td class="'.$trClass.'"><input type="checkbox" id="active'.$sched['id'].'" '.($sched['active'] ? 'checked="checked"' : '').' onChange="active('.$sched['id'].');" /></td>
+							<td class="'.$trClass.'">'.$move.'</td>
+							<td class="'.$trClass.'">'.$sched['sortnr'].'</td>
+							<td class="'.$trClass.'"><a href="?a=schedulerEdit&amp;id='.$sched['id'].'"><b>'.($sched['name'] == '' ? 'noname' : $sched['name']).'</b></a></td>
+							<!--<td class="'.$trClass.'">'.$sched['repeat'].'</td>//-->
+							<td class="'.$trClass.'">'.($sched['download'] ? 'yes' : 'no').'</td>
+							<td class="'.$trClass.'">'.($sched['activeDayTimeInvert'] ? 'yes' : 'no').'</td>
+							<td class="'.$trClass.'">'.date('H:i:s', mktime(0, 0, 0, date('n'), date('j'), date('Y')) + $sched['activeDayTimeBegin']).'</td>
+							<td class="'.$trClass.'">'.date('H:i:s', mktime(0, 0, 0, date('n'), date('j'), date('Y')) + $sched['activeDayTimeEnd']).'</td>
+							
+							
+						</td>
+					';
+				}
+				/*if(!$schedulerActive){
+					$trClass = 'schedulerActive';
+					$schedulerOut .= '
+						<tr>
+							<td class="'.$trClass.'"></td>
+							<td class="'.$trClass.'"></td>
+							<td class="'.$trClass.'">0</td>
+							<td class="'.$trClass.'">0</td>
+							<!--<td class="'.$trClass.'"></td>//-->
+							<td class="'.$trClass.'" colspan="2">Default scheduler</td>
+							<td class="'.$trClass.'">yes</td>
+							<td class="'.$trClass.'">no</td>
+						</td>
+					';
+				}*/
+				
+				$smarty->assign('tableColspan', 8);
+				$smarty->assign('scheduler', $schedulerOut);
+				
+				dbClose($dbh);
+			}
+			$smarty->display($tpl, $cacheId);
+			
+		break;
+		
+		case 'schedulerEdit':
+			
+			$tpl = $a.'.tpl';
+			$cacheId = $a;
+			if(!$smarty->isCached($tpl, $cacheId)){
+				smartyAssignStd($smarty);
+				
+				$dbh = dbConnect();
+				if($id){
+					$scheduler = getDbTable($dbh, 'scheduler', "where id = '$id'");
+					$sched = $scheduler[$id];
+					
+					$smarty->assign('name', $sched['name']);
+					if($sched['active'])
+						$smarty->assign('activeChecked', 'checked="checked"');
+					$smarty->assign('activeDayTimeBegin', date('H:i:s', mktime(0, 0, 0, date('n'), date('j'), date('Y')) + $sched['activeDayTimeBegin']));
+					$smarty->assign('activeDayTimeEnd', date('H:i:s', mktime(0, 0, 0, date('n'), date('j'), date('Y')) + $sched['activeDayTimeEnd']));
+					if($sched['download'])
+						$smarty->assign('downloadChecked', 'checked="checked"');
+					if($sched['activeDayTimeInvert'])
+						$smarty->assign('activeDayTimeInvertChecked', 'checked="checked"');
+					$smarty->assign('sortnr', $sched['sortnr']);
+					
+					$smarty->assign('del', '
+						<tr>
+							<td colspan="2"><a href="?a=schedulerDel&amp;id='.$sched['id'].'">Delete</a></td>
+						</tr>
+					');
+				}
+				else{
+					$res = mysql_fetch_assoc(mysql_query("select max(sortnr) m from scheduler;", $dbh));
+					$sortnr = $res['m'] + 1;
+					
+					$smarty->assign('activeChecked', 'checked="checked"');
+					$smarty->assign('downloadChecked', 'checked="checked"');
+					$smarty->assign('sortnr', $sortnr);
+				}
+				dbClose($dbh);
+				
+				$smarty->assign('id', $id);
+			}
+			$smarty->display($tpl, $cacheId);
+			
+		break;
+		
+		case 'schedulerEditExec':
+			
+			$name = checkInput($_POST['name'], 'a-zA-Z0-9.,-_ ', 255);
+			$active = (int)$_POST['active'];
+			$activeDayTimeBegin = $_POST['activeDayTimeBegin'];
+			$activeDayTimeEnd = $_POST['activeDayTimeEnd'];
+			$download = (int)$_POST['download'];
+			$activeDayTimeInvert = (int)$_POST['activeDayTimeInvert'];
+			$sortnr = (int)$_POST['sortnr'];
+			
+			$activeDayTimeBeginHour = 0;
+			$activeDayTimeBeginMin = 0;
+			$activeDayTimeBeginSec = 0;
+			
+			$activeDayTimeEndHour = 0;
+			$activeDayTimeEndMin = 0;
+			$activeDayTimeEndSec = 0;
+			
+			
+			if($name == '')
+				$name = 'noname';
+			
+			if(preg_match('/^(\d{1,2}).(\d{1,2})$/', $activeDayTimeBegin, $res))
+				list(, $activeDayTimeBeginHour, $activeDayTimeBeginMin) = $res;
+			elseif(preg_match('/^(\d{1,2}).(\d{1,2}).(\d{1,2})$/', $activeDayTimeBegin, $res))
+				list(, $activeDayTimeBeginHour, $activeDayTimeBeginMin, $activeDayTimeBeginSec) = $res;
+			
+			if(preg_match('/^(\d{1,2}).(\d{1,2})$/', $activeDayTimeEnd, $res))
+				list(, $activeDayTimeEndHour, $activeDayTimeEndMin) = $res;
+			elseif(preg_match('/^(\d{1,2}).(\d{1,2}).(\d{1,2})$/', $activeDayTimeEnd, $res))
+				list(, $activeDayTimeEndHour, $activeDayTimeEndMin, $activeDayTimeEndSec) = $res;
+			
+			$activeDayTimeBeginTs = mktime($activeDayTimeBeginHour, $activeDayTimeBeginMin, $activeDayTimeBeginSec, date('n'), date('j'), date('Y')) - mktime(0, 0, 0, date('n'), date('j'), date('Y'));
+			$activeDayTimeEndTs = mktime($activeDayTimeEndHour, $activeDayTimeEndMin, $activeDayTimeEndSec, date('n'), date('j'), date('Y')) - mktime(0, 0, 0, date('n'), date('j'), date('Y'));
+			
+			if($activeDayTimeBeginTs >= 86400 || $activeDayTimeBeginTs < 0)
+				$activeDayTimeBeginTs = 0;
+			if($activeDayTimeEndTs >= 86400 || $activeDayTimeEndTs < 0)
+				$activeDayTimeEndTs = 86399;
+			
+			$dbh = dbConnect();
+			if($id)
+				mysql_query("update scheduler set name = '$name', active = '$active', activeDayTimeInvert = '$activeDayTimeInvert', activeDayTimeBegin = '$activeDayTimeBeginTs', activeDayTimeEnd = '$activeDayTimeEndTs', sortnr = '$sortnr', download = '$download' where id = '$id' limit 1;", $dbh);
+			else
+				mysql_query("insert into scheduler(_users, name, active, activeDayTimeInvert, activeDayTimeBegin, activeDayTimeEnd, sortnr, download, ctime) values ('".$user->get('id')."', '$name', '$active', '$activeDayTimeInvert', '$activeDayTimeBeginTs', '$activeDayTimeEndTs', '$sortnr', '$download', '".mktime()."');", $dbh);
+			
+			dbClose($dbh);
+			
+			header('Location: ?a=scheduler');
+			
+		break;
+		
+		case 'schedulerMove':
+			
+			$direction = checkInput($_GET['dir'], 'du', 1);
+			$sortnr = (int)$_GET['sortnr'];
+			
+			$dbh = dbConnect();
+			
+			if($direction == 'd'){
+				mysql_query("update scheduler set sortnr = sortnr - 1 where sortnr = ".($sortnr + 1).";");
+				mysql_query("update scheduler set sortnr = sortnr + 1 where id = '$id' limit 1;");
+			}
+			else{
+				mysql_query("update scheduler set sortnr = sortnr + 1 where sortnr = ".($sortnr - 1).";");
+				mysql_query("update scheduler set sortnr = sortnr - 1 where id = '$id' limit 1;");
+			}
+			
+			dbClose($dbh);
+			
+			header('Location: ?a=scheduler');
+			
+		break;
+		
+		case 'schedulerSort':
+			
+			$dbh = dbConnect();
+			
+			$sortnr = 1;
+			$res = mysql_query("select id, sortnr from scheduler order by sortnr, id;", $dbh);
+			while($sched = mysql_fetch_assoc($res))
+				mysql_query("update scheduler set sortnr = '".($sortnr++)."' where id = '".$sched['id']."' limit 1;", $dbh);
+			dbClose($dbh);
+			
+			header('Location: ?a=scheduler');
+			
+		break;
+		
+		case 'schedulerDel':
+			
+			$dbh = dbConnect();
+			mysql_query("delete from scheduler where id = '$id' limit 1;", $dbh);
+			dbClose($dbh);
+			
+			header('Location: ?a=schedulerSort');
+			
+		break;
+		
+		case 'schedulerActive':
+			
+			$active = (int)$_GET['active'];
+			
+			$dbh = dbConnect();
+			mysql_query("update scheduler set active = '$active' where id = '$id' limit 1;", $dbh);
+			dbClose($dbh);
 			
 		break;
 		

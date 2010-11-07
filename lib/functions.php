@@ -107,6 +107,7 @@ function smartyAssignStd(&$smarty, $siteTitleSuffix = ''){
 	$smarty->assign('htmlHeadExt', $CONFIG['HTML_HEAD_EXT']);
 	
 	$smarty->assign('httpReferer', $_SERVER['HTTP_REFERER']);
+	$smarty->assign('phpdlVersion', $CONFIG['PHPDL_VERSION']);
 	
 }
 
@@ -191,5 +192,34 @@ function hex2bin($hexstr) {
 function mkpasswd($salt, $plainpw){
 	return md5('TheFox'.$salt.$plainpw);
 }
+
+function scheduler($dbh){
+	
+	/*
+		Return values:
+			>  0	Matched a scheduler entry. Download active.
+			<  0	Matched a scheduler entry. Download inactive.
+			== 0	Machted no scheduler entry. Download inactive.
+	*/
+	
+	$res = mysql_query("select * from scheduler where active = '1' order by sortnr;", $dbh);
+	while($sched = mysql_fetch_assoc($res)){
+		$active = false;
+		
+		$activeDayTimeBegin = mktime(0, 0, 0, date('n'), date('j'), date('Y')) + $sched['activeDayTimeBegin'];
+		$activeDayTimeEnd = mktime(0, 0, 0, date('n'), date('j'), date('Y')) + $sched['activeDayTimeEnd'];
+		
+		if(mktime() >= $activeDayTimeBegin && mktime() <= $activeDayTimeEnd)
+			$active = true;
+		
+		$active = $sched['activeDayTimeInvert'] ? !$active : $active;
+		
+		if($active)
+			return($sched['download'] ? $sched['id'] : -$sched['id']);
+	}
+	
+	return 0;
+}
+
 
 ?>

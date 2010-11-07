@@ -49,17 +49,24 @@ function main(){
 	fwrite($fh, posix_getpid());
 	fclose($fh);
 	
+	$n = 0;
 	while(true){
 		
+		$n++;
 		$dbh = dbConnect();
+		$scheduler = scheduler($dbh);
 		
-		#$packets = getDbTable($dbh, 'packets', "where archive = '0'");
+		#print "dg $n: $scheduler\n";
 		
 		$resdls = mysql_fetch_assoc(mysql_query("select count(id) c from files where stime != '0' and ftime = '0';", $dbh));
 		if($resdls['c'] >= $CONFIG['DL_SLOTS']){
 			print "no free download slots\n";
 		}
-		else{
+		elseif($scheduler <= 0){
+			print "scheduler inactive $scheduler\n";
+		}
+		elseif($scheduler > 0){
+			print "scheduler ok $scheduler\n";
 			$res = mysql_query("select id from packets where archive = '0' and ftime = '0' order by id;", $dbh);
 			while($row = mysql_fetch_assoc($res)){
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);

@@ -1,4 +1,4 @@
--- Created @ 2010/11/03 19:32:19 by TheFox@fox21.at
+-- Created @ 2010/11/07 18:33:28 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -56,6 +56,7 @@ CREATE TABLE `packets` (
   `md5Verified` enum('0','1') NOT NULL DEFAULT '0',
   `source` text NOT NULL,
   `password` text NOT NULL,
+  `sortnr` smallint(4) NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL DEFAULT '0',
   `stime` int(11) NOT NULL DEFAULT '0',
   `ftime` int(11) NOT NULL DEFAULT '0',
@@ -95,7 +96,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-03 19:32:19
+-- Dump completed on 2010-11-07 18:33:29
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -141,6 +142,41 @@ LOCK TABLES `hosters` WRITE;
 INSERT INTO `hosters` VALUES (1,'RapidShare.com','hoster.rapidshare-com.php','rapidshare.com\\/files\\/','1','','',1287612321);
 /*!40000 ALTER TABLE `hosters` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `scheduler`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `scheduler` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `_users` int(11) NOT NULL DEFAULT '0',
+  `_packets` int(11) NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL,
+  `repeat` varchar(255) NOT NULL,
+  `repeatTimeBegin` int(11) NOT NULL DEFAULT '0',
+  `repeatTimeEnd` int(11) NOT NULL DEFAULT '0',
+  `active` enum('0','1') NOT NULL DEFAULT '1',
+  `activeDayTimeInvert` enum('0','1') NOT NULL DEFAULT '0',
+  `activeDayTimeBegin` int(11) NOT NULL DEFAULT '0',
+  `activeDayTimeEnd` int(11) NOT NULL DEFAULT '0',
+  `sortnr` smallint(2) NOT NULL DEFAULT '0',
+  `download` enum('0','1') NOT NULL DEFAULT '1',
+  `ctime` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `scheduler`
+--
+
+LOCK TABLES `scheduler` WRITE;
+/*!40000 ALTER TABLE `scheduler` DISABLE KEYS */;
+INSERT INTO `scheduler` VALUES (1,1,0,'Default scheduler','',0,0,'1','0',0,86399,1,'1',1289151033);
+/*!40000 ALTER TABLE `scheduler` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -151,4 +187,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-03 19:32:20
+-- Dump completed on 2010-11-07 18:33:29
