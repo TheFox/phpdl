@@ -29,6 +29,7 @@ $CONFIG_PATH = '../lib/config.php';
 $CONFIG_TPL_PATH = 'config.php.tpl';
 $INSTALL_SQL_PATH = 'install.sql';
 
+include_once('../lib/stdconfig.php');
 
 session_start();
 if(isset($_SESSION['TTL'])){
@@ -48,7 +49,7 @@ if(file_exists($CONFIG_PATH)){
 	}
 }
 else{
-	print "you must first run ./install/install.sh in your shell.";
+	print "You must first run ./install/install.sh in your shell.";
 	exit(1);
 }
 
@@ -71,6 +72,9 @@ switch($a){
 ?>
 <form action="?a=save" method="post">
 	<table border="0" cellpadding="3" cellspacing="3" width="100%">
+		<tr>
+			<td colspan="2"><h1>PHP Downloader <?php print $CONFIG['PHPDL_VERSION']; ?></h1></td>
+		</tr>
 		<tr>
 			<td colspan="2">0. General terms and conditions</td>
 		</tr>
@@ -417,13 +421,13 @@ switch($a){
 }
 
 function htmlHead(){
-	
+	global $CONFIG;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>PHPDL Install</title>
+		<title>PHPDL <?php print $CONFIG['PHPDL_VERSION']; ?> Install</title>
 		<script type="text/javascript" src="../lib/jquery/jquery-1.4.3.js"></script>
 	</head>
 	<body>
@@ -506,8 +510,9 @@ function htmlFooter(){
 }
 
 function htmlInstallFinished(){
+	global $CONFIG;
 	print '
-		<b><font color="#009900">Installation OK.</font></b><br />
+		<b><font color="#009900">PHP Downloader '.$CONFIG['PHPDL_VERSION'].' installation OK.</font></b><br />
 		<br />
 		<ul>
 			<li><font color="#ff0000"><b>Delete the "install" directory!</b></font></li>
@@ -562,15 +567,12 @@ function pathCheck($progname){
 }
 
 function rndstr($len = 512){
-	$charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+*#-_:,;|>.<!$%&/()=?{}[]~';
+	$charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-_:,;|>.<!%&/=?(){}[]';
 	$charsetLen = strlen($charset);
 	
 	$retval = '';
-	
-	for($i = 0; $i < $len; $i++){
-		$c = substr($charset, rand(0, $charsetLen - 1), 1);
-		$retval .= $c;
-	}
+	for($i = 0; $i < $len; $i++)
+		$retval .= substr($charset, rand(0, $charsetLen - 1), 1);
 	
 	return $retval;
 }
