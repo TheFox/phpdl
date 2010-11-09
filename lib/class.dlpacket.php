@@ -51,9 +51,17 @@ class dlpacket extends dbh{
 		return $this->filesC();
 	}
 	
+	function reloadById($id){
+		$this->files = array();
+		$this->data = array();
+		$this->dataChanges = array();
+		return $this->loadById($id);
+	}
+	
 	function filesC(){
-		#print "packet.filesC ".count(($this->files))."\n";
-		return count(array_keys($this->files));
+		if(count($this->files))
+			return count(array_keys($this->files));
+		return 0;
 	}
 	
 	function fileErrors(){

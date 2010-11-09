@@ -146,6 +146,13 @@ else{
 						
 						$packetC++;
 						
+						$packet->loadFiles();
+						$packetFilesFinished = $packet->filesFinished();
+						$packetFilesC = $packet->filesC();
+						$packetFilesFinishedPercent = 0;
+						if($packetFilesC)
+							$packetFilesFinishedPercent = (int)($packetFilesFinished / $packetFilesC * 100);
+						
 						$move = '';
 						if($packetNum > 1){
 							if($packetC == 1)
@@ -164,11 +171,11 @@ else{
 							$status[] = 'waiting';
 						elseif($packet->get('stime') && !$packet->get('ftime')){
 							$trClass = 'packetIsDownloading';
-							$status[] = 'downloading (~'.(int)($packet->filesFinished() / $packet->filesC() * 100).' %)';
+							$status[] = 'downloading (~'.$packetFilesFinishedPercent.' %, '.$packetFilesFinished.'/'.$packetFilesC.')';
 						}
 						elseif($packet->get('stime') && $packet->get('ftime')){
 							$trClass = 'packetHasFinished';
-							$status[] = 'finished';
+							$status[] = $packetFilesFinishedPercent.' % finished';
 						}
 						if($packet->fileErrors())
 							$trClass = 'packetHasError';
