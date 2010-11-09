@@ -15,12 +15,16 @@
 			<td><textarea name="urls" rows="20" cols="60">{$files}</textarea></td>
 		</tr>
 		<tr>
-			<td width="120">Source (URL, ...)</td>
+			<td>Source (URL, ...)</td>
 			<td><input type="text" name="source" value="{$source}" /></td>
 		</tr>
 		<tr>
-			<td width="120">Password</td>
+			<td>Password</td>
 			<td><input type="text" name="password" value="{$password}" /></td>
+		</tr>
+		<tr>
+			<td>Sortnr</td>
+			<td><input type="text" name="sortnr" value="{$sortnr}" maxlength="2" /></td>
 		</tr>
 		<tr>
 			<td colspan="2">{$save}</td>

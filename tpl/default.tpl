@@ -42,9 +42,12 @@
 </script>
 
 <table border="1">
-	<tr><td colspan="9"><div id="status">{$status}</div></td></tr>
+	<tr><td colspan="11"><div id="status">{$status}</div></td></tr>
+	<tr><td colspan="11"><a href="?a=packetSort">Sort</a></td></tr>
 	<tr>
 		<td>id</td>
+		<td>move</td>
+		<td>sortnr</td>
 		<td>user</td>
 		<td>name</td>
 		<td>ctime</td>

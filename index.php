@@ -122,6 +122,7 @@ else{
 	switch($a){
 		
 		default:
+		case 'stack':
 			
 			$tpl = 'default.tpl';
 			$cacheId = 'default';
@@ -135,12 +136,27 @@ else{
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				
 				$stack = '';
-				$res = mysql_query("select id from packets where archive = '0' order by id;", $dbh);
+				$res = mysql_query("select id from packets where archive = '0' order by sortnr, id;", $dbh);
+				$packetNum = mysql_num_rows($res);
+				$packetC = 0;
 				#foreach($packets as $packetId => $packet){
 				while($row = mysql_fetch_assoc($res)){
 					
 					if($packet->reloadById($row['id'])){
-					
+						
+						$packetC++;
+						
+						$move = '';
+						if($packetNum > 1){
+							if($packetC == 1)
+								$move = '<a href="?a=packetMove&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a>';
+							elseif($packetC <= $packetNum - 1)
+								$move = '<a href="?a=packetMove&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a> <a href="?a=packetMove&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+							else
+								$move = '<a href="?a=packetMove&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+							
+						}
+						
 						$trClass = '';
 						$status = array();
 						
@@ -162,6 +178,8 @@ else{
 						$stack .= '
 							<tr id="packetTr'.$packet->get('id').'">
 								<td class="'.$trClass.'">'.$packet->get('id').'</td>
+								<td class="'.$trClass.'">'.$move.'</td>
+								<td class="'.$trClass.'">'.$packet->get('sortnr').'</td>
 								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
 								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packet->get('id').'">'.$packet->get('name').'</a></td>
 								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
@@ -211,14 +229,23 @@ else{
 						$smarty->assign('nameDisabled', 'disabled="disabled"');
 						$smarty->assign('source', $packet->get('source'));
 						$smarty->assign('password', $packet->get('password'));
+						$smarty->assign('sortnr', $packet->get('sortnr'));
 						
 						if($packet->loadFiles())
 							foreach($packet->files as $fileId => $file)
 								$filesOut .= $file->get('uri')."\n";
 					}
 				}
-				else
+				else{
 					$filesOut = $_POST['files'];
+					
+					$dbh = dbConnect();
+					$res = mysql_fetch_assoc(mysql_query("select max(sortnr) m from packets;", $dbh));
+					$sortnr = $res['m'] + 1;
+					dbClose($dbh);
+					
+					$smarty->assign('sortnr', $sortnr);
+				}
 				
 				$smarty->assign('id', $id);
 				$smarty->assign('files', $filesOut);
@@ -255,6 +282,7 @@ else{
 			
 			$source = preg_replace('/["\']/', '', $_POST['source']);
 			$password = preg_replace('/["\']/', '', $_POST['password']);
+			$sortnr = (int)$_POST['sortnr'];
 			
 			$dbh = dbConnect();
 			if($id){
@@ -291,13 +319,13 @@ else{
 						
 					}
 					
-					mysql_query("update packets set source = '$source', password = '$password' where id = '$id' limit 1;");
+					mysql_query("update packets set source = '$source', password = '$password', sortnr = '$sortnr' where id = '$id' limit 1;");
 					
 				}
 			}
 			else{
 				// Add new
-				mysql_query("insert into packets(_user, name, archive, source, password, ctime) values ('".$user->get('id')."', '$name', '1', '$source', '$password', '".mktime()."');", $dbh);
+				mysql_query("insert into packets(_user, name, archive, source, password, sortnr, ctime) values ('".$user->get('id')."', '$name', '1', '$source', '$password', '$sortnr', '".mktime()."');", $dbh);
 				$pid = mysql_insert_id($dbh);
 				foreach($urls as $url)
 					mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$pid', '$url', '".mktime()."');", $dbh);
@@ -358,6 +386,42 @@ else{
 			}
 			else
 				print "failed";
+			
+		break;
+		
+		case 'packetMove':
+			
+			$direction = checkInput($_GET['dir'], 'du', 1);
+			$sortnr = (int)$_GET['sortnr'];
+			
+			$dbh = dbConnect();
+			
+			if($direction == 'd'){
+				mysql_query("update packets set sortnr = sortnr - 1 where sortnr = ".($sortnr + 1).";");
+				mysql_query("update packets set sortnr = sortnr + 1 where id = '$id' limit 1;");
+			}
+			else{
+				mysql_query("update packets set sortnr = sortnr + 1 where sortnr = ".($sortnr - 1).";");
+				mysql_query("update packets set sortnr = sortnr - 1 where id = '$id' limit 1;");
+			}
+			
+			dbClose($dbh);
+			
+			header('Location: ?');
+			
+		break;
+		
+		case 'packetSort':
+			
+			$dbh = dbConnect();
+			
+			$sortnr = 1;
+			$res = mysql_query("select id, sortnr from packets order by sortnr, id;", $dbh);
+			while($packet = mysql_fetch_assoc($res))
+				mysql_query("update packets set sortnr = '".($sortnr++)."' where id = '".$packet['id']."' limit 1;", $dbh);
+			dbClose($dbh);
+			
+			header('Location: ?');
 			
 		break;
 		
