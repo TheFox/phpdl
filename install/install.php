@@ -126,7 +126,7 @@ switch($a){
 					<tr>
 						<td>Database Password</td>
 						<td><pre>$DB_PASS</pre></td>
-						<td><input type="text" name="DB_PASS" id="DB_PASS" value="<?php print isset($_SESSION['DB_PASS']) ? $_SESSION['DB_PASS'] : ''; ?>" /></td>
+						<td><input type="password" name="DB_PASS" id="DB_PASS" value="<?php print isset($_SESSION['DB_PASS']) ? $_SESSION['DB_PASS'] : ''; ?>" /></td>
 					</tr>
 					<tr>
 						<td colspan="3">
