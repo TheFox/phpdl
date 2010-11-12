@@ -26,6 +26,7 @@ if(!defined('ANTIHACK')) die('Hacking attempt.');
 $CONFIG = array(
 	
 	'PHPDL_VERSION' => '0.2.0',
+	'PHPDL_RELEASEID' => 0,
 	
 	'SITE_HOST' => '',
 	'SITE_NAME' => 'PHP Downloader',
