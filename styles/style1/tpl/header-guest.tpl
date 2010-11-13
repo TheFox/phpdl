@@ -7,7 +7,7 @@
 		{include file="head.tpl"}
 	</head>
 	<body>
-		<table border="1" cellpadding="5" cellspacing="5" width="100%">
+		<table border="0" cellpadding="5" cellspacing="5" width="100%">
 			<tr>
 				<td class="content">
 <!-- END OF header-guest.tpl //-->

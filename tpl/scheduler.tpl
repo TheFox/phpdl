@@ -25,7 +25,7 @@
 	
 </script>
 
-<table border="1">
+<table border="0">
 	<tr><td colspan="{$tableColspan}"><div id="status">{$status}</div></td></tr>
 	<tr><td colspan="{$tableColspan}"><a href="?a=schedulerEdit&amp;id=0">Add</a> | <a href="?a=schedulerSort">Sort</a></td></tr>
 	<tr><td colspan="{$tableColspan}">{$dateLong}</td></tr>

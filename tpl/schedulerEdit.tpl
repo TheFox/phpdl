@@ -2,7 +2,7 @@
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 <form action="?a=schedulerEditExec&amp;id={$id}" method="post">
-	<table border="1">
+	<table border="0">
 		<tr>
 			<td>Name (optional)</td>
 			<td><input type="text" name="name" value="{$name}" maxlength="255" /></td>

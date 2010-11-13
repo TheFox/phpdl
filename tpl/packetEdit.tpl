@@ -2,7 +2,7 @@
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 {$formBegin}
-	<table border="1" cellpadding="0" cellspacing="4" width="100%">
+	<table border="0" cellpadding="0" cellspacing="4" width="100%">
 		<tr>
 			<td colspan="2" class="packetHasError">{$error}</td>
 		</tr>

@@ -6,7 +6,7 @@
 			</tr>
 			<tr>
 				<td align="center">
-					<table border="1">
+					<table border="0">
 						<tr>
 							<td class="copyright">
 								This site was generated @ {$dateLong} by {$siteGenerator}.<br />

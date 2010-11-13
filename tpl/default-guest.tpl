@@ -2,7 +2,7 @@
 {include file="{$siteStyleTplDir}/header-guest.tpl"}
 
 <form action="?a=loginExec" method="post">
-	<table border="1">
+	<table border="0">
 		<tr>
 			<td width="120">Login</td>
 			<td><input type="text" name="login" /></td>
