@@ -1,4 +1,4 @@
--- Created @ 2010/11/12 18:37:29 by TheFox@fox21.at
+-- Created @ 2010/11/13 18:27:55 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -96,7 +96,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-12 18:37:30
+-- Dump completed on 2010-11-13 18:27:55
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -174,7 +174,7 @@ CREATE TABLE `scheduler` (
 
 LOCK TABLES `scheduler` WRITE;
 /*!40000 ALTER TABLE `scheduler` DISABLE KEYS */;
-INSERT INTO `scheduler` VALUES (1,1,0,'Default scheduler','',0,0,'1','0',0,86399,1,'1',1289151033);
+INSERT INTO `scheduler` VALUES (1,1,0,'Default scheduler','',0,0,'1','0',0,86399,1,'1',1289664734);
 /*!40000 ALTER TABLE `scheduler` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -187,4 +187,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-12 18:37:31
+-- Dump completed on 2010-11-13 18:27:56
