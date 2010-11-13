@@ -24,9 +24,11 @@ define('ANTIHACK', 1);
 if(isset($_SERVER['SERVER_ADDR'])) die('Hacking attempt.');
 
 
+chdir(substr($_SERVER['SCRIPT_FILENAME'], 0, strlen($_SERVER['SCRIPT_FILENAME']) - strlen(basename($_SERVER['SCRIPT_FILENAME']))));
+
 if(file_exists('install')){
 	print "ERROR: You must first install PHPDL.\n";
-	exit();
+	exit(1);
 }
 
 include_once('./lib/config.php');
@@ -42,6 +44,7 @@ function main(){
 	
 	
 	print "pid: ".posix_getpid()."\n";
+	print "cwd: ".getcwd()."\n";
 	
 	$fh = fopen($CONFIG['PHPDL_STACK_PIDFILE'], 'w');
 	fwrite($fh, posix_getpid());
