@@ -23,6 +23,9 @@ Install
 	5. After installation delete the "install" directory.
 	6. Run ./startstack in your terminal.
 
+Security
+	wget is used to download the files. Each file has a own wget process. If you have a pro account it could be that the password is shown in the process list of your pc/server! If you don't want to show other users your one click hoster password, don't enter it in the hosters table!
+
 Created with help from many libraries and frameworks including:
 	- JQuery
 	- Smarty
