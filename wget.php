@@ -76,14 +76,10 @@ if(count($argv) >= 2){
 		}
 		else
 			print "ERROR: no hoster found\n";
-		
-		
 	}
 	else
 		print "ERROR: file not found\n";
 	
-	
 }
-
 
 ?>

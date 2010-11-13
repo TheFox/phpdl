@@ -15,7 +15,6 @@
 							<td width="120" valign="top">
 								<span id="navigation">
 									<a href="?">Stack</a><br />
-									<a href="?a=packetEdit&amp;id=0">Add</a><br />
 									<a href="?a=scheduler">Scheduler</a><br />
 									<br />
 									Tools<br />

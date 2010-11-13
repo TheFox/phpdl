@@ -236,8 +236,14 @@ else{
 							$error .= '<li>This packet is owned by another user.</li>';
 						if($packet->filesDownloading())
 							$error .= '<li>You can not modify a downloading packet.</li>';
-						if($packet->get('ftime'))
+						if($packet->get('ftime')){
 							$error .= '<li>You can not modify a finished packet.</li>';
+							$smarty->assign('reset', '
+								<tr>
+									<td colspan="2"><a href="?a=packetResetExec&amp;id='.$packet->get('id').'">Reset</td>
+								</tr>
+							');
+						}
 						if($packet->get('archive'))
 							$error .= '<li>This packet is archived.</li>';
 					
@@ -359,15 +365,13 @@ else{
 			if($packet->loadById($id)){
 				
 				if($user->get('id') != $packet->get('_user'))
-					exit();
+					exit(1);
 				
-				#mysql_query("delete from files where _packet = '$id';");
-				#mysql_query("delete from packets where id = '$id' limit 1;");
-				
-				mysql_query("update packets set archive = '1' where id = '$id' limit 1;");
+				$dbh = dbConnect();
+				mysql_query("update packets set archive = '1' where id = '$id' limit 1;", $dbh);
+				dbClose($dbh);
 				
 			}
-			
 			
 			if(!$noredirect)
 				header('Location: ?');
@@ -413,12 +417,12 @@ else{
 			$dbh = dbConnect();
 			
 			if($direction == 'd'){
-				mysql_query("update packets set sortnr = sortnr - 1 where sortnr = ".($sortnr + 1).";");
-				mysql_query("update packets set sortnr = sortnr + 1 where id = '$id' limit 1;");
+				mysql_query("update packets set sortnr = sortnr - 1 where sortnr = ".($sortnr + 1).";", $dbh);
+				mysql_query("update packets set sortnr = sortnr + 1 where id = '$id' limit 1;", $dbh);
 			}
 			else{
-				mysql_query("update packets set sortnr = sortnr + 1 where sortnr = ".($sortnr - 1).";");
-				mysql_query("update packets set sortnr = sortnr - 1 where id = '$id' limit 1;");
+				mysql_query("update packets set sortnr = sortnr + 1 where sortnr = ".($sortnr - 1).";", $dbh);
+				mysql_query("update packets set sortnr = sortnr - 1 where id = '$id' limit 1;", $dbh);
 			}
 			
 			dbClose($dbh);
@@ -438,6 +442,26 @@ else{
 			dbClose($dbh);
 			
 			header('Location: ?');
+			
+		break;
+		
+		case 'packetResetExec':
+			
+			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+			if($packet->loadById($id)){
+				
+				if($user->get('id') != $packet->get('_user'))
+					exit(1);
+				
+				$dbh = dbConnect();
+				mysql_query("update packets set archive = '0', md5Verified = '0', stime = '0', ftime = '0' where id = '$id' limit 1;", $dbh);
+				mysql_query("update files set pid = '0', md5Verified = '0', error = '0', stime = '0', ftime = '0' where _packet = '$id';", $dbh);
+				dbClose($dbh);
+				
+			}
+			
+			if(!$noredirect)
+				header('Location: ?');
 			
 		break;
 		

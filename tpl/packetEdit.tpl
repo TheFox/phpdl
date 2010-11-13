@@ -26,6 +26,7 @@
 			<td>Sortnr</td>
 			<td><input type="text" name="sortnr" value="{$sortnr}" maxlength="2" /></td>
 		</tr>
+		{$reset}
 		<tr>
 			<td colspan="2">{$save}</td>
 		</tr>

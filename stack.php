@@ -88,6 +88,11 @@ function main(){
 									
 									if(!$packet->get('stime')){
 										$packet->save('stime', mktime());
+										
+										if(file_exists($packetDownloadDir))
+											rmdirr($packetDownloadDir);
+										if(file_exists($packetFinishedDir))
+											rmdirr($packetFinishedDir);
 									}
 									
 									if($nextfile = $packet->getFileNextUnfinished()){

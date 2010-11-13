@@ -43,7 +43,7 @@
 
 <table border="0">
 	<tr><td colspan="11"><div id="status">{$status}</div></td></tr>
-	<tr><td colspan="11"><a href="?a=packetSort">Sort</a></td></tr>
+	<tr><td colspan="11"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSort">Sort</a></td></tr>
 	<tr>
 		<td>id</td>
 		<td>move</td>
