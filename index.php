@@ -252,7 +252,7 @@ else{
 					$filesOut = $_POST['files'];
 					
 					$dbh = dbConnect();
-					$res = mysql_fetch_assoc(mysql_query("select max(sortnr) m from packets;", $dbh));
+					$res = mysql_fetch_assoc(mysql_query("select max(sortnr) m from packets where archive = '0';", $dbh));
 					$sortnr = $res['m'] + 1;
 					dbClose($dbh);
 					
