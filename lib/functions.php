@@ -221,6 +221,18 @@ function scheduler($dbh){
 	return 0;
 }
 
+function filesDownloading($dbh){
+	$retval = 0;
+	
+	$res = mysql_query("select id from packets where archive = '0';", $dbh);
+	while($row = mysql_fetch_assoc($res)){
+		$res2 = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = '".$row['id']."' and stime != '0' and ftime = '0';", $dbh));
+		$retval += $res2['c'];
+	}
+	
+	return $retval;
+}
+
 function printd($text = ''){
 	list($usec, $sec) = explode(' ', microtime());
 	printf("%s.%03d %s", date('Y/m/d H:i:s'), (int)($usec * 1000), $text);
