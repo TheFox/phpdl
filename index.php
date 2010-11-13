@@ -66,6 +66,7 @@ if($user->isGuest){
 			$cacheId = 'default-guest';
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
 			}
 			$smarty->display($tpl, $cacheId);
 			
@@ -105,6 +106,7 @@ if($user->isGuest){
 			$cacheId = 'default-guest-superuseradd-exec';
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
 				
 				$smarty->assign('status', '<b><font color="#009900">User added.</font></b> Now you can <a href="?">log in</a> with this user.');
 			}
@@ -128,6 +130,7 @@ else{
 			$cacheId = 'default';
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
 				
 				
 				$dbh = dbConnect();
@@ -220,6 +223,7 @@ else{
 			$cacheId = $a;
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
 				
 				$error = '';
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
@@ -446,6 +450,7 @@ else{
 			$cacheId = $a;
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
 				
 				$error = '';
 				if(!file_exists($containerLibPath))
@@ -494,6 +499,7 @@ else{
 			$cacheId = $a;
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
 				
 				$dbh = dbConnect();
 				$schedulerActive = abs(scheduler($dbh));
@@ -567,6 +573,7 @@ else{
 			$cacheId = $a;
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
 				
 				$dbh = dbConnect();
 				if($id){
@@ -711,6 +718,133 @@ else{
 			$dbh = dbConnect();
 			mysql_query("update scheduler set active = '$active' where id = '$id' limit 1;", $dbh);
 			dbClose($dbh);
+			
+		break;
+		
+		case 'superuser':
+			
+			if($user->get('superuser')){
+				$tpl = $a.'.tpl';
+				$cacheId = $a;
+				if(!$smarty->isCached($tpl, $cacheId)){
+					smartyAssignStd($smarty);
+					smartyAssignMenu($smarty, $user);
+				}
+				$smarty->display($tpl, $cacheId);
+			}
+			
+		break;
+		
+		case 'superuserUsers':
+			
+			if($user->get('superuser')){
+				$tpl = $a.'.tpl';
+				$cacheId = $a;
+				if(!$smarty->isCached($tpl, $cacheId)){
+					smartyAssignStd($smarty);
+					smartyAssignMenu($smarty, $user);
+					
+					$usersOut = '';
+					$dbh = dbConnect();
+					$res = mysql_query("select id, login from users order by id;");
+					while($row = mysql_fetch_assoc($res)){
+						$usersOut .= '
+							<tr>
+								<td>'.$row['id'].'</td>
+								<td><a href="?a=superuserUserEdit&amp;id='.$row['id'].'">'.$row['login'].'</a></td>
+							</tr>
+						';
+					}
+					dbClose($dbh);
+					
+					$smarty->assign('users', $usersOut);
+				}
+				$smarty->display($tpl, $cacheId);
+			}
+			
+		break;
+		
+		case 'superuserUserEdit':
+			
+			if($user->get('superuser')){
+				$tpl = $a.'.tpl';
+				$cacheId = $a;
+				if(!$smarty->isCached($tpl, $cacheId)){
+					smartyAssignStd($smarty);
+					smartyAssignMenu($smarty, $user);
+					
+					$user = new user($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+					$user->loadById($id);
+					
+					$smarty->assign('id', $user->get('id'));
+					$smarty->assign('login', $user->get('login'));
+					$smarty->assign('superuserChecked', $user->get('superuser') ? 'checked="checked"' : '');
+					
+				}
+				$smarty->display($tpl, $cacheId);
+			}
+			
+		break;
+		
+		case 'superuserUserEditExec':
+			
+			if($user->get('superuser')){
+				$login = checkInput($_POST['login'], 'a-z0-9_', 32);
+				$superuser = (int)$_POST['superuser'];
+				$dbh = dbConnect();
+				if($id){
+					# mod user
+					$muser = new user($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+					if($muser->loadByUserId($id)){
+						if($id > $user->get('id')){
+							if($login != ''){
+								$res = mysql_query("select id from users where login like '$login' limit 1;");
+								if(!mysql_num_rows($res))
+									$muser->set('login', $login);
+							}
+							if($_POST['password'] != '')
+								$muser->set('password', mkpasswd($CONFIG['USER_PASSWORD_SALT'], $_POST['password']));
+							$muser->set('sessionId', 'y');
+							$muser->set('superuser', $superuser);
+							$muser->save();
+						}
+					}
+				}
+				else{
+					# new user
+					$res = mysql_query("select id from users where login like '$login' limit 1;");
+					if(!mysql_num_rows($res)){
+						mysql_query("insert into users(login) values ('$login');");
+						$newid = mysql_insert_id($dbh);
+						
+						$muser = new user($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+						if($muser->loadByUserId($newid)){
+							if($_POST['password'] != '')
+								$muser->set('password', mkpasswd($CONFIG['USER_PASSWORD_SALT'], $_POST['password']));
+							$muser->set('sessionId', 'y');
+							$muser->set('superuser', $superuser);
+							$muser->save();
+						}
+					}
+				}
+				dbClose($dbh);
+				
+				header('Location: ?a=superuserUsers');
+			}
+			
+		break;
+		
+		case 'superuserUserDelExec':
+			
+			if($user->get('superuser')){
+				
+				if($id > $user->get('id')){
+					$dbh = dbConnect();
+					mysql_query("delete from users where id = '$id' limit 1;", $dbh);
+					dbClose($dbh);
+				}
+				header('Location: ?a=superuserUsers');
+			}
 			
 		break;
 		

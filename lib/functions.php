@@ -111,15 +111,10 @@ function smartyAssignStd(&$smarty, $siteTitleSuffix = ''){
 	
 }
 
-function smartyAssignMenu(&$smarty, $current){
+function smartyAssignMenu(&$smarty, $user){
 	global $CONFIG, $CONFIG_STYLE;
-	if(isset($CONFIG_STYLE['SITE_STYLE_CURRENTMENUITEM']))
-		foreach($CONFIG['SITE_MENU'] as $item){
-			if($item == $current)
-				$smarty->assign('menueCurrentItemClass'.$item, $CONFIG_STYLE['SITE_STYLE_CURRENTMENUITEM']);
-			else
-				$smarty->assign('menueCurrentItemClass'.$item, '');
-		}
+	if($user->get('superuser'))
+		$smarty->assign('superuserMenu', '<a href="?a=superuser">Superuser</a><br />');
 }
 
 function dbConnect(){
