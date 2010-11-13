@@ -234,7 +234,7 @@ function printd($text = ''){
 }
 
 function rmdirr($dir){
-	if(is_dir($dir)){
+	if(is_dir($dir) && $dir != '.'){
 		$objects = scandir($dir);
 		foreach($objects as $object){
 			if($object != '.' && $object != '..'){
