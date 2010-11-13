@@ -224,6 +224,10 @@ switch($a){
 						<td>mysql_insert_id()</td>
 						<td><?php print function_exists('mysql_insert_id') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
 					</tr>
+					<tr>
+						<td>microtime()</td>
+						<td><?php print function_exists('microtime') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
 				</table>
 			</td>
 		</tr>
