@@ -34,18 +34,16 @@ include_once('./lib/functions.php');
 include_once('./lib/class.dlpacket.php');
 include_once('./lib/class.dlfile.php');
 
-$PID_PATH = '.stack.php.pid';
-
 declare(ticks = 1);
 
 
 function main(){
-	global $CONFIG, $PID_PATH;
+	global $CONFIG;
 	
 	
 	print "pid: ".posix_getpid()."\n";
 	
-	$fh = fopen($PID_PATH, 'w');
+	$fh = fopen($CONFIG['PHPDL_STACK_PIDFILE'], 'w');
 	fwrite($fh, posix_getpid());
 	fclose($fh);
 	
@@ -130,12 +128,13 @@ function main(){
 }
 
 function sigHandler($sig){
-	global $PID_PATH;
+	global $CONFIG;
 	print "sigHandler $sig\n";
 	switch($sig){
 		case SIGTERM:
-			if(file_exists($PID_PATH)){
-				unlink($PID_PATH);
+		case SIGINT:
+			if(file_exists($CONFIG['PHPDL_STACK_PIDFILE'])){
+				unlink($CONFIG['PHPDL_STACK_PIDFILE']);
 				exit();
 			}
 		break;
@@ -143,6 +142,7 @@ function sigHandler($sig){
 }
 
 pcntl_signal(SIGTERM, 'sigHandler');
+pcntl_signal(SIGINT, 'sigHandler');
 main();
 
 ?>
