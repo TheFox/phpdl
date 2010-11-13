@@ -142,7 +142,6 @@ else{
 				$res = mysql_query("select id from packets where archive = '0' order by sortnr, id;", $dbh);
 				$packetNum = mysql_num_rows($res);
 				$packetC = 0;
-				#foreach($packets as $packetId => $packet){
 				while($row = mysql_fetch_assoc($res)){
 					
 					if($packet->reloadById($row['id'])){
@@ -159,11 +158,11 @@ else{
 						$move = '';
 						if($packetNum > 1){
 							if($packetC == 1)
-								$move = '<a href="?a=packetMove&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a>';
+								$move = '<a href="?a=packetMoveExec&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a>';
 							elseif($packetC <= $packetNum - 1)
-								$move = '<a href="?a=packetMove&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a> <a href="?a=packetMove&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+								$move = '<a href="?a=packetMoveExec&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a> <a href="?a=packetMoveExec&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
 							else
-								$move = '<a href="?a=packetMove&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+								$move = '<a href="?a=packetMoveExec&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
 							
 						}
 						
@@ -197,7 +196,7 @@ else{
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
 								<td class="'.$trClass.'"><a href="?a=packetInfo&amp;id='.$packet->get('id').'">info</a></td>
-								<td class="'.$trClass.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveButton'.$packet->get('id').'" type="button" value="-" onClick="packetArchive('.$packet->get('id').');" />' : '').'</td>
+								<td class="'.$trClass.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveExecButton'.$packet->get('id').'" type="button" value="-" onClick="packetArchiveExec('.$packet->get('id').');" />' : '').'</td>
 							</tr>
 						';
 					}
@@ -275,7 +274,7 @@ else{
 					$smarty->assign('error', '<ul>'.$error.'</ul>');
 				}
 				else{
-					$smarty->assign('formBegin', '<form action="?a=packetEditSave&amp;id='.$id.'" method="post">');
+					$smarty->assign('formBegin', '<form action="?a=packetEditExec&amp;id='.$id.'" method="post">');
 					$smarty->assign('formEnd', '</form>');
 					$smarty->assign('save', '<input type="submit" value="Save" />');
 					
@@ -287,7 +286,7 @@ else{
 			
 		break;
 		
-		case 'packetEditSave':
+		case 'packetEditExec':
 			
 			$name = checkInput($_POST['name'], 'a-zA-Z0-9._ -', 256);
 			$name = str_replace(array(' ', 'ä', 'Ä', 'ü', 'Ü', 'ö', 'Ö', 'ß'), array('-', 'ae', 'Ae', 'ue', 'Ue', 'oe', 'Oe', 'ss'), $name);
@@ -359,7 +358,7 @@ else{
 			
 		break;
 		
-		case 'packetArchive':
+		case 'packetArchiveExec':
 			
 			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 			if($packet->loadById($id)){
@@ -405,11 +404,11 @@ else{
 				flush();
 			}
 			else
-				print "failed";
+				print 'failed';
 			
 		break;
 		
-		case 'packetMove':
+		case 'packetMoveExec':
 			
 			$direction = checkInput($_GET['dir'], 'du', 1);
 			$sortnr = (int)$_GET['sortnr'];
@@ -431,12 +430,12 @@ else{
 			
 		break;
 		
-		case 'packetSort':
+		case 'packetSortExec':
 			
 			$dbh = dbConnect();
 			
 			$sortnr = 1;
-			$res = mysql_query("select id, sortnr from packets order by sortnr, id;", $dbh);
+			$res = mysql_query("select id, sortnr from packets where archive = '0' order by sortnr, id;", $dbh);
 			while($packet = mysql_fetch_assoc($res))
 				mysql_query("update packets set sortnr = '".($sortnr++)."' where id = '".$packet['id']."' limit 1;", $dbh);
 			dbClose($dbh);
@@ -538,11 +537,11 @@ else{
 					$move = '';
 					if($schedulerNum > 1){
 						if($schedulerC == 1)
-							$move = '<a href="?a=schedulerMove&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a>';
+							$move = '<a href="?a=schedulerMoveExec&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a>';
 						elseif($schedulerC <= $schedulerNum - 1)
-							$move = '<a href="?a=schedulerMove&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a> <a href="?a=schedulerMove&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+							$move = '<a href="?a=schedulerMoveExec&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a> <a href="?a=schedulerMoveExec&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
 						else
-							$move = '<a href="?a=schedulerMove&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+							$move = '<a href="?a=schedulerMoveExec&amp;id='.$sched['id'].'&amp;sortnr='.$sched['sortnr'].'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
 						
 					}
 					
@@ -566,21 +565,6 @@ else{
 						</td>
 					';
 				}
-				/*if(!$schedulerActive){
-					$trClass = 'schedulerActive';
-					$schedulerOut .= '
-						<tr>
-							<td class="'.$trClass.'"></td>
-							<td class="'.$trClass.'"></td>
-							<td class="'.$trClass.'">0</td>
-							<td class="'.$trClass.'">0</td>
-							<!--<td class="'.$trClass.'"></td>//-->
-							<td class="'.$trClass.'" colspan="2">Default scheduler</td>
-							<td class="'.$trClass.'">yes</td>
-							<td class="'.$trClass.'">no</td>
-						</td>
-					';
-				}*/
 				
 				$smarty->assign('tableColspan', 8);
 				$smarty->assign('scheduler', $schedulerOut);
@@ -617,7 +601,7 @@ else{
 					
 					$smarty->assign('del', '
 						<tr>
-							<td colspan="2"><a href="?a=schedulerDel&amp;id='.$sched['id'].'">Delete</a></td>
+							<td colspan="2"><a href="?a=schedulerDelExec&amp;id='.$sched['id'].'">Delete</a></td>
 						</tr>
 					');
 				}
@@ -689,7 +673,7 @@ else{
 			
 		break;
 		
-		case 'schedulerMove':
+		case 'schedulerMoveExec':
 			
 			$direction = checkInput($_GET['dir'], 'du', 1);
 			$sortnr = (int)$_GET['sortnr'];
@@ -711,7 +695,7 @@ else{
 			
 		break;
 		
-		case 'schedulerSort':
+		case 'schedulerSortExec':
 			
 			$dbh = dbConnect();
 			
@@ -725,13 +709,13 @@ else{
 			
 		break;
 		
-		case 'schedulerDel':
+		case 'schedulerDelExec':
 			
 			$dbh = dbConnect();
 			mysql_query("delete from scheduler where id = '$id' limit 1;", $dbh);
 			dbClose($dbh);
 			
-			header('Location: ?a=schedulerSort');
+			header('Location: ?a=schedulerSortExec');
 			
 		break;
 		

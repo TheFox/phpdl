@@ -3,12 +3,12 @@
 
 <script type="text/javascript">
 	
-	function packetArchive(id){
-		var button = $('#packetArchiveButton' + id);
+	function packetArchiveExec(id){
+		var button = $('#packetArchiveExecButton' + id);
 		button.hide();
 		$.ajax({
 			type: 'GET',
-			url: '?a=packetArchive&id=' + id + '&noredirect=1',
+			url: '?a=packetArchiveExec&id=' + id + '&noredirect=1',
 			success: function(){
 				var packetTr = $('#packetTr' + id);
 				packetTr.hide();
@@ -43,7 +43,7 @@
 
 <table border="0">
 	<tr><td colspan="11"><div id="status">{$status}</div></td></tr>
-	<tr><td colspan="11"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSort">Sort</a></td></tr>
+	<tr><td colspan="11"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a></td></tr>
 	<tr>
 		<td>id</td>
 		<td>move</td>
