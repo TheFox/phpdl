@@ -233,4 +233,20 @@ function printd($text = ''){
 	printf("%s.%03d %s", date('Y/m/d H:i:s'), (int)($usec * 1000), $text);
 }
 
+function rmdirr($dir){
+	if(is_dir($dir)){
+		$objects = scandir($dir);
+		foreach($objects as $object){
+			if($object != '.' && $object != '..'){
+				if(filetype($dir.'/'.$object) == 'dir')
+					rmdirr($dir.'/'.$object);
+				else
+					unlink($dir.'/'.$object);
+			}
+		}
+		reset($objects);
+		rmdir($dir);
+	}
+}
+
 ?>
