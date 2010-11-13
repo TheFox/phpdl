@@ -551,7 +551,7 @@ else{
 					
 					$schedulerOut .= '
 						<tr>
-							<td class="'.$trClass.'"><input type="checkbox" id="active'.$sched['id'].'" '.($sched['active'] ? 'checked="checked"' : '').' onChange="active('.$sched['id'].');" /></td>
+							<td class="'.$trClass.'"><input type="checkbox" id="active'.$sched['id'].'" '.($sched['active'] ? 'checked="checked"' : '').' onChange="schedulerActiveExec('.$sched['id'].');" /></td>
 							<td class="'.$trClass.'">'.$move.'</td>
 							<td class="'.$trClass.'">'.$sched['sortnr'].'</td>
 							<td class="'.$trClass.'"><a href="?a=schedulerEdit&amp;id='.$sched['id'].'"><b>'.($sched['name'] == '' ? 'noname' : $sched['name']).'</b></a></td>
@@ -719,7 +719,7 @@ else{
 			
 		break;
 		
-		case 'schedulerActive':
+		case 'schedulerActiveExec':
 			
 			$active = (int)$_GET['active'];
 			

@@ -12,11 +12,11 @@
 		
 	});
 	
-	function active(id){
+	function schedulerActiveExec(id){
 		var checkbox = $('#active' + id);
 		$.ajax({
 			type: 'GET',
-			url: '?a=schedulerActive&id=' + id + '&active=' + (checkbox.is(':checked') ? 1 : 0),
+			url: '?a=schedulerActiveExec&id=' + id + '&active=' + (checkbox.is(':checked') ? 1 : 0),
 			success: function(){
 				//alert('ok');
 			}
