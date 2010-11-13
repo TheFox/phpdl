@@ -37,14 +37,17 @@ include_once('./lib/class.dlpacket.php');
 include_once('./lib/class.dlfile.php');
 
 declare(ticks = 1);
-
+$LOG_LAST = '';
+$SCHEDULER_LAST = 0;
 
 function main(){
-	global $CONFIG;
+	global $CONFIG, $SCHEDULER_LAST;
 	
 	
-	print "pid: ".posix_getpid()."\n";
-	print "cwd: ".getcwd()."\n";
+	print "\n";
+	printd("start\n");
+	printd("pid: ".posix_getpid()."\n");
+	printd("cwd: ".getcwd()."\n");
 	
 	$fh = fopen($CONFIG['PHPDL_STACK_PIDFILE'], 'w');
 	fwrite($fh, posix_getpid());
@@ -56,91 +59,103 @@ function main(){
 		$n++;
 		$dbh = dbConnect();
 		$scheduler = scheduler($dbh);
+		$filesDownloading = filesDownloading($dbh);
 		
-		#print "dg $n: $scheduler\n";
+		if($SCHEDULER_LAST != $scheduler){
+			plog("scheduler '$scheduler' matched\n");
+			$SCHEDULER_LAST = $scheduler;
+		}
 		
-		$resdls = mysql_fetch_assoc(mysql_query("select count(id) c from files where stime != '0' and ftime = '0';", $dbh));
-		if($resdls['c'] >= $CONFIG['DL_SLOTS']){
-			print "no free download slots\n";
-		}
-		elseif($scheduler <= 0){
-			print "scheduler inactive $scheduler\n";
-		}
-		elseif($scheduler > 0){
-			print "scheduler ok $scheduler\n";
-			$res = mysql_query("select id from packets where archive = '0' and ftime = '0' order by sortnr, id;", $dbh);
-			while($row = mysql_fetch_assoc($res)){
-				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
-				if($packet->loadById($row['id'])){
-					
-					print "packet ".$packet->get('id')."\n";
-					
-					$packetDirBn = $packet->get('id').'.'.strtolower($packet->get('name'));
-					$packetDirBn = str_replace(' ', '.', $packetDirBn);
-					
-					$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
-					$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
-					
-					if(!$packet->fileErrors()){
-						if($packet->loadFiles()){
+		$res = mysql_query("select id from packets where archive = '0' and ftime = '0' order by sortnr, id;", $dbh);
+		while($row = mysql_fetch_assoc($res)){
+			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+			if($packet->loadById($row['id'])){
+				
+				$packetDirBn = $packet->get('id').'.'.strtolower($packet->get('name'));
+				$packetDirBn = str_replace(' ', '.', $packetDirBn);
+				
+				$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
+				$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
+				
+				if(!$packet->fileErrors()){
+					if($packet->loadFiles()){
+						
+						if($packet->filesUnfinished()){
 							
-							if($packet->filesUnfinished()){
+							if($scheduler > 0){
 								
-								if(!$packet->get('stime')){
-									$packet->save('stime', mktime());
-								}
-								
-								if($nextfile = $packet->getFileNextUnfinished()){
-									$nextfile->set('error', $DLFILE_ERROR_NO_ERROR);
-									$nextfile->set('stime', mktime());
-									$nextfile->set('ftime', 0);
-									$nextfile->save();
+								if($filesDownloading < $CONFIG['DL_SLOTS']){
 									
-									if(!file_exists($packetDownloadDir)){
-										mkdir($packetDownloadDir);
-										chmod($packetDownloadDir, 0755);
+									if(!$packet->get('stime')){
+										$packet->save('stime', mktime());
 									}
 									
-									print "\tstart download ".$nextfile->get('id')."\n";
-									system('php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" &> /dev/null &');
-									
-									break;
+									if($nextfile = $packet->getFileNextUnfinished()){
+										$nextfile->set('error', $DLFILE_ERROR_NO_ERROR);
+										$nextfile->set('stime', mktime());
+										$nextfile->set('ftime', 0);
+										$nextfile->save();
+										
+										if(!file_exists($packetDownloadDir)){
+											mkdir($packetDownloadDir);
+											chmod($packetDownloadDir, 0755);
+										}
+										
+										printd("packet ".$packet->get('id').": download ".$nextfile->get('id')."\n");
+										system('php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" &> /dev/null &');
+										sleep(1);
+										
+										break;
+									}
 								}
 								else
-									print "\tno next file\n";
+									plog("no free download slots (".$CONFIG['DL_SLOTS'].")\n");
 							}
-							else{
-								print "\tall files finished\n";
-								$packet->save('ftime', mktime());
-								$packet->md5Verify();
-								
-								rename($packetDownloadDir, $packetFinishedDir);
-							}
+						}
+						else{
+							printd("packet ".$packet->get('id').": all files finished\n");
+							$packet->save('ftime', mktime());
+							$packet->md5Verify();
+							
+							rename($packetDownloadDir, $packetFinishedDir);
 						}
 					}
 				}
-				unset($packet);
 			}
+			unset($packet);
 		}
+		
 		dbClose($dbh);
 		
-		
-		print "sleep 5\n\n";
 		sleep(5);
 	}
+	
+	printd("exit\n");
 }
 
 function sigHandler($sig){
 	global $CONFIG;
-	print "sigHandler $sig\n";
+	
+	printd("sigHandler $sig\n");
 	switch($sig){
 		case SIGTERM:
 		case SIGINT:
 			if(file_exists($CONFIG['PHPDL_STACK_PIDFILE'])){
 				unlink($CONFIG['PHPDL_STACK_PIDFILE']);
-				exit();
+				
+				printd("exit\n");
+				exit(1);
 			}
 		break;
+	}
+}
+
+function plog($text){
+	// Print log.
+	global $LOG_LAST;
+	if($LOG_LAST != $text){
+		printd($text);
+		$LOG_LAST = $text;
 	}
 }
 
