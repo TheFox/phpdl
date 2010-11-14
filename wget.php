@@ -30,6 +30,9 @@ include_once('./lib/class.dlfile.php');
 
 if(count($argv) >= 2){
 	
+	print "\n";
+	printd("start\n");
+	
 	$fileId = (int)$argv[1];
 	$packetDownloadDir = '';
 	
@@ -41,8 +44,8 @@ if(count($argv) >= 2){
 	if($packetDownloadDir == '')
 		$packetDownloadDir = '.';
 	
-	print "file id: $fileId\n";
-	print "download dir: '$packetDownloadDir'\n";
+	printd("file id: $fileId\n");
+	printd("download dir: '$packetDownloadDir'\n");
 	
 	$dbh = dbConnect();
 	$file = new dlfile($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
@@ -51,7 +54,7 @@ if(count($argv) >= 2){
 	
 	if($file->loadById($fileId)){
 		#$file = $files[$fileId];
-		print "uri: '".$file->get('uri')."'\n";
+		printd("uri: '".$file->get('uri')."'\n");
 		
 		$thisHoster = null;
 		foreach($hosters as $id => $thisHoster)
@@ -59,27 +62,32 @@ if(count($argv) >= 2){
 				break;
 		
 		if($thisHoster){
-			print "hoster found\n";
+			printd("hoster found\n");
 			$libThisHosterPath = './lib/hoster/'.$thisHoster['phpPath'];
 			if(file_exists($libThisHosterPath)){
 				include_once($libThisHosterPath);
-				print "hoster plugin loaded\n";
+				printd("hoster plugin loaded: $libThisHosterPath\n");
 				
-				if(function_exists('hosterExec') && preg_match('/^http:/', $file->get('uri'))){
-					$filePath = hosterExec($file, $thisHoster, $packetDownloadDir);
+				if(function_exists('hosterExec')){
+					if(preg_match('/^http:/', $file->get('uri'))){
+						printd("hoster plugin: hosterExec()\n");
+						$filePath = hosterExec($file, $thisHoster, $packetDownloadDir);
+						printd("hoster plugin: hosterExec() done: $filePath\n");
+					}
 				}
-				
-				print "hoster plugin: hosterExec done\n";
+				else
+					printd("ERROR: hoster plugin: no hosterExec() function\n");
 			}
 			else
-				print "ERROR: '$libThisHosterPath' not found\n";
+				printd("ERROR: plugin not found: $libThisHosterPath\n");
 		}
 		else
-			print "ERROR: no hoster found\n";
+			printd("ERROR: no hoster found\n");
 	}
 	else
-		print "ERROR: file not found\n";
+		printd("ERROR: file not found\n");
 	
+	printd("exit\n");
 }
 
 ?>

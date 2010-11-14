@@ -230,7 +230,7 @@ function filesDownloading($dbh){
 
 function printd($text = ''){
 	list($usec, $sec) = explode(' ', microtime());
-	printf("%s.%03d %s", date('Y/m/d H:i:s'), (int)($usec * 1000), $text);
+	printf("%s.%03d %5d %s", date('Y/m/d H:i:s'), (int)($usec * 1000), posix_getpid(), $text);
 }
 
 function rmdirr($dir){

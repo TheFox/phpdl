@@ -46,8 +46,9 @@ function main(){
 	
 	print "\n";
 	printd("start\n");
-	printd("pid: ".posix_getpid()."\n");
 	printd("cwd: ".getcwd()."\n");
+	
+	$date = date('Ymd');
 	
 	$fh = fopen($CONFIG['PHPDL_STACK_PIDFILE'], 'w');
 	fwrite($fh, posix_getpid());
@@ -107,7 +108,9 @@ function main(){
 										}
 										
 										printd("packet ".$packet->get('id').": download ".$nextfile->get('id')."\n");
-										system('php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" &> /dev/null &');
+										$sh = 'php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" 1>> log/wget.'.$date.'.log 2>> log/wget.'.$date.'.log &';
+										printd("exec '$sh'\n");
+										system($sh);
 										sleep(1);
 										
 										break;
