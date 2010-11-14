@@ -7,7 +7,7 @@
 		
 		// autorefresh
 		setTimeout(function(){
-			document.location.href = '?a=scheduler';
+			document.location.href = document.location.href;
 		}, 1000 * 60);
 		
 	});

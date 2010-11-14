@@ -196,7 +196,7 @@ else{
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
 								<td class="'.$trClass.'"><a href="?a=packetInfo&amp;id='.$packet->get('id').'">info</a></td>
-								<td class="'.$trClass.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveExecButton'.$packet->get('id').'" type="button" value="-" onClick="packetArchiveExec('.$packet->get('id').');" />' : '').'</td>
+								<td class="'.$trClass.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveExecButton'.$packet->get('id').'" type="button" value="+" onClick="packetArchiveExec('.$packet->get('id').');" />' : '').'</td>
 							</tr>
 						';
 					}
@@ -235,16 +235,16 @@ else{
 							$error .= '<li>This packet is owned by another user.</li>';
 						if($packet->filesDownloading())
 							$error .= '<li>You can not modify a downloading packet.</li>';
-						if($packet->get('ftime')){
+						if($packet->get('ftime'))
 							$error .= '<li>You can not modify a finished packet.</li>';
+						if($packet->get('archive'))
+							$error .= '<li>This packet is archived.</li>';
+						if($packet->get('ftime') || $packet->get('archive'))
 							$smarty->assign('reset', '
 								<tr>
 									<td colspan="2"><a href="?a=packetResetExec&amp;id='.$packet->get('id').'">Reset</td>
 								</tr>
 							');
-						}
-						if($packet->get('archive'))
-							$error .= '<li>This packet is archived.</li>';
 					
 						$smarty->assign('nameValue', $packet->get('name'));
 						$smarty->assign('nameDisabled', 'disabled="disabled"');
@@ -355,6 +355,81 @@ else{
 			dbClose($dbh);
 			
 			header('Location: ?');
+			
+		break;
+		
+		case 'packetArchive':
+			
+			$tpl = $a.'.tpl';
+			$cacheId = $a;
+			if(!$smarty->isCached($tpl, $cacheId)){
+				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
+				
+				
+				$dbh = dbConnect();
+				$users = getDbTable($dbh, 'users');
+				
+				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+				
+				$stack = '';
+				$res = mysql_query("select id from packets where archive = '1' order by id desc;", $dbh);
+				$packetNum = mysql_num_rows($res);
+				$packetC = 0;
+				while($row = mysql_fetch_assoc($res)){
+					
+					if($packet->reloadById($row['id'])){
+						
+						$packetC++;
+						
+						$packet->loadFiles();
+						$packetFilesFinished = $packet->filesFinished();
+						$packetFilesC = $packet->filesC();
+						$packetFilesFinishedPercent = 0;
+						if($packetFilesC)
+							$packetFilesFinishedPercent = (int)($packetFilesFinished / $packetFilesC * 100);
+						
+						
+						$trClass = '';
+						$status = array();
+						
+						if(!$packet->get('stime'))
+							$status[] = 'waiting';
+						elseif($packet->get('stime') && !$packet->get('ftime')){
+							$trClass = 'packetIsDownloading';
+							$status[] = 'downloading (~'.$packetFilesFinishedPercent.' %, '.$packetFilesFinished.'/'.$packetFilesC.')';
+						}
+						elseif($packet->get('stime') && $packet->get('ftime')){
+							$trClass = 'packetHasFinished';
+							$status[] = $packetFilesFinishedPercent.' % finished';
+						}
+						if($packet->fileErrors())
+							$trClass = 'packetHasError';
+						if($packet->get('md5Verified'))
+							$status[] = 'verified';
+						
+						$stack .= '
+							<tr id="packetTr'.$packet->get('id').'">
+								<td class="'.$trClass.'">'.$packet->get('id').'</td>
+								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
+								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packet->get('id').'">'.$packet->get('name').'</a></td>
+								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
+								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
+								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
+								<td class="'.$trClass.'">'.join(', ', $status).'</td>
+								<td class="'.$trClass.'"><a href="?a=packetInfo&amp;id='.$packet->get('id').'">info</a></td>
+							</tr>
+						';
+					}
+					
+				}
+				$smarty->assign('stack', $stack);
+				
+				
+				dbClose($dbh);
+				
+			}
+			$smarty->display($tpl, $cacheId);
 			
 		break;
 		

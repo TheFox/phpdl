@@ -3,6 +3,15 @@
 
 <script type="text/javascript">
 	
+	$(document).ready(function(){
+		
+		// autorefresh
+		setTimeout(function(){
+			document.location.href = document.location.href;
+		}, 1000 * 60);
+		
+	});
+	
 	function packetArchiveExec(id){
 		var button = $('#packetArchiveExecButton' + id);
 		button.hide();
@@ -29,15 +38,6 @@
 			}
 		});
 	}
-	
-	$(document).ready(function(){
-		
-		// autorefresh
-		setTimeout(function(){
-			document.location.href = '?';
-		}, 30000);
-		
-	});
 	
 </script>
 
