@@ -174,8 +174,13 @@ function checkInput($val, $pattern, $len = -1){
 	return $val;
 }
 
-function wget($bin, $uri, $o){
-	system($bin.' -O '.$o.' "'.$uri.'"');
+function wget($bin, $uri, $o, $limit = 0){
+	$shLimit = '';
+	
+	if($limit)
+		$shLimit = '--limit-rate='.$limit.'k';
+	
+	system($bin.' -U "Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10" -t 10 --waitretry=5 '.$shLimit.' -O "'.$o.'" "'.$uri.'"');
 }
 
 function hex2bin($hexstr) {

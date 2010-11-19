@@ -54,7 +54,6 @@ $CONFIG = array(
 	
 	'HTML_HEAD_EXT' => '',
 	
-	'BROWSER_USERAGENT' => 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10',
 	
 );
 
