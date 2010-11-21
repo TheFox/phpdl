@@ -36,12 +36,11 @@ class dlpacket extends dbh{
 		$this->dbhConfig = array('DB_HOST' => $dbHost, 'DB_NAME' => $dbName, 'DB_USER' => $dbUser, 'DB_PASS' => $dbPass, 'DB_TABLE' => 'packets');
 		$this->data = array();
 		$this->dataChanges = array();
-		
 	}
 	
 	function loadFiles(){
 		#print "packet.loadFiles\n";
-		$res = mysql_query("select id from files where _packet = ".$this->data['id'].";", $this->dbh);
+		$res = mysql_query("select id from files where _packet = ".$this->data['id']." order by id;", $this->dbh);
 		while($row = mysql_fetch_assoc($res)){
 			#print "packet.loadFiles ".$row['id']."\n";
 			$newfile = new dlfile($this->dbhConfig['DB_HOST'], $this->dbhConfig['DB_NAME'], $this->dbhConfig['DB_USER'], $this->dbhConfig['DB_PASS']);
@@ -65,11 +64,11 @@ class dlpacket extends dbh{
 	}
 	
 	function fileErrors(){
-		global $DLFILE_ERROR_NO_ERROR;
+		global $DLFILE_ERROR;
 		
 		$this->_dbhCheck();
 		
-		$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$this->data['id']." and error != '$DLFILE_ERROR_NO_ERROR';", $this->dbh));
+		$res = mysql_fetch_assoc(mysql_query("select count(id) c from files where _packet = ".$this->data['id']." and error != '".$DLFILE_ERROR['ERROR_NO_ERROR']."';", $this->dbh));
 		return (int)$res['c'];
 	}
 	
@@ -110,6 +109,18 @@ class dlpacket extends dbh{
 			}
 		if($v)
 			$this->save('md5Verified', 1);
+	}
+	
+	function isDownloading(){
+		return $this->get('stime') && !$this->get('ftime');
+	}
+	
+	function isFinished(){
+		return $this->get('stime') && $this->get('ftime');
+	}
+	
+	function isArchived(){
+		return $this->get('archive');
 	}
 	
 	function __destruct(){

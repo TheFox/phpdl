@@ -53,13 +53,14 @@ if(count($argv) >= 2){
 	dbClose($dbh);
 	
 	if($file->loadById($fileId)){
-		#$file = $files[$fileId];
 		printd("uri: '".$file->get('uri')."'\n");
 		
 		$thisHoster = null;
-		foreach($hosters as $id => $thisHoster)
-			if(preg_match('/'.$thisHoster['searchPattern'].'/i', $file->get('uri')))
+		foreach($hosters as $id => $hostersThisHoster)
+			if(preg_match('/'.$hostersThisHoster['searchPattern'].'/i', $file->get('uri'))){
+				$thisHoster = $hostersThisHoster;
 				break;
+			}
 		
 		if($thisHoster){
 			printd("hoster found\n");
@@ -70,9 +71,38 @@ if(count($argv) >= 2){
 				
 				if(function_exists('hosterExec')){
 					if(preg_match('/^http:/', $file->get('uri'))){
+						
+						$file->set('error', $DLFILE_ERROR['ERROR_NO_ERROR']);
+						$file->set('stime', mktime());
+						$file->set('ftime', 0);
+						$file->save();
+						
 						printd("hoster plugin: hosterExec()\n");
 						$filePath = hosterExec($file, $thisHoster, $packetDownloadDir);
-						printd("hoster plugin: hosterExec() done: $filePath\n");
+						printd("hoster plugin: hosterExec() done: '$filePath'\n");
+						
+						$error = $DLFILE_ERROR['ERROR_NO_ERROR'];
+						$size = 0;
+						
+						if(is_numeric($filePath))
+							$error = $filePath;
+						elseif($filePath == '')
+							$error = $DLFILE_ERROR['ERROR_DOWNLOAD_FAILED'];
+						elseif(!($size = filesize($filePath)))
+							$error = $DLFILE_ERROR['ERROR_FILE_SIZE_IS_NULL'];
+						
+						if($error){
+							if(file_exists($filePath) && $filePath != '')
+								unlink($filePath);
+							printd("file failed: ".getDlFileErrorMsg($error)."\n");
+						}
+						else{
+							printd("file ok: $size byte\n");
+						}
+						
+						$file->set('error', $error);
+						$file->set('size', $size);
+						
 					}
 				}
 				else
@@ -81,8 +111,15 @@ if(count($argv) >= 2){
 			else
 				printd("ERROR: plugin not found: $libThisHosterPath\n");
 		}
-		else
-			printd("ERROR: no hoster found\n");
+		else{
+			printd("ERROR: no hoster plugin found\n");
+			$file->save('error', $DLFILE_ERROR['ERROR_NO_HOSTERPLUGIN_FOUND']);
+		}
+		
+		if(!$file->get('stime'))
+			$file->set('stime', mktime());
+		$file->set('ftime', mktime());
+		$file->save();
 	}
 	else
 		printd("ERROR: file not found\n");

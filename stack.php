@@ -78,30 +78,36 @@ function main(){
 				$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
 				$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
 				
-				if(!$packet->fileErrors()){
-					if($packet->loadFiles()){
+				if($packet->loadFiles()){
+					
+					if($packet->filesUnfinished()){
 						
-						if($packet->filesUnfinished()){
+						if($scheduler > 0){
 							
-							if($scheduler > 0){
+							if($filesDownloading < $CONFIG['DL_SLOTS']){
 								
-								if($filesDownloading < $CONFIG['DL_SLOTS']){
+								if(!$packet->get('stime')){
+									$packet->save('stime', mktime());
 									
-									if(!$packet->get('stime')){
-										$packet->save('stime', mktime());
-										
-										if(file_exists($packetDownloadDir))
-											rmdirr($packetDownloadDir);
-										if(file_exists($packetFinishedDir))
-											rmdirr($packetFinishedDir);
+									if(file_exists($packetDownloadDir))
+										rmdirr($packetDownloadDir);
+									if(file_exists($packetFinishedDir))
+										rmdirr($packetFinishedDir);
+								}
+								
+								if($nextfile = $packet->getFileNextUnfinished()){
+									
+									printd("nextfile error\n");
+									while($nextfile->get('error')){
+										printd("nextfile ".$nextfile->get('id')."\n");
+										$nextfile = $packet->getFileNextUnfinished();
+										if(!$nextfile)
+											break;
+										sleep(1);
 									}
+									printd("nextfile error done\n");
 									
-									if($nextfile = $packet->getFileNextUnfinished()){
-										$nextfile->set('error', $DLFILE_ERROR_NO_ERROR);
-										$nextfile->set('stime', mktime());
-										$nextfile->set('ftime', 0);
-										$nextfile->save();
-										
+									if($nextfile){
 										if(!file_exists($packetDownloadDir)){
 											mkdir($packetDownloadDir);
 											chmod($packetDownloadDir, 0755);
@@ -112,21 +118,22 @@ function main(){
 										printd("exec '$sh'\n");
 										system($sh);
 										sleep(1);
-										
 										break;
 									}
 								}
-								else
-									plog("no free download slots (".$CONFIG['DL_SLOTS'].")\n");
 							}
+							else
+								plog("no free download slots (".$CONFIG['DL_SLOTS'].")\n");
 						}
-						else{
-							printd("packet ".$packet->get('id').": all files finished\n");
-							$packet->save('ftime', mktime());
-							$packet->md5Verify();
-							
-							rename($packetDownloadDir, $packetFinishedDir);
-						}
+					}
+					else{
+						printd("packet ".$packet->get('id').": all files finished\n");
+						if(!$packet->get('stime'))
+							$packet->set('stime', mktime());
+						$packet->save('ftime', mktime());
+						$packet->md5Verify();
+						
+						rename($packetDownloadDir, $packetFinishedDir);
 					}
 				}
 			}

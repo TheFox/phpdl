@@ -25,23 +25,26 @@ if(!defined('ANTIHACK')) die('Hacking attempt.');
 include_once('class.dbh.php');
 
 
-$DLFILE_ERROR_NO_ERROR = 0;
-$DLFILE_ERROR_UNKOWN = 1;
-$DLFILE_ERROR_NO_FREE_SLUTS = 2; # yes, sluts! rs response "All free download slots are full".
-$DLFILE_ERROR_MD5_FAILED = 3;
+$DLFILE_ERROR = array(
+	'ERROR_NO_ERROR' => 0,
+	'ERROR_UNKOWN' => 1,
+	'ERROR_NO_FREE_SLUTS' => 2,
+	'ERROR_MD5_FAILED' => 3,
+	'ERROR_DOWNLOAD_FAILED' => 4,
+	'ERROR_FILE_SIZE_IS_NULL' => 5,
+	'ERROR_NO_HOSTERPLUGIN_FOUND' => 6,
+);
 
 function getDlFileErrorMsg($errno){
+	global $DLFILE_ERROR;
 	
-	if($errno == 0)
-		return 'DLFILE_ERROR_NO_ERROR';
-	if($errno == 1)
-		return 'DLFILE_ERROR_UNKOWN';
-	if($errno == 2)
-		return 'DLFILE_ERROR_NO_FREE_SLUTS';
-	if($errno == 3)
-		return 'DLFILE_ERROR_MD5_FAILED';
+	$num = 0;
+	$c = count(array_keys($DLFILE_ERROR));
+	foreach($DLFILE_ERROR as $err => $num)
+		if($num == $errno)
+			return $err;
 	
-	return '';
+	return 'ERROR_UNKOWN';
 }
 
 class dlfile extends dbh{

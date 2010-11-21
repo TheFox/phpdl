@@ -74,43 +74,29 @@ function hosterExec($file, $thisHoster, $loadingDir){
 			
 			$tmpfile = $loadingDir.'/.'.$filename;
 			wget($CONFIG['WGET'], $url, $tmpfile);
-			
+			$error = 0;
 			if(file_exists($tmpfile)){
-				$error = $DLFILE_ERROR_NO_ERROR;
+				
 				$size = filesize($tmpfile);
 				
 				if($size <= 10000)
-					if(preg_match('/All free download slots are full/s', file_get_contents($tmpfile)))
-						$error = $DLFILE_ERROR_NO_FREE_SLUTS;
+					if(preg_match('/All free download slots are full/s', @file_get_contents($tmpfile)))
+						$error = $DLFILE_ERROR['ERROR_NO_FREE_SLUTS'];
 				
 				if($md5 == strtolower(md5_file($tmpfile)))
-					$file->set('md5Verified', 1);
-				else
-					$error = $DLFILE_ERROR_MD5_FAILED;
+					$file->save('md5Verified', 1);
 				
-				if($error){
-					unlink($tmpfile);
-					$file->set('error', $error);
-					print "ERROR: ".getDlFileErrorMsg($error)."\n";
-				}
-				else{
-					
-					$newfilePath = $loadingDir.'/'.$filename;
-					rename($tmpfile, $newfilePath);
-					
-					$retval = $filename;
-				}
+				$newfilePath = $loadingDir.'/'.$filename;
+				rename($tmpfile, $newfilePath);
 				
-				$file->set('size', $size);
-				
+				if(file_exists($newfilePath))
+					$retval = $newfilePath;
 			}
-			#else $file->set('error', $DLFILE_ERROR_UNKOWN);
 			
 			
+			if($error)
+				$retval = (int)$error;
 			
-			
-			$file->set('ftime', mktime());
-			$file->save();
 		}
 		unlink($tmp);
 	}
