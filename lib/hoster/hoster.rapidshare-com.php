@@ -23,7 +23,7 @@
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 
-function hosterExec($file, $thisHoster, $loadingDir){
+function hosterExec($file, $thisHoster, $loadingDir, $speed = 0){
 	global $CONFIG;
 	$retval = '';
 	$rapidpro = $thisHoster['user'] != '' && $thisHoster['password'] != '';
@@ -42,7 +42,7 @@ function hosterExec($file, $thisHoster, $loadingDir){
 		
 		print "link '$url'\n";
 		$tmp = './tmp/'.$filename.'.tmp';
-		wget($CONFIG['WGET'], $url, $tmp);
+		wget($CONFIG['WGET'], $url, $tmp, $speed);
 		if(preg_match('/DL:([^,]*),([^,]*),([^,]*),(.*)/', file_get_contents($tmp), $res)){
 			$hostname = $res[1];
 			$dlauth = $res[2];
@@ -73,7 +73,7 @@ function hosterExec($file, $thisHoster, $loadingDir){
 			$file->save();
 			
 			$tmpfile = $loadingDir.'/.'.$filename;
-			wget($CONFIG['WGET'], $url, $tmpfile);
+			wget($CONFIG['WGET'], $url, $tmpfile, $speed);
 			$error = 0;
 			if(file_exists($tmpfile)){
 				

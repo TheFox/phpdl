@@ -114,7 +114,7 @@ function main(){
 										}
 										
 										printd("packet ".$packet->get('id').": download ".$nextfile->get('id')."\n");
-										$sh = 'php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" 1>> log/wget.'.$date.'.log 2>> log/wget.'.$date.'.log &';
+										$sh = 'php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" "'.$packet->get('speed').'" 1>> log/wget.'.$date.'.log 2>> log/wget.'.$date.'.log &';
 										printd("exec '$sh'\n");
 										system($sh);
 										sleep(1);

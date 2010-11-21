@@ -258,6 +258,7 @@ else{
 						$smarty->assign('nameDisabled', 'disabled="disabled"');
 						$smarty->assign('source', $packet->get('source'));
 						$smarty->assign('password', $packet->get('password'));
+						$smarty->assign('speed', $packet->get('speed'));
 						$smarty->assign('sortnr', $packet->get('sortnr'));
 						
 						if($packet->loadFiles())
@@ -276,6 +277,7 @@ else{
 					$sortnr = $res['m'] + 1;
 					dbClose($dbh);
 					
+					$smarty->assign('speed', 0);
 					$smarty->assign('sortnr', $sortnr);
 				}
 				
@@ -324,6 +326,7 @@ else{
 			
 			$source = preg_replace('/["\']/', '', $_POST['source']);
 			$password = preg_replace('/["\']/', '', $_POST['password']);
+			$speed = checkInput($_POST['speed'], '0-9', 11);
 			$sortnr = (int)$_POST['sortnr'];
 			
 			$dbh = dbConnect();
@@ -361,13 +364,13 @@ else{
 						
 					}
 					
-					mysql_query("update packets set source = '$source', password = '$password', sortnr = '$sortnr' where id = '$id' limit 1;");
+					mysql_query("update packets set source = '$source', password = '$password', speed = '$speed', sortnr = '$sortnr' where id = '$id' limit 1;");
 					
 				}
 			}
 			else{
 				// Add new
-				mysql_query("insert into packets(_user, name, archive, source, password, sortnr, ctime) values ('".$user->get('id')."', '$name', '1', '$source', '$password', '$sortnr', '".mktime()."');", $dbh);
+				mysql_query("insert into packets(_user, name, archive, source, password, speed, sortnr, ctime) values ('".$user->get('id')."', '$name', '1', '$source', '$password', '$speed', '$sortnr', '".mktime()."');", $dbh);
 				$pid = mysql_insert_id($dbh);
 				foreach($urls as $url)
 					mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$pid', '$url', '".mktime()."');", $dbh);

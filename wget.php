@@ -34,18 +34,22 @@ if(count($argv) >= 2){
 	printd("start\n");
 	
 	$fileId = (int)$argv[1];
-	$packetDownloadDir = '';
-	
 	if(!$fileId)
 		exit();
+	
+	$packetDownloadDir = '';
 	if(isset($argv[2]))
 		$packetDownloadDir = $argv[2];
-	
 	if($packetDownloadDir == '')
 		$packetDownloadDir = '.';
 	
+	$speed = 0;
+	if(isset($argv[3]))
+		$speed = (int)$argv[3];
+	
 	printd("file id: $fileId\n");
 	printd("download dir: '$packetDownloadDir'\n");
+	printd("speed: $speed\n");
 	
 	$dbh = dbConnect();
 	$file = new dlfile($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
@@ -78,7 +82,7 @@ if(count($argv) >= 2){
 						$file->save();
 						
 						printd("hoster plugin: hosterExec()\n");
-						$filePath = hosterExec($file, $thisHoster, $packetDownloadDir);
+						$filePath = hosterExec($file, $thisHoster, $packetDownloadDir, $speed);
 						printd("hoster plugin: hosterExec() done: '$filePath'\n");
 						
 						$error = $DLFILE_ERROR['ERROR_NO_ERROR'];

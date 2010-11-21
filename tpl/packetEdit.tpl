@@ -24,10 +24,13 @@
 			<td><input type="text" name="password" value="{$password}" /></td>
 		</tr>
 		<tr>
+			<td>Speed</td>
+			<td><input type="text" name="speed" value="{$speed}" /> kb/s (0 = unlimited)</td>
+		</tr>
+		<tr>
 			<td>Sortnr</td>
 			<td><input type="text" name="sortnr" value="{$sortnr}" maxlength="2" /></td>
 		</tr>
-		
 		{$reset}
 		<tr>
 			<td colspan="2">{$save}</td>
