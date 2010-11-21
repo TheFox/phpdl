@@ -8,6 +8,6 @@ SH_SOURCE=`dirname $0`
 
 cd $SH_SOURCE
 php stack.php 1>> log/stack.$DATE.log 2>> log/stack.$DATE.log < /dev/null &
-echo stack.php started in background
+echo "stack.php started in background (PID=$!)"
 
 # EOF
