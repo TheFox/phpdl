@@ -1,4 +1,4 @@
--- Created @ 2010/11/13 23:23:57 by TheFox@fox21.at
+-- Created @ 2010/11/21 18:06:41 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -98,7 +98,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-13 23:23:57
+-- Dump completed on 2010-11-21 18:06:41
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -154,7 +154,7 @@ UNLOCK TABLES;
 CREATE TABLE `scheduler` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `_users` int(11) NOT NULL DEFAULT '0',
-  `_packets` int(11) NOT NULL DEFAULT '0',
+  `_packet` int(11) NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL,
   `repeat` varchar(255) NOT NULL,
   `repeatTimeBegin` int(11) NOT NULL DEFAULT '0',
@@ -176,7 +176,7 @@ CREATE TABLE `scheduler` (
 
 LOCK TABLES `scheduler` WRITE;
 /*!40000 ALTER TABLE `scheduler` DISABLE KEYS */;
-INSERT INTO `scheduler` VALUES (1,1,0,'Default scheduler','',0,0,'1','0',0,86399,1,'1',1289664734);
+INSERT INTO `scheduler` VALUES (1,1,0,'Default scheduler','',0,0,'1','0',0,86399,1,'1',1289689794);
 /*!40000 ALTER TABLE `scheduler` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -189,4 +189,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-11-13 23:23:58
+-- Dump completed on 2010-11-21 18:06:41
