@@ -228,21 +228,29 @@ else{
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				
 				$filesOut = '';
+				$filesErrorOut = '';
 				if($id){
 					// Edit
 					if($packet->loadById($id)){
+						
+						$packetIsFinished = $packet->isFinished();
+						
 						if($user->get('id') != $packet->get('_user'))
 							$error .= '<li>This packet is owned by another user.</li>';
-						if($packet->filesDownloading())
-							$error .= '<li>You can not modify a downloading packet.</li>';
-						if($packet->get('ftime'))
-							$error .= '<li>You can not modify a finished packet.</li>';
-						if($packet->get('archive'))
-							$error .= '<li>This packet is archived.</li>';
+						
+						if($packet->isArchived())
+							$error .= '<li>This packet is archived. Press <i><u>Packet Reset</u></i> to restart/reset the packet and all links.</li>';
+						else{
+							if($packet->isDownloading())
+								$error .= '<li>You can not modify a downloading packet.</li>';
+							elseif($packet->isFinished())
+								$error .= '<li>You can not modify a finished packet.</li>';
+						}
+						
 						if($packet->get('ftime') || $packet->get('archive'))
 							$smarty->assign('reset', '
 								<tr>
-									<td colspan="2"><a href="?a=packetResetExec&amp;id='.$packet->get('id').'">Reset</td>
+									<td colspan="2"><a href="?a=packetResetExec&amp;id='.$packet->get('id').'">Packet Reset</td>
 								</tr>
 							');
 					
@@ -254,7 +262,10 @@ else{
 						
 						if($packet->loadFiles())
 							foreach($packet->files as $fileId => $file)
-								$filesOut .= $file->get('uri')."\n";
+								if($packetIsFinished && $file->get('error'))
+									$filesErrorOut = $file->get('uri').' # '.getDlFileErrorMsg($file->get('error'))."\n";
+								else
+									$filesOut .= $file->get('uri')."\n";
 					}
 				}
 				else{
@@ -270,6 +281,16 @@ else{
 				
 				$smarty->assign('id', $id);
 				$smarty->assign('files', $filesOut);
+				$smarty->assign('filesError', $filesErrorOut == '' ? '' : '
+					<tr>
+						<td valign="top">Failed links</td>
+						<td>
+							<textarea rows="20" cols="60">'.$filesErrorOut.'</textarea><br />
+							<a href="?a=packetFilesErrorReset&amp;id='.$id.'">Reset all files with errors</a><!-- | <a href="?a=packetFilesErrorNew&amp;id='.$id.'">Assume all files with errors to a new packet</a>//-->
+						</td>
+					</tr>
+				');
+				
 				if($error != ''){
 					$smarty->assign('error', '<ul>'.$error.'</ul>');
 				}
@@ -536,6 +557,33 @@ else{
 			
 			if(!$noredirect)
 				header('Location: ?');
+			
+		break;
+		
+		case 'packetFilesErrorReset':
+			
+			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+			if($packet->loadById($id))
+				if($user->get('id') == $packet->get('_user'))
+					if($packet->isFinished()){
+						if($packet->loadFiles())
+							foreach($packet->files as $fileId => $file)
+								if($file->get('error')){
+									$file->set('error', $DLFILE_ERROR['ERROR_NO_ERROR']);
+									$file->set('pid', 0);
+									$file->set('md5Verified', 0);
+									$file->set('stime', 0);
+									$file->set('ftime', 0);
+									$file->save();
+								}
+						$packet->set('archive', 0);
+						$packet->set('md5Verified', 0);
+						$packet->set('stime', 0);
+						$packet->set('ftime', 0);
+						$packet->save();
+					}
+			
+			header('Location: ?a=packetEdit&id='.$id);
 			
 		break;
 		

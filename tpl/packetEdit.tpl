@@ -14,6 +14,7 @@
 			<td valign="top">Links</td>
 			<td><textarea name="urls" rows="20" cols="60">{$files}</textarea></td>
 		</tr>
+		{$filesError}
 		<tr>
 			<td>Source (URL, ...)</td>
 			<td><input type="text" name="source" value="{$source}" /></td>
@@ -26,6 +27,7 @@
 			<td>Sortnr</td>
 			<td><input type="text" name="sortnr" value="{$sortnr}" maxlength="2" /></td>
 		</tr>
+		
 		{$reset}
 		<tr>
 			<td colspan="2">{$save}</td>
