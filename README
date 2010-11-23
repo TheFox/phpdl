@@ -11,6 +11,8 @@ Description
 Features
 	- Multiuser.
 	- Web interface. Manage your downloads from everywhere.
+	- Packet speed limit.
+	- Export packet informations as txt.
 	- RSDF files support.
 	- DLC files support.
 	- RapidShare.com (Free and Pro) support.
