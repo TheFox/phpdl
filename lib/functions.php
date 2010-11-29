@@ -233,6 +233,13 @@ function filesDownloading($dbh){
 	return $retval;
 }
 
+function fileWrite($path, $content){
+	if($fh = fopen($path, 'w')){
+		fwrite($fh, $content);
+		fclose();
+	}
+}
+
 function printd($text = ''){
 	list($usec, $sec) = explode(' ', microtime());
 	printf("%s.%03d %5d %s", date('Y/m/d H:i:s'), (int)($usec * 1000), posix_getpid(), $text);
