@@ -39,18 +39,15 @@ if(isset($_SESSION['TTL'])){
 else
 	sessionNew();
 
-if(file_exists($CONFIG_PATH)){
-	if(filesize($CONFIG_PATH) > 0){
-		htmlHead();
-		htmlInstallFinished();
-		htmlFooter();
-		
-		exit();
-	}
+if(file_exists('INSTALLED')){
+	header('Location: ..');
+	exit();
 }
 else{
-	print "You must first run ./install/install.sh in your shell.";
-	exit(1);
+	if(!file_exists($CONFIG_PATH)){
+		print "You must first run ./install/install.sh in your shell.";
+		exit(1);
+	}
 }
 
 $smarty = null;
@@ -205,10 +202,6 @@ switch($a){
 						<td><?php print function_exists('preg_split') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
 					</tr>
 					<tr>
-						<td>pcntl_signal()</td>
-						<td><?php print function_exists('pcntl_signal') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
-					</tr>
-					<tr>
 						<td>posix_getpid()</td>
 						<td><?php print function_exists('posix_getpid') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
 					</tr>
@@ -357,20 +350,10 @@ switch($a){
 			$smarty->assign('USER_PASSWORD_SALT', $USER_PASSWORD_SALT);
 			$smarty->assign('USER_SESSION_TTL', $USER_SESSION_TTL);
 			
-			$ok = false;
-			
-			if(is_writeable($CONFIG_PATH))
-				if($fh = fopen($CONFIG_PATH, 'w')){
-					fwrite($fh, $smarty->fetch($CONFIG_TPL_PATH));
-					fclose($fh);
-				}
-			
-			if(file_exists($CONFIG_PATH))
-				if(filesize($CONFIG_PATH) > 0)
-					$ok = true;
-			
-			if($ok)
-				htmlInstallFinished();
+			if(fileWrite($CONFIG_PATH, $smarty->fetch($CONFIG_TPL_PATH))){
+				if(fileWrite('INSTALLED', date('Y-m-d H:i:s')))
+					htmlInstallFinished();
+			}
 			else
 				print '<b><font color="#cc0000">Installation failed</font></b>';
 			
@@ -516,12 +499,12 @@ function htmlFooter(){
 function htmlInstallFinished(){
 	global $CONFIG;
 	print '
-		<b><font color="#009900">PHP Downloader '.$CONFIG['PHPDL_VERSION'].' installation OK.</font></b><br />
+		<b>PHP Downloader '.$CONFIG['PHPDL_VERSION'].' installation <font color="#009900">OK</font>.</b><br />
 		<br />
 		<ul>
-			<li><font color="#ff0000"><b>Delete the "install" directory!</b></font></li>
-			<li>Change the mode for lib/config.php to 644 (rw-r--r--).</li>
-			<li>Run ./startstack in your terminal. stack.php must always run.</li>
+			<li>Change the mode for file "<b>lib/config.php</b>" to 644 (rw-r--r--).</li>
+			<li>Change the mode for directory "<b>install</b>" to 755 (rwxr-xr-x).</li>
+			<li>Run <b>./startstack</b> in your terminal. stack.php must always run.</li>
 			<li>Click <a href="..">here</a>.</li>
 		</ul>
 	';
@@ -579,6 +562,16 @@ function rndstr($len = 512){
 		$retval .= substr($charset, rand(0, $charsetLen - 1), 1);
 	
 	return $retval;
+}
+
+function fileWrite($path, $content){
+	if($fh = fopen($path, 'w')){
+		fwrite($fh, $content);
+		fclose($fh);
+		
+		return filesize($path);
+	}
+	return 0;
 }
 
 ?>

@@ -23,7 +23,7 @@
 define('ANTIHACK', 1);
 
 
-if(file_exists('install')){
+if(!file_exists('install/INSTALLED')){
 	header('Location: install/install.php');
 	exit();
 }

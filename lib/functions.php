@@ -236,8 +236,11 @@ function filesDownloading($dbh){
 function fileWrite($path, $content){
 	if($fh = fopen($path, 'w')){
 		fwrite($fh, $content);
-		fclose();
+		fclose($fh);
+		
+		return filesize($path);
 	}
+	return 0;
 }
 
 function printd($text = ''){
