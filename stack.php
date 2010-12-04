@@ -91,7 +91,6 @@ function main(){
 								
 								if($nextfile = $packet->getFileNextUnfinished()){
 									
-									printd("nextfile error\n");
 									while($nextfile->get('error')){
 										printd("nextfile ".$nextfile->get('id')."\n");
 										$nextfile = $packet->getFileNextUnfinished();
@@ -99,7 +98,6 @@ function main(){
 											break;
 										sleep(1);
 									}
-									printd("nextfile error done\n");
 									
 									if($nextfile){
 										if(!file_exists($packetDownloadDir)){
@@ -130,12 +128,10 @@ function main(){
 							
 							if(file_exists($packetFinishedDir)){
 								$files = scandir($packetDownloadDir);
-								foreach($files as $file){
-									if($file != '.' && $file != '..' && file_exists($packetDownloadDir.'/'.$file)){
+								foreach($files as $file)
+									if($file != '.' && $file != '..' && file_exists($packetDownloadDir.'/'.$file))
 										rename($packetDownloadDir.'/'.$file, $packetFinishedDir.'/'.$file);
-										printd("move file:\n\t$packetDownloadDir/$file\n\t$packetFinishedDir/$file\n\n");
-									}
-								}
+								
 								reset($files);
 								rmdir($packetDownloadDir);
 							}
