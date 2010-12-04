@@ -30,7 +30,7 @@ a:link, a:active, a:hover, a:visited{
 	color: #000000;
 }
 
-input{
+input, textarea{
 	border: 1px solid #000000;
 }
 
