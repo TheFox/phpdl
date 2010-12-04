@@ -39,6 +39,7 @@ include_once('./lib/class.dlfile.php');
 declare(ticks = 1);
 $LOG_LAST = '';
 $SCHEDULER_LAST = 0;
+$SHUTDOWN = false;
 
 function main(){
 	global $CONFIG, $SCHEDULER_LAST;
@@ -53,9 +54,10 @@ function main(){
 	fileWrite($CONFIG['PHPDL_STACK_PIDFILE'], posix_getpid());
 	
 	$n = 0;
-	while(true){
+	while(!$SHUTDOWN){
 		
 		$n++;
+		
 		$dbh = dbConnect();
 		$scheduler = scheduler($dbh);
 		$filesDownloading = filesDownloading($dbh);
@@ -84,14 +86,8 @@ function main(){
 							
 							if($filesDownloading < $CONFIG['DL_SLOTS']){
 								
-								if(!$packet->get('stime')){
+								if(!$packet->get('stime'))
 									$packet->save('stime', mktime());
-									
-									if(file_exists($packetDownloadDir))
-										rmdirr($packetDownloadDir);
-									if(file_exists($packetFinishedDir))
-										rmdirr($packetFinishedDir);
-								}
 								
 								if($nextfile = $packet->getFileNextUnfinished()){
 									
@@ -126,13 +122,26 @@ function main(){
 					}
 					else{
 						if(!$packet->fileErrors()){
-							printd("packet ".$packet->get('id').": all files finished with no errors\n");
+							printd("packet ".$packet->get('id').": all files finished\n");
 							if(!$packet->get('stime'))
 								$packet->set('stime', mktime());
 							$packet->save('ftime', mktime());
 							$packet->md5Verify();
 							
-							rename($packetDownloadDir, $packetFinishedDir);
+							if(file_exists($packetFinishedDir)){
+								$files = scandir($packetDownloadDir);
+								foreach($files as $file){
+									if($file != '.' && $file != '..' && file_exists($packetDownloadDir.'/'.$file)){
+										rename($packetDownloadDir.'/'.$file, $packetFinishedDir.'/'.$file);
+										printd("move file:\n\t$packetDownloadDir/$file\n\t$packetFinishedDir/$file\n\n");
+									}
+								}
+								reset($files);
+								rmdir($packetDownloadDir);
+							}
+							else
+								rename($packetDownloadDir, $packetFinishedDir);
+							
 						}
 					}
 				}
@@ -142,27 +151,41 @@ function main(){
 		
 		dbClose($dbh);
 		
+		$SHUTDOWN = shutdownCheck();
+		
 		sleep(5);
 	}
 	
-	printd("exit\n");
+	shutdown();
 }
 
 function sigHandler($sig){
-	global $CONFIG;
-	
 	printd("sigHandler $sig\n");
 	switch($sig){
 		case SIGTERM:
 		case SIGINT:
-			if(file_exists($CONFIG['PHPDL_STACK_PIDFILE'])){
-				unlink($CONFIG['PHPDL_STACK_PIDFILE']);
-				
-				printd("exit\n");
-				exit(1);
-			}
+			shutdown(1);
 		break;
 	}
+}
+
+function shutdown($err = 0){
+	global $CONFIG;
+	if(file_exists($CONFIG['PHPDL_STACK_PIDFILE'])){
+		unlink($CONFIG['PHPDL_STACK_PIDFILE']);
+		
+		printd("exit $err\n");
+		exit($err);
+	}
+}
+
+function shutdownCheck(){
+	global $CONFIG;
+	if(file_exists($CONFIG['PHPDL_STACK_SDFILE'])){
+		unlink($CONFIG['PHPDL_STACK_SDFILE']);
+		return true;
+	}
+	return false;
 }
 
 function plog($text){
