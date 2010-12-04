@@ -100,6 +100,22 @@ class dlpacket extends dbh{
 		return null;
 	}
 	
+	function getFilesErrorsTypes(){
+		global $DLFILE_ERROR;
+		
+		$this->_dbhCheck();
+		$rv = array();
+		
+		$res = mysql_query("select * from files where _packet = ".$this->data['id']." and error != '".$DLFILE_ERROR['ERROR_NO_ERROR']."';", $this->dbh);
+		while($row = mysql_fetch_assoc($res))
+			$rv[(int)$row['error']]++;
+		
+		if(count($rv))
+			return $rv;
+		
+		return null;
+	}
+	
 	function md5Verify(){
 		$v = true;
 		foreach($this->files as $id => $file)
