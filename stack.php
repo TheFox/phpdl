@@ -50,9 +50,7 @@ function main(){
 	
 	$date = date('Ymd');
 	
-	$fh = fopen($CONFIG['PHPDL_STACK_PIDFILE'], 'w');
-	fwrite($fh, posix_getpid());
-	fclose($fh);
+	fileWrite($CONFIG['PHPDL_STACK_PIDFILE'], posix_getpid());
 	
 	$n = 0;
 	while(true){
@@ -127,13 +125,15 @@ function main(){
 						}
 					}
 					else{
-						printd("packet ".$packet->get('id').": all files finished\n");
-						if(!$packet->get('stime'))
-							$packet->set('stime', mktime());
-						$packet->save('ftime', mktime());
-						$packet->md5Verify();
-						
-						rename($packetDownloadDir, $packetFinishedDir);
+						if(!$packet->fileErrors()){
+							printd("packet ".$packet->get('id').": all files finished with no errors\n");
+							if(!$packet->get('stime'))
+								$packet->set('stime', mktime());
+							$packet->save('ftime', mktime());
+							$packet->md5Verify();
+							
+							rename($packetDownloadDir, $packetFinishedDir);
+						}
 					}
 				}
 			}
