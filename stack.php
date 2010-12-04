@@ -26,7 +26,7 @@ if(isset($_SERVER['SERVER_ADDR'])) die('Hacking attempt.');
 
 chdir(substr($_SERVER['SCRIPT_FILENAME'], 0, strlen($_SERVER['SCRIPT_FILENAME']) - strlen(basename($_SERVER['SCRIPT_FILENAME']))));
 
-if(file_exists('install')){
+if(!file_exists('install/INSTALLED')){
 	print "ERROR: You must first install PHPDL.\n";
 	exit(1);
 }
