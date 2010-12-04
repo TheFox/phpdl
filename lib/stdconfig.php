@@ -28,6 +28,7 @@ $CONFIG = array(
 	'PHPDL_VERSION' => '0.5.0-dev',
 	'PHPDL_RELEASEID' => 0,
 	'PHPDL_STACK_PIDFILE' => 'tmp/.stack.php.pid',
+	'PHPDL_STACK_SDFILE' => 'tmp/.stack.php.sd',
 	
 	'SITE_HOST' => '',
 	'SITE_NAME' => 'PHP Downloader',
