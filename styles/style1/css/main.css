@@ -82,6 +82,10 @@ img{
 	text-align: center;
 }
 
+.packetIsDownloading, .packetHasFinished, .packetHasError{
+	/*vertical-align: top;*/
+}
+
 .packetIsDownloading{
 	background-color: #00ff00;
 }

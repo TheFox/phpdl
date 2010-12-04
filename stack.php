@@ -119,13 +119,14 @@ function main(){
 						}
 					}
 					else{
+						
+						printd("packet ".$packet->get('id').": all files finished\n");
+						if(!$packet->get('stime'))
+							$packet->set('stime', mktime());
+						$packet->save('ftime', mktime());
+						$packet->md5Verify();
+						
 						if(!$packet->fileErrors()){
-							printd("packet ".$packet->get('id').": all files finished\n");
-							if(!$packet->get('stime'))
-								$packet->set('stime', mktime());
-							$packet->save('ftime', mktime());
-							$packet->md5Verify();
-							
 							if(file_exists($packetFinishedDir)){
 								$files = scandir($packetDownloadDir);
 								foreach($files as $file)

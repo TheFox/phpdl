@@ -23,6 +23,10 @@
 				packetTr.hide();
 				packetTr.remove();
 				
+				var packetTrFilesErrors = $('#packetTrFilesErrors' + id);
+				packetTrFilesErrors.hide();
+				packetTrFilesErrors.remove();
+				
 				var div = $('<div>');
 				div.css('background-color', '#00ff00');
 				div.html('Packet (' + id + ') successfully archived.');

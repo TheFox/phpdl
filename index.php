@@ -152,6 +152,8 @@ else{
 						$packetFilesFinished = $packet->filesFinished();
 						$packetFilesC = $packet->filesC();
 						$packetFilesFinishedPercent = 0;
+						$packetFilesErrors = array();
+						
 						if($packetFilesC)
 							$packetFilesFinishedPercent = (int)($packetFilesFinished / $packetFilesC * 100);
 						
@@ -167,6 +169,7 @@ else{
 						}
 						
 						$trClass = '';
+						$trRowSpan = 1;
 						$status = array();
 						
 						if(!$packet->get('stime'))
@@ -179,26 +182,37 @@ else{
 							$trClass = 'packetHasFinished';
 							$status[] = $packetFilesFinishedPercent.' % finished';
 						}
-						if($packet->fileErrors())
+						if($packetFilesErrorsTypes = $packet->getFilesErrorsTypes()){
 							$trClass = 'packetHasError';
+							$trRowSpan = 2;
+							foreach($packetFilesErrorsTypes as $errorNo => $errorNum)
+								$packetFilesErrors[] = getDlFileErrorMsg($errorNo);
+						}
 						if($packet->get('md5Verified'))
 							$status[] = 'verified';
 						
 						$stack .= '
 							<tr id="packetTr'.$packet->get('id').'">
-								<td class="'.$trClass.'">'.$packet->get('id').'</td>
-								<td class="'.$trClass.'">'.$move.'</td>
-								<td class="'.$trClass.'">'.$packet->get('sortnr').'</td>
-								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
-								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packet->get('id').'">'.$packet->get('name').'</a></td>
+								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'">'.$packet->get('id').'</td>
+								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'">'.$move.'</td>
+								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'">'.$packet->get('sortnr').'</td>
+								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'">'.$users[$packet->get('_user')]['login'].'</td>
+								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'"><a href="?a=packetEdit&amp;id='.$packet->get('id').'">'.$packet->get('name').'</a></td>
 								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
 								<td class="'.$trClass.'"><a href="?a=packetInfo&amp;id='.$packet->get('id').'">info</a></td>
-								<td class="'.$trClass.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveExecButton'.$packet->get('id').'" type="button" value="+" onClick="packetArchiveExec('.$packet->get('id').');" />' : '').'</td>
+								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveExecButton'.$packet->get('id').'" type="button" value="+" onClick="packetArchiveExec('.$packet->get('id').');" />' : '').'</td>
 							</tr>
 						';
+						if($trRowSpan >= 2)
+							$stack .= '
+								<tr id="packetTrFilesErrors'.$packet->get('id').'">
+									<td class="'.$trClass.'" colspan="5">'.join(', ', $packetFilesErrors).'</td>
+								</tr>
+							';
+						
 					}
 					
 				}
