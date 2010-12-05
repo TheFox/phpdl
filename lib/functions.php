@@ -180,7 +180,7 @@ function wget($bin, $uri, $o, $speed = 0){
 	if($speed)
 		$shSpeed = '--limit-rate='.$speed.'k';
 	
-	system($bin.' -U "Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10" -t 10 --waitretry=5 '.$shSpeed.' -O "'.$o.'" "'.$uri.'"');
+	system($bin.' -U "Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10" -t 5 --waitretry=10 '.$shSpeed.' -O "'.$o.'" "'.$uri.'"');
 }
 
 function hex2bin($hexstr) {

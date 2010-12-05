@@ -177,8 +177,14 @@ else{
 							$status[] = 'waiting';
 						}
 						elseif($packet->get('stime') && !$packet->get('ftime')){
-							$trClass = 'packetIsDownloading';
-							$status[] = 'in progress';
+							if($packet->filesDownloading()){
+								$trClass = 'packetIsDownloading';
+								$status[] = 'downloading';
+							}
+							else{
+								$trClass = 'packetInProgress';
+								$status[] = 'in progress';
+							}
 						}
 						elseif($packet->get('stime') && $packet->get('ftime')){
 							$trClass = 'packetHasFinished';

@@ -90,6 +90,10 @@ img{
 	background-color: #00ff00;
 }
 
+.packetInProgress{
+	background-color: #ff8800;
+}
+
 .packetHasFinished{
 	background-color: #cccccc;
 }
