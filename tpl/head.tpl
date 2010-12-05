@@ -18,6 +18,7 @@
 <title>{$siteTitle} {$phpdlVersion}</title>
 
 <script type="text/javascript" src="lib/jquery/jquery-1.4.3.js"></script>
+<script type="text/javascript" src="lib/jquery/jquery.bt-0.9.5-rc1.js"></script>
 
 {$htmlHeadExt}
 <!-- END OF head.tpl //-->
