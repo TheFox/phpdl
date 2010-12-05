@@ -139,6 +139,8 @@ else{
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				
 				$stack = '';
+				$jsDocumentReady = '';
+				
 				$res = mysql_query("select id from packets where archive = '0' order by sortnr, id;", $dbh);
 				$packetNum = mysql_num_rows($res);
 				$packetC = 0;
@@ -171,18 +173,16 @@ else{
 						$trClass = '';
 						$status = array();
 						
-						if(!$packet->get('stime') || $packetFilesErrorsTypes){
+						if(!$packet->get('stime')){
 							$status[] = 'waiting';
-							if($packetFilesFinished)
-								$status[] = '~'.$packetFilesFinishedPercent.'% ('.$packetFilesFinished.'/'.$packetFilesC.') finished';
 						}
 						elseif($packet->get('stime') && !$packet->get('ftime')){
 							$trClass = 'packetIsDownloading';
-							$status[] = 'downloading (~'.$packetFilesFinishedPercent.'%, '.$packetFilesFinished.'/'.$packetFilesC.' files)';
+							$status[] = 'in progress';
 						}
 						elseif($packet->get('stime') && $packet->get('ftime')){
 							$trClass = 'packetHasFinished';
-							$status[] = '~'.$packetFilesFinishedPercent.'% finished, '.$packetFilesFinished.'/'.$packetFilesC.' files';
+							$status[] = 'finished';
 						}
 						
 						if($packetFilesErrorsTypes){
@@ -191,11 +191,12 @@ else{
 							$packetFilesErrors = array();
 							foreach($packetFilesErrorsTypes as $errorNo => $errorNum)
 								$packetFilesErrors[] = getDlFileErrorMsg($errorNo);
-							$status[] = '<a href="#" onMouseOver="packetErrorsTip(this, \'This packet has the following errors: '.join(', ', $packetFilesErrors).'\')">errors</a>';
+							$status[] = '<a href="#" onMouseOver="onMouseOverTip(this, \'This packet has the following errors: '.join(', ', $packetFilesErrors).'\')">errors</a>';
 						}
 						if($packet->get('md5Verified'))
 							$status[] = 'verified';
 						
+						$progressBarId = 'progressBar'.$packet->get('id');
 						$stack .= '
 							<tr id="packetTr'.$packet->get('id').'">
 								<td class="'.$trClass.'">'.$packet->get('id').'</td>
@@ -206,11 +207,20 @@ else{
 								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
+								<td class="'.$trClass.'"><div id="'.$progressBarId.'" class="progressBar"></div></td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
 								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packet->get('id').'">txt</a> <a href="?a=packetExportXml&amp;id='.$packet->get('id').'">xml</a></td>
-								<td class="'.$trClass.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveExecButton'.$packet->get('id').'" type="button" value="+" onClick="packetArchiveExec('.$packet->get('id').');" />' : '').'</td>
+								<td class="'.$trClass.'" align="center"><span id="packetArchiveExecButton'.$packet->get('id').'" class="ui-state-default ui-icon ui-icon-circle-minus" onClick="packetArchiveExec('.$packet->get('id').');"></span></td>
 							</tr>
 						';
+						#'.($packet->get('_user') == $user->get('id') ? '<input  type="button" value="+"  />' : '').'
+						
+						#$jsDocumentReady .= "$('#$progressBarId').progressBar($packetFilesFinishedPercent, { showText: false, boxImage: 'img/progressbar.gif', barImage: 'img/progressbg_green.gif'}); $('#$progressBarId').bt('$packetFilesFinishedPercent %, $packetFilesFinished/$packetFilesC files', { trigger: 'hover', positions: 'top' });\n";
+						$jsDocumentReady .= 
+							"$('#$progressBarId').progressbar({ value: $packetFilesFinishedPercent });\n".
+							"$('#$progressBarId').bt('$packetFilesFinishedPercent %, $packetFilesFinished/$packetFilesC files', { trigger: 'hover', positions: 'top' });\n"
+						;
+						
 					}
 					
 				}
@@ -220,6 +230,9 @@ else{
 				if(!file_exists($CONFIG['PHPDL_STACK_PIDFILE']))
 					$status .= '<div class="msgError">stack.php is not running. Run "./startstack" in your terminal.</div>';
 				$smarty->assign('status', $status);
+				
+				$smarty->assign('stackColspan', 12);
+				$smarty->assign('jsDocumentReady', $jsDocumentReady);
 				
 				dbClose($dbh);
 				
@@ -422,6 +435,8 @@ else{
 						$packetFilesFinished = $packet->filesFinished();
 						$packetFilesC = $packet->filesC();
 						$packetFilesFinishedPercent = 0;
+						$packetFilesErrorsTypes = $packet->getFilesErrorsTypes();
+						
 						if($packetFilesC)
 							$packetFilesFinishedPercent = (int)($packetFilesFinished / $packetFilesC * 100);
 						
@@ -430,26 +445,26 @@ else{
 						$status = array();
 						
 						if(!$packet->get('stime'))
-							$status[] = 'waiting';
+							$status[] = 'not started';
 						elseif(($packet->get('stime') && !$packet->get('ftime'))){
-							$trClass = 'packetIsDownloading';
-							$status[] = '~'.$packetFilesFinishedPercent.'% finished, '.$packetFilesFinished.'/'.$packetFilesC.' files';
+							$status[] = 'not finished';
 						}
 						elseif($packet->get('stime') && $packet->get('ftime')){
 							$trClass = 'packetHasFinished';
-							$status[] = $packetFilesFinishedPercent.'% finished, '.$packetFilesC.' files';
+							$status[] = 'finished';
 						}
-						if($packetFilesErrorsTypes = $packet->getFilesErrorsTypes()){
+						if($packetFilesErrorsTypes){
 							$trClass = 'packetHasError';
 							
 							$packetFilesErrors = array();
 							foreach($packetFilesErrorsTypes as $errorNo => $errorNum)
 								$packetFilesErrors[] = getDlFileErrorMsg($errorNo);
-							$status[] = '<a href="#" onMouseOver="packetErrorsTip(this, \'This packet has the following errors: '.join(', ', $packetFilesErrors).'\');">errors</a>';
+							$status[] = '<a href="#" onMouseOver="onMouseOverTip(this, \'This packet has the following errors: '.join(', ', $packetFilesErrors).'\')">errors</a>';
 						}
 						if($packet->get('md5Verified'))
 							$status[] = 'verified';
 						
+						$progressBarId = 'progressBar'.$packet->get('id');
 						$stack .= '
 							<tr id="packetTr'.$packet->get('id').'">
 								<td class="'.$trClass.'">'.$packet->get('id').'</td>
@@ -458,14 +473,21 @@ else{
 								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
+								<td class="'.$trClass.'"><div id="'.$progressBarId.'" class="progressBar"></div></td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
 								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packet->get('id').'">txt</a> <a href="?a=packetExportXml&amp;id='.$packet->get('id').'">xml</a></td>
 							</tr>
 						';
+						
+						$jsDocumentReady .= 
+							"$('#$progressBarId').progressbar({ value: $packetFilesFinishedPercent });\n".
+							"$('#$progressBarId').bt('$packetFilesFinishedPercent %, $packetFilesFinished/$packetFilesC files', { trigger: 'hover', positions: 'top' });\n"
+						;
 					}
 					
 				}
 				$smarty->assign('stack', $stack);
+				$smarty->assign('jsDocumentReady', $jsDocumentReady);
 				
 				
 				dbClose($dbh);

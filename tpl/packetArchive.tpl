@@ -10,6 +10,8 @@
 			document.location.href = document.location.href;
 		}, 1000 * 900);
 		
+		{$jsDocumentReady}
+		
 	});
 	
 </script>
@@ -19,10 +21,11 @@
 	<tr>
 		<td>id</td>
 		<td>user</td>
-		<td>name</td>
+		<td><a href="#" id="nameHelp">name</a></td>
 		<td><a href="#" id="ctimeHelp">ctime</a></td>
 		<td><a href="#" id="stimeHelp">stime</a></td>
 		<td><a href="#" id="ftimeHelp">ftime</a></td>
+		<td><a href="#" id="progressHelp">progress</a></td>
 		<td>status</td>
 		<td><a id="exportHelp"><u>exp</u></a></td>
 	</tr>

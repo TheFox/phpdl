@@ -10,6 +10,8 @@
 			document.location.href = document.location.href;
 		}, 1000 * 60);
 		
+		{$jsDocumentReady}
+		
 	});
 	
 	function packetArchiveExec(id){
@@ -43,18 +45,19 @@
 </script>
 
 <table border="0">
-	<tr><td colspan="11">Stack</td></tr>
-	<tr><td colspan="11"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a></td></tr>
-	<tr><td colspan="11"><div id="status">{$status}</div></td></tr>
+	<tr><td colspan="{$stackColspan}">Stack</td></tr>
+	<tr><td colspan="{$stackColspan}"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a></td></tr>
+	<tr><td colspan="{$stackColspan}"><div id="status">{$status}</div></td></tr>
 	<tr>
 		<td>id</td>
 		<td>move</td>
 		<td>sortnr</td>
 		<td>user</td>
-		<td>name</td>
+		<td><a href="#" id="nameHelp">name</a></td>
 		<td><a href="#" id="ctimeHelp">ctime</a></td>
 		<td><a href="#" id="stimeHelp">stime</a></td>
 		<td><a href="#" id="ftimeHelp">ftime</a></td>
+		<td><a href="#" id="progressHelp">progress</a></td>
 		<td>status</td>
 		<td><a href="#" id="exportHelp">exp</a></td>
 		<td><a href="#" id="archiveHelp">archive</a></td>
