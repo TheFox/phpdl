@@ -352,8 +352,18 @@ else{
 			
 			$urls =  array();
 			foreach(preg_split("/\n/s", $urlsstr) as $url)
-				if($url != '')
-					$urls[] = preg_replace('/["\']/', '', $url);
+				if($url != ''){
+					$gridpos = strpos($url, '#');
+					if($gridpos !== false)
+						$url = substr($url, 0, $gridpos);
+					$url = preg_replace('/["\']/', '', $url);
+					$url = preg_replace('/^ +/', '', $url);
+					$url = preg_replace('/ +$/', '', $url);
+					
+					// Check after truncate and trim.
+					if($url != '')
+						$urls[] = $url;
+				}
 			
 			$source = preg_replace('/["\']/', '', $_POST['source']);
 			$password = preg_replace('/["\']/', '', $_POST['password']);
