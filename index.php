@@ -202,7 +202,7 @@ else{
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
-								<td class="'.$trClass.'"><a href="?a=packetInfo&amp;id='.$packet->get('id').'">info</a></td>
+								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packet->get('id').'">txt</a> <a href="?a=packetExportXml&amp;id='.$packet->get('id').'">xml</a></td>
 								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveExecButton'.$packet->get('id').'" type="button" value="+" onClick="packetArchiveExec('.$packet->get('id').');" />' : '').'</td>
 							</tr>
 						';
@@ -435,7 +435,7 @@ else{
 							$status[] = 'waiting';
 						elseif($packet->get('stime') && !$packet->get('ftime')){
 							$trClass = 'packetIsDownloading';
-							$status[] = 'downloading (~'.$packetFilesFinishedPercent.' %, '.$packetFilesFinished.'/'.$packetFilesC.')';
+							$status[] = '~'.$packetFilesFinishedPercent.' % finished, '.$packetFilesFinished.'/'.$packetFilesC.' files';
 						}
 						elseif($packet->get('stime') && $packet->get('ftime')){
 							$trClass = 'packetHasFinished';
@@ -455,7 +455,7 @@ else{
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
-								<td class="'.$trClass.'"><a href="?a=packetInfo&amp;id='.$packet->get('id').'">info</a></td>
+								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packet->get('id').'">txt</a> <a href="?a=packetExportXml&amp;id='.$packet->get('id').'">xml</a></td>
 							</tr>
 						';
 					}
@@ -490,14 +490,13 @@ else{
 			
 		break;
 		
-		case 'packetInfo':
+		case 'packetExportTxt':
 			
 			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 			if($packet->loadById($id)){
 				
 				$filename = 'phpdl.'.$packet->get('id').'.'.$packet->get('name').'.txt';
 				
-				#header('Content-Type: application/octet-stream');
 				header('Content-Type: text/plain');
 				header('Content-Disposition: attachment; filename="'.$filename.'"');
 				
@@ -518,6 +517,51 @@ else{
 			}
 			else
 				print 'failed';
+			
+		break;
+		
+		case 'packetExportXml':
+			
+			$filename = 'phpdl.xml';
+			$tpl = $a.'.tpl';
+			$cacheId = $a;
+			if(!$smarty->isCached($tpl, $cacheId)){
+				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
+				
+				$errorsOut = '';
+				foreach($DLFILE_ERROR as $name => $id)
+					$errorsOut .= '<error id="'.$id.'" name="'.$name.'" />';
+				$smarty->assign('dlfileErrors', $errorsOut);
+				
+				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+				if($packet->loadById($id)){
+					
+					$filename = 'phpdl.'.$packet->get('id').'.'.$packet->get('name').'.xml';
+					
+					$filesOut = '';
+					if($packet->loadFiles())
+						foreach($packet->files as $fileId => $file)
+							$filesOut .= '<file id="'.$file->get('id').'" user="'.$file->get('_user').'" packet="'.$file->get('_packet').'" uri="'.$file->get('uri').'" md5="'.$file->get('md5').'" md5Verified="'.$file->get('md5Verified').'" size="'.$file->get('size').'" error="'.$file->get('error').'" ctime="'.$file->get('ctime').'" stime="'.$file->get('stime').'" ftime="'.$file->get('ftime').'" />';
+					
+					$smarty->assign('packetId', $packet->get('id'));
+					$smarty->assign('packetName', $packet->get('name'));
+					$smarty->assign('packetSource', $packet->get('source'));
+					$smarty->assign('packetPassword', $packet->get('password'));
+					$smarty->assign('packetMd5Verified', $packet->get('md5Verified'));
+					$smarty->assign('packetCtime', $packet->get('ctime'));
+					$smarty->assign('packetStime', $packet->get('stime'));
+					$smarty->assign('packetFtime', $packet->get('ftime'));
+					
+					$smarty->assign('files', $filesOut);
+					
+				}
+				
+			}
+			
+			header('Content-Type: application/xml');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
+			$smarty->display($tpl, $cacheId);
 			
 		break;
 		
