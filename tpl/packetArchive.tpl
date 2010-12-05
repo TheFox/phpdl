@@ -10,8 +10,6 @@
 			document.location.href = document.location.href;
 		}, 1000 * 900);
 		
-		$('#exportHelp').bt('Export the packet as XML or TXT.', { trigger: 'hover', positions: 'top' });
-		
 	});
 	
 </script>
@@ -22,9 +20,9 @@
 		<td>id</td>
 		<td>user</td>
 		<td>name</td>
-		<td>ctime</td>
-		<td>stime</td>
-		<td>ftime</td>
+		<td><a href="#" id="ctimeHelp">ctime</a></td>
+		<td><a href="#" id="stimeHelp">stime</a></td>
+		<td><a href="#" id="ftimeHelp">ftime</a></td>
 		<td>status</td>
 		<td><a id="exportHelp"><u>exp</u></a></td>
 	</tr>

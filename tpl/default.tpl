@@ -10,13 +10,12 @@
 			document.location.href = document.location.href;
 		}, 1000 * 60);
 		
-		$('#exportHelp').bt('Export the packet as XML or TXT.', { trigger: 'hover', positions: 'top' });
-		
 	});
 	
 	function packetArchiveExec(id){
 		var button = $('#packetArchiveExecButton' + id);
 		button.hide();
+		
 		$.ajax({
 			type: 'GET',
 			url: '?a=packetArchiveExec&id=' + id + '&noredirect=1',
@@ -24,10 +23,6 @@
 				var packetTr = $('#packetTr' + id);
 				packetTr.hide();
 				packetTr.remove();
-				
-				var packetTrFilesErrors = $('#packetTrFilesErrors' + id);
-				packetTrFilesErrors.hide();
-				packetTrFilesErrors.remove();
 				
 				var div = $('<div>');
 				div.css('background-color', '#00ff00');
@@ -48,20 +43,21 @@
 </script>
 
 <table border="0">
-	<tr><td colspan="11"><div id="status">{$status}</div></td></tr>
+	<tr><td colspan="11">Stack</td></tr>
 	<tr><td colspan="11"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a></td></tr>
+	<tr><td colspan="11"><div id="status">{$status}</div></td></tr>
 	<tr>
 		<td>id</td>
 		<td>move</td>
 		<td>sortnr</td>
 		<td>user</td>
 		<td>name</td>
-		<td>ctime</td>
-		<td>stime</td>
-		<td>ftime</td>
+		<td><a href="#" id="ctimeHelp">ctime</a></td>
+		<td><a href="#" id="stimeHelp">stime</a></td>
+		<td><a href="#" id="ftimeHelp">ftime</a></td>
 		<td>status</td>
-		<td><a id="exportHelp"><u>exp</u></a></td>
-		<td>archive</td>
+		<td><a href="#" id="exportHelp">exp</a></td>
+		<td><a href="#" id="archiveHelp">archive</a></td>
 	</tr>
 	{$stack}
 </table>

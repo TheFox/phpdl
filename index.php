@@ -152,7 +152,7 @@ else{
 						$packetFilesFinished = $packet->filesFinished();
 						$packetFilesC = $packet->filesC();
 						$packetFilesFinishedPercent = 0;
-						$packetFilesErrors = array();
+						$packetFilesErrorsTypes = $packet->getFilesErrorsTypes();
 						
 						if($packetFilesC)
 							$packetFilesFinishedPercent = (int)($packetFilesFinished / $packetFilesC * 100);
@@ -169,50 +169,48 @@ else{
 						}
 						
 						$trClass = '';
-						$trRowSpan = 1;
 						$status = array();
 						
-						if(!$packet->get('stime'))
+						if(!$packet->get('stime') || $packetFilesErrorsTypes){
 							$status[] = 'waiting';
+							if($packetFilesFinished)
+								$status[] = '~'.$packetFilesFinishedPercent.'% ('.$packetFilesFinished.'/'.$packetFilesC.') finished';
+						}
 						elseif($packet->get('stime') && !$packet->get('ftime')){
 							$trClass = 'packetIsDownloading';
-							$status[] = 'downloading (~'.$packetFilesFinishedPercent.' %, '.$packetFilesFinished.'/'.$packetFilesC.')';
+							$status[] = 'downloading (~'.$packetFilesFinishedPercent.'%, '.$packetFilesFinished.'/'.$packetFilesC.' files)';
 						}
 						elseif($packet->get('stime') && $packet->get('ftime')){
 							$trClass = 'packetHasFinished';
-							$status[] = $packetFilesFinishedPercent.' % finished';
+							$status[] = '~'.$packetFilesFinishedPercent.'% finished, '.$packetFilesFinished.'/'.$packetFilesC.' files';
 						}
-						if($packetFilesErrorsTypes = $packet->getFilesErrorsTypes()){
+						
+						if($packetFilesErrorsTypes){
 							$trClass = 'packetHasError';
-							$trRowSpan = 2;
+							
+							$packetFilesErrors = array();
 							foreach($packetFilesErrorsTypes as $errorNo => $errorNum)
 								$packetFilesErrors[] = getDlFileErrorMsg($errorNo);
+							$status[] = '<a href="#" onMouseOver="packetErrorsTip(this, \'This packet has the following errors: '.join(', ', $packetFilesErrors).'\')">errors</a>';
 						}
 						if($packet->get('md5Verified'))
 							$status[] = 'verified';
 						
 						$stack .= '
 							<tr id="packetTr'.$packet->get('id').'">
-								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'">'.$packet->get('id').'</td>
-								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'">'.$move.'</td>
-								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'">'.$packet->get('sortnr').'</td>
-								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'">'.$users[$packet->get('_user')]['login'].'</td>
-								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'"><a href="?a=packetEdit&amp;id='.$packet->get('id').'">'.$packet->get('name').'</a></td>
+								<td class="'.$trClass.'">'.$packet->get('id').'</td>
+								<td class="'.$trClass.'">'.$move.'</td>
+								<td class="'.$trClass.'">'.$packet->get('sortnr').'</td>
+								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
+								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packet->get('id').'">'.$packet->get('name').'</a></td>
 								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
 								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packet->get('id').'">txt</a> <a href="?a=packetExportXml&amp;id='.$packet->get('id').'">xml</a></td>
-								<td class="'.$trClass.'" rowspan="'.$trRowSpan.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveExecButton'.$packet->get('id').'" type="button" value="+" onClick="packetArchiveExec('.$packet->get('id').');" />' : '').'</td>
+								<td class="'.$trClass.'" align="center">'.($packet->get('_user') == $user->get('id') ? '<input id="packetArchiveExecButton'.$packet->get('id').'" type="button" value="+" onClick="packetArchiveExec('.$packet->get('id').');" />' : '').'</td>
 							</tr>
 						';
-						if($trRowSpan >= 2)
-							$stack .= '
-								<tr id="packetTrFilesErrors'.$packet->get('id').'">
-									<td class="'.$trClass.'" colspan="5">'.join(', ', $packetFilesErrors).'</td>
-								</tr>
-							';
-						
 					}
 					
 				}
@@ -433,16 +431,22 @@ else{
 						
 						if(!$packet->get('stime'))
 							$status[] = 'waiting';
-						elseif($packet->get('stime') && !$packet->get('ftime')){
+						elseif(($packet->get('stime') && !$packet->get('ftime'))){
 							$trClass = 'packetIsDownloading';
-							$status[] = '~'.$packetFilesFinishedPercent.' % finished, '.$packetFilesFinished.'/'.$packetFilesC.' files';
+							$status[] = '~'.$packetFilesFinishedPercent.'% finished, '.$packetFilesFinished.'/'.$packetFilesC.' files';
 						}
 						elseif($packet->get('stime') && $packet->get('ftime')){
 							$trClass = 'packetHasFinished';
-							$status[] = $packetFilesFinishedPercent.' % finished';
+							$status[] = $packetFilesFinishedPercent.'% finished, '.$packetFilesC.' files';
 						}
-						if($packet->fileErrors())
+						if($packetFilesErrorsTypes = $packet->getFilesErrorsTypes()){
 							$trClass = 'packetHasError';
+							
+							$packetFilesErrors = array();
+							foreach($packetFilesErrorsTypes as $errorNo => $errorNum)
+								$packetFilesErrors[] = getDlFileErrorMsg($errorNo);
+							$status[] = '<a href="#" onMouseOver="packetErrorsTip(this, \'This packet has the following errors: '.join(', ', $packetFilesErrors).'\');">errors</a>';
+						}
 						if($packet->get('md5Verified'))
 							$status[] = 'verified';
 						
