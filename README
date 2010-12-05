@@ -30,7 +30,8 @@ Security
 	wget is used to download the files. Each file has a own wget process. If you have a pro account it could be that the password is shown in the process list of your pc/server! If you don't want to show other users your one click hoster password, don't enter it in the hosters table!
 
 Created with help from many libraries and frameworks including:
-	- JQuery (http://jquery.com/)
+	- jQuery (http://jquery.com/)
+		- jQuery UI (http://jqueryui.com/)
 		- BeautyTips (http://plugins.jquery.com/project/bt)
 	- Smarty (http://www.smarty.net/)
 

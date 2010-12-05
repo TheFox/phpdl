@@ -13,12 +13,16 @@
 <meta name="online-since" content="{$siteOnlinesince}" />
 
 <link rel="stylesheet" type="text/css" href="{$siteStyleDir}/css/main.css" />
+<link rel="stylesheet" type="text/css" href="lib/jquery/jqueryui/jquery-ui-1.8.6.css" />
+
 <link rel="shortcut icon" type="image/x-icon" href="{$siteFavicon}" />
 
 <title>{$siteTitle} {$phpdlVersion}</title>
 
 <script type="text/javascript" src="lib/jquery/jquery-1.4.3.js"></script>
 <script type="text/javascript" src="lib/jquery/jquery.bt-0.9.5-rc1.js"></script>
+<script type="text/javascript" src="lib/jquery/jqueryui/jquery-ui-1.8.6.js"></script>
+
 <script type="text/javascript" src="lib/phpdl.js"></script>
 
 {$htmlHeadExt}
