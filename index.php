@@ -173,6 +173,11 @@ else{
 						if($packetFilesC)
 							$packetFilesFinishedPercent = (int)($packetFilesFinished / $packetFilesC * 100);
 						
+						$packetDirBn = getPacketFilename($packetId, $packet->get('name'));
+					
+						$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
+						$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
+						
 						$move = '';
 						if($packetNum > 1){
 							if($packetC == 1)
@@ -224,7 +229,7 @@ else{
 								<td class="'.$trClass.'">'.$move.'</td>
 								<td class="'.$trClass.'">'.$packet->get('sortnr').'</td>
 								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
-								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packetId.'">'.$packet->get('name').'</a>'.($packetIsFinished ? ' [<a href="downloads/finished/'.getPacketFilename($packetId, $packet->get('name')).'" target="_blank">dir</a>]' : '').'</td>
+								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packetId.'">'.$packet->get('name').'</a>'.($packetIsFinished && file_exists($packetFinishedDir) ? ' [<a href="'.$packetFinishedDir.'" target="_blank">dir</a>]' : '').'</td>
 								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
