@@ -4,6 +4,9 @@
 <form action="?a=loginExec" method="post">
 	<table border="0">
 		<tr>
+			<td colspan="2"><div id="status">{$status}</div></td>
+		</tr>
+		<tr>
 			<td width="120">Login</td>
 			<td><input type="text" name="login" /></td>
 		</tr>

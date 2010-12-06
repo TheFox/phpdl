@@ -67,6 +67,18 @@ if($user->isGuest){
 			if(!$smarty->isCached($tpl, $cacheId)){
 				smartyAssignStd($smarty);
 				smartyAssignMenu($smarty, $user);
+				
+				$status = '';
+				
+				if(preg_match('/MSIE/i', $_SERVER['HTTP_USER_AGENT']))
+					$status .= '
+						<div id="statusBrowser" class="msgError">
+							<h1>Don\'t use Internet Explorer. Uninstall Internet Explorer for security reasons.</h1>
+							<h1>Please use <a href="http://www.mozilla.com/firefox/" target="_blank">Firefox</a>, <a href="http://www.apple.com/safari/" target="_blank">Safari</a> or <a href="http://www.google.com/chrome/" target="_blank">Chrome</a> instead.</h1>
+						</div>
+					';
+				
+				$smarty->assign('status', $status);
 			}
 			$smarty->display($tpl, $cacheId);
 			
