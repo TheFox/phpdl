@@ -565,6 +565,19 @@ else{
 			
 		break;
 		
+		case 'packetActiveAllExec':
+			
+			$active = (int)$_GET['active'];
+			
+			$dbh = dbConnect();
+			mysql_query("update packets set active = '$active' where archive = '0';", $dbh);
+			dbClose($dbh);
+			
+			if(!$noredirect)
+				header('Location: ?');
+			
+		break;
+		
 		case 'packetExportTxt':
 			
 			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
@@ -688,6 +701,7 @@ else{
 				$packet->set('md5Verified', 0);
 				$packet->set('stime', 0);
 				$packet->set('ftime', 0);
+				$packet->set('active', 1);
 				$packet->save();
 				
 				$dbh = dbConnect();
