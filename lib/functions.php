@@ -264,4 +264,11 @@ function rmdirr($dir){
 	}
 }
 
+function getPacketFilename($id, $name){
+	$path = $id.'.'.$name;
+	$path = str_replace(' ', '.', $path);
+	$path = strtolower($path);
+	return $path;
+}
+
 ?>

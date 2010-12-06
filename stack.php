@@ -73,8 +73,7 @@ function main(){
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				if($packet->loadById($row['id'])){
 					
-					$packetDirBn = $packet->get('id').'.'.strtolower($packet->get('name'));
-					$packetDirBn = str_replace(' ', '.', $packetDirBn);
+					$packetDirBn = getPacketFilename($packet->get('id'), $packet->get('name'));
 					
 					$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
 					$packetFinishedDir = 'downloads/finished/'.$packetDirBn;

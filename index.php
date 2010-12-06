@@ -168,6 +168,7 @@ else{
 						$packetFilesC = $packet->filesC();
 						$packetFilesFinishedPercent = 0;
 						$packetFilesErrorsTypes = $packet->getFilesErrorsTypes();
+						$packetIsFinished = $packet->isFinished();
 						
 						if($packetFilesC)
 							$packetFilesFinishedPercent = (int)($packetFilesFinished / $packetFilesC * 100);
@@ -189,7 +190,7 @@ else{
 						if(!$packet->get('stime')){
 							$status[] = 'waiting';
 						}
-						elseif($packet->get('stime') && !$packet->get('ftime')){
+						elseif($packet->isDownloading()){
 							if($packet->filesDownloading()){
 								$trClass = 'packetIsDownloading';
 								$status[] = 'downloading';
@@ -199,7 +200,7 @@ else{
 								$status[] = 'in progress';
 							}
 						}
-						elseif($packet->get('stime') && $packet->get('ftime')){
+						elseif($packetIsFinished){
 							$trClass = 'packetHasFinished';
 							$status[] = 'finished';
 						}
@@ -223,7 +224,7 @@ else{
 								<td class="'.$trClass.'">'.$move.'</td>
 								<td class="'.$trClass.'">'.$packet->get('sortnr').'</td>
 								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
-								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packet->get('id').'">'.$packet->get('name').'</a></td>
+								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packetId.'">'.$packet->get('name').'</a>'.($packetIsFinished ? ' [<a href="downloads/finished/'.getPacketFilename($packetId, $packet->get('name')).'" target="_blank">dir</a>]' : '').'</td>
 								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
