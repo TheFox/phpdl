@@ -163,6 +163,7 @@ else{
 						$packetC++;
 						
 						$packet->loadFiles();
+						$packetId = $packet->get('id');
 						$packetFilesFinished = $packet->filesFinished();
 						$packetFilesC = $packet->filesC();
 						$packetFilesFinishedPercent = 0;
@@ -174,11 +175,11 @@ else{
 						$move = '';
 						if($packetNum > 1){
 							if($packetC == 1)
-								$move = '<a href="?a=packetMoveExec&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a>';
+								$move = '<a href="?a=packetMoveExec&amp;id='.$packetId.'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a>';
 							elseif($packetC <= $packetNum - 1)
-								$move = '<a href="?a=packetMoveExec&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a> <a href="?a=packetMoveExec&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+								$move = '<a href="?a=packetMoveExec&amp;id='.$packetId.'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=d"><img src="img/button_down.gif" border="0" /></a> <a href="?a=packetMoveExec&amp;id='.$packetId.'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
 							else
-								$move = '<a href="?a=packetMoveExec&amp;id='.$packet->get('id').'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
+								$move = '<a href="?a=packetMoveExec&amp;id='.$packetId.'&amp;sortnr='.$packet->get('sortnr').'&amp;dir=u"><img src="img/button_up.gif" border="0" /></a>';
 							
 						}
 						
@@ -214,10 +215,11 @@ else{
 						if($packet->get('md5Verified'))
 							$status[] = 'verified';
 						
-						$progressBarId = 'progressBar'.$packet->get('id');
+						$progressBarId = 'progressBar'.$packetId;
 						$stack .= '
-							<tr id="packetTr'.$packet->get('id').'">
-								<td class="'.$trClass.'">'.$packet->get('id').'</td>
+							<tr id="packetTr'.$packetId.'">
+								<td class="'.$trClass.'"><input id="packetActive'.$packetId.'" type="checkbox" value="1" '.($packet->get('active') ? 'checked="checked"' : '').' onChange="packetActiveExec('.$packetId.', this)" tabindex="'.$packetC.'" /></td>
+								<td class="'.$trClass.'">'.$packetId.'</td>
 								<td class="'.$trClass.'">'.$move.'</td>
 								<td class="'.$trClass.'">'.$packet->get('sortnr').'</td>
 								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
@@ -227,8 +229,8 @@ else{
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'"><div id="'.$progressBarId.'" class="progressBar"></div></td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
-								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packet->get('id').'">txt</a> <a href="?a=packetExportXml&amp;id='.$packet->get('id').'">xml</a></td>
-								<td class="'.$trClass.'" align="center"><span id="packetArchiveExecButton'.$packet->get('id').'" class="ui-state-default ui-icon ui-icon-circle-minus" onClick="packetArchiveExec('.$packet->get('id').');"></span></td>
+								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packetId.'">txt</a> <a href="?a=packetExportXml&amp;id='.$packetId.'">xml</a></td>
+								<td class="'.$trClass.'" align="center"><span id="packetArchiveExecButton'.$packetId.'" class="ui-state-default ui-icon ui-icon-circle-minus" onClick="packetArchiveExec('.$packetId.');"></span></td>
 							</tr>
 						';
 						#'.($packet->get('_user') == $user->get('id') ? '<input  type="button" value="+"  />' : '').'
@@ -249,7 +251,7 @@ else{
 					$status .= '<div class="msgError">stack.php is not running. Run "./startstack" in your terminal.</div>';
 				$smarty->assign('status', $status);
 				
-				$smarty->assign('stackColspan', 12);
+				$smarty->assign('stackColspan', 13);
 				$smarty->assign('jsDocumentReady', $jsDocumentReady);
 				
 				dbClose($dbh);
@@ -306,7 +308,8 @@ else{
 						
 						if($packet->loadFiles())
 							foreach($packet->files as $fileId => $file)
-								if($packetIsFinished && $file->get('error'))
+								#if($packetIsFinished && $file->get('error'))
+								if($file->get('error'))
 									$filesErrorOut = $file->get('uri').' # '.getDlFileErrorMsg($file->get('error'))."\n";
 								else
 									$filesOut .= $file->get('uri')."\n";
@@ -533,9 +536,27 @@ else{
 				if($user->get('id') != $packet->get('_user'))
 					exit(1);
 				
-				$dbh = dbConnect();
-				mysql_query("update packets set archive = '1' where id = '$id' limit 1;", $dbh);
-				dbClose($dbh);
+				$packet->save('archive', 1);
+				
+			}
+			
+			if(!$noredirect)
+				header('Location: ?');
+			
+		break;
+		
+		
+		case 'packetActiveExec':
+			
+			$active = (int)$_GET['active'];
+			
+			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+			if($packet->loadById($id)){
+				
+				/*if($user->get('id') != $packet->get('_user'))
+					exit(1);*/
+				
+				$packet->save('active', $active);
 				
 			}
 			
@@ -663,8 +684,13 @@ else{
 				if($user->get('id') != $packet->get('_user'))
 					exit(1);
 				
+				$packet->set('archive', 0);
+				$packet->set('md5Verified', 0);
+				$packet->set('stime', 0);
+				$packet->set('ftime', 0);
+				$packet->save();
+				
 				$dbh = dbConnect();
-				mysql_query("update packets set archive = '0', md5Verified = '0', stime = '0', ftime = '0' where id = '$id' limit 1;", $dbh);
 				mysql_query("update files set pid = '0', md5Verified = '0', error = '0', stime = '0', ftime = '0' where _packet = '$id';", $dbh);
 				dbClose($dbh);
 				
@@ -679,8 +705,7 @@ else{
 			
 			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 			if($packet->loadById($id))
-				if($user->get('id') == $packet->get('_user'))
-					if($packet->isFinished()){
+				if($user->get('id') == $packet->get('_user')){
 						if($packet->loadFiles())
 							foreach($packet->files as $fileId => $file)
 								if($file->get('error')){
@@ -693,10 +718,9 @@ else{
 								}
 						$packet->set('archive', 0);
 						$packet->set('md5Verified', 0);
-						$packet->set('stime', 0);
 						$packet->set('ftime', 0);
 						$packet->save();
-					}
+				}
 			
 			header('Location: ?a=packetEdit&id='.$id);
 			

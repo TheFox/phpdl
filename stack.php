@@ -67,84 +67,87 @@ function main(){
 			$SCHEDULER_LAST = $scheduler;
 		}
 		
-		$res = mysql_query("select id from packets where archive = '0' and ftime = '0' order by sortnr, id;", $dbh);
-		while($row = mysql_fetch_assoc($res)){
-			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
-			if($packet->loadById($row['id'])){
-				
-				$packetDirBn = $packet->get('id').'.'.strtolower($packet->get('name'));
-				$packetDirBn = str_replace(' ', '.', $packetDirBn);
-				
-				$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
-				$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
-				
-				if($packet->loadFiles()){
+		$res = mysql_query("select id from packets where archive = '0' and active = '1' and ftime = '0' order by sortnr, id;", $dbh);
+		if(mysql_num_rows($res))
+			while($row = mysql_fetch_assoc($res)){
+				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+				if($packet->loadById($row['id'])){
 					
-					if($packet->filesUnfinished()){
+					$packetDirBn = $packet->get('id').'.'.strtolower($packet->get('name'));
+					$packetDirBn = str_replace(' ', '.', $packetDirBn);
+					
+					$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
+					$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
+					
+					if($packet->loadFiles()){
 						
-						if($scheduler > 0){
+						if($packet->filesUnfinished()){
 							
-							if($filesDownloading < $CONFIG['DL_SLOTS']){
+							if($scheduler > 0){
 								
-								if(!$packet->get('stime'))
-									$packet->save('stime', mktime());
-								
-								if($nextfile = $packet->getFileNextUnfinished()){
+								if($filesDownloading < $CONFIG['DL_SLOTS']){
 									
-									while($nextfile->get('error')){
-										printd("nextfile ".$nextfile->get('id')."\n");
-										$nextfile = $packet->getFileNextUnfinished();
-										if(!$nextfile)
-											break;
-										sleep(1);
-									}
+									if(!$packet->get('stime'))
+										$packet->save('stime', mktime());
 									
-									if($nextfile){
-										if(!file_exists($packetDownloadDir)){
-											mkdir($packetDownloadDir);
-											chmod($packetDownloadDir, 0755);
+									if($nextfile = $packet->getFileNextUnfinished()){
+										
+										while($nextfile->get('error')){
+											printd("nextfile ".$nextfile->get('id')."\n");
+											$nextfile = $packet->getFileNextUnfinished();
+											if(!$nextfile)
+												break;
+											sleep(1);
 										}
 										
-										printd("packet ".$packet->get('id').": download ".$nextfile->get('id')."\n");
-										$sh = 'php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" "'.$packet->get('speed').'" 1>> log/wget.'.$date.'.log 2>> log/wget.'.$date.'.log &';
-										printd("exec '$sh'\n");
-										system($sh);
-										sleep(1);
-										break;
+										if($nextfile){
+											if(!file_exists($packetDownloadDir)){
+												mkdir($packetDownloadDir);
+												chmod($packetDownloadDir, 0755);
+											}
+											
+											printd("packet ".$packet->get('id').": download ".$nextfile->get('id')."\n");
+											$sh = 'php wget.php '.$nextfile->get('id').' "'.$packetDownloadDir.'" "'.$packet->get('speed').'" 1>> log/wget.'.$date.'.log 2>> log/wget.'.$date.'.log &';
+											printd("exec '$sh'\n");
+											system($sh);
+											sleep(1);
+											break;
+										}
 									}
 								}
+								else
+									plog("no free download slots (".$CONFIG['DL_SLOTS'].")\n");
 							}
-							else
-								plog("no free download slots (".$CONFIG['DL_SLOTS'].")\n");
 						}
-					}
-					else{
-						
-						printd("packet ".$packet->get('id').": all files finished\n");
-						if(!$packet->get('stime'))
-							$packet->set('stime', mktime());
-						$packet->save('ftime', mktime());
-						$packet->md5Verify();
-						
-						if(!$packet->fileErrors()){
-							if(file_exists($packetFinishedDir)){
-								$files = scandir($packetDownloadDir);
-								foreach($files as $file)
-									if($file != '.' && $file != '..' && file_exists($packetDownloadDir.'/'.$file))
-										rename($packetDownloadDir.'/'.$file, $packetFinishedDir.'/'.$file);
-								
-								reset($files);
-								rmdir($packetDownloadDir);
-							}
-							else
-								rename($packetDownloadDir, $packetFinishedDir);
+						else{
 							
+							printd("packet ".$packet->get('id').": all files finished\n");
+							if(!$packet->get('stime'))
+								$packet->set('stime', mktime());
+							$packet->save('ftime', mktime());
+							$packet->md5Verify();
+							
+							if(!$packet->fileErrors()){
+								if(file_exists($packetFinishedDir)){
+									$files = scandir($packetDownloadDir);
+									foreach($files as $file)
+										if($file != '.' && $file != '..' && file_exists($packetDownloadDir.'/'.$file))
+											rename($packetDownloadDir.'/'.$file, $packetFinishedDir.'/'.$file);
+									
+									reset($files);
+									rmdir($packetDownloadDir);
+								}
+								else
+									rename($packetDownloadDir, $packetFinishedDir);
+								
+							}
 						}
 					}
 				}
+				unset($packet);
 			}
-			unset($packet);
-		}
+		else
+			plog("no active download\n");
 		
 		dbClose($dbh);
 		

@@ -1,4 +1,4 @@
--- Created @ 2010/12/05 18:48:51 by TheFox@fox21.at
+-- Created @ 2010/12/06 19:54:29 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -57,16 +57,20 @@ CREATE TABLE `packets` (
   `md5Verified` enum('0','1') NOT NULL DEFAULT '0',
   `source` text NOT NULL,
   `password` text NOT NULL,
+  `httpUser` varchar(255) NOT NULL,
+  `httpPassword` varchar(255) NOT NULL,
   `speed` int(11) NOT NULL DEFAULT '0' COMMENT 'Max speed in kbps',
   `sortnr` smallint(4) NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL DEFAULT '0',
   `stime` int(11) NOT NULL DEFAULT '0',
   `ftime` int(11) NOT NULL DEFAULT '0',
+  `active` enum('0','1') NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `_user` (`_user`),
   KEY `archive` (`archive`),
   KEY `stime` (`stime`),
-  KEY `ftime` (`ftime`)
+  KEY `ftime` (`ftime`),
+  KEY `active` (`active`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -99,7 +103,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-12-05 18:48:52
+-- Dump completed on 2010-12-06 19:54:30
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -190,4 +194,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-12-05 18:48:52
+-- Dump completed on 2010-12-06 19:54:30

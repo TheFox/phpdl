@@ -111,7 +111,7 @@ class dbh{
 	function _dbhCheck(){
 		#print "dbh._dbhCheck ".$this->dbh."<br>\n";
 		if($this->dbh){
-			if(!mysql_ping($this->dbh))
+			if(!@mysql_ping($this->dbh))
 				$this->_dbhConnect();
 			#else print "dbh._dbhCheck ping ok<br>\n";
 		}

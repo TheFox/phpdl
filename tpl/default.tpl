@@ -42,6 +42,14 @@
 		});
 	}
 	
+	function packetActiveExec(id, obj){
+		$.ajax({
+			type: 'GET',
+			url: '?a=packetActiveExec&id=' + id + '&active=' + ($(obj).is(':checked') ? 1 : 0) + '&noredirect=1',
+			success: function(){}
+		});
+	}
+	
 </script>
 
 <table border="0">
@@ -49,6 +57,7 @@
 	<tr><td colspan="{$stackColspan}"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a></td></tr>
 	<tr><td colspan="{$stackColspan}"><div id="status">{$status}</div></td></tr>
 	<tr>
+		<td>&nbsp;</td>
 		<td>id</td>
 		<td>move</td>
 		<td>sortnr</td>
