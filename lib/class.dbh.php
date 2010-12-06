@@ -60,11 +60,10 @@ class dbh{
 	}
 	
 	function save($item = null, $value = null){
-		
-		
+		#print "dbh.save $item && $value<br>\n";
 		$this->_dbhCheck();
-		#print "dbh.save '$item' = '$value'\n";
-		if($item && $value)
+		
+		if($item !== null && $value !== null)
 			$this->set($item, $value);
 		
 		
@@ -80,11 +79,13 @@ class dbh{
 			}
 			$sql .= " where id = '".$this->get('id')."' limit 1;";
 			
-			#print "dbh.save '$sql'\n";
+			#print "dbh.save ".$this->dbh." '$sql'\n";
 			mysql_query($sql, $this->dbh);
 			
 			$this->dataChanges = array();
 		}
+		
+		#print "dbh.save ok $dataChangesLen<br>\n";
 	}
 	
 	function get($item){
@@ -108,10 +109,11 @@ class dbh{
 	}
 	
 	function _dbhCheck(){
-		#print "dbh._dbhCheck<br>\n";
+		#print "dbh._dbhCheck ".$this->dbh."<br>\n";
 		if($this->dbh){
-			if(!@mysql_ping($this->dbh))
+			if(!mysql_ping($this->dbh))
 				$this->_dbhConnect();
+			#else print "dbh._dbhCheck ping ok<br>\n";
 		}
 		else{
 			if($this->dbhConfig['DB_HOST'] != '' && $this->dbhConfig['DB_NAME'] != '' && $this->dbhConfig['DB_USER'] != '' && $this->dbhConfig['DB_PASS'] != '')

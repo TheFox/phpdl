@@ -39,7 +39,8 @@ class dlpacket extends dbh{
 	}
 	
 	function loadFiles(){
-		#print "packet.loadFiles\n";
+		$this->_dbhCheck();
+		
 		$res = mysql_query("select id from files where _packet = ".$this->data['id']." order by id;", $this->dbh);
 		while($row = mysql_fetch_assoc($res)){
 			#print "packet.loadFiles ".$row['id']."\n";
