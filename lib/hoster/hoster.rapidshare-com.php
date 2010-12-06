@@ -69,8 +69,7 @@ function hosterExec($file, $thisHoster, $loadingDir, $speed = 0){
 			}
 			
 			print "link '$url'\n";
-			$file->set('md5', $md5);
-			$file->save();
+			$file->save('md5', $md5);
 			
 			$tmpfile = $loadingDir.'/.'.$filename;
 			wget($CONFIG['WGET'], $url, $tmpfile, $speed);

@@ -12,7 +12,7 @@
 		</tr>
 		<tr>
 			<td valign="top">Links</td>
-			<td><textarea name="urls" rows="20" cols="60">{$files}</textarea></td>
+			<td><textarea name="urls" rows="20" cols="80">{$files}</textarea></td>
 		</tr>
 		{$filesError}
 		<tr>

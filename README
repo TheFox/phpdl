@@ -9,13 +9,14 @@ Description
 	In the background there is a other script running which is downloading the files.
 
 Features
-	- Multiuser.
 	- Web interface. Manage your downloads from everywhere.
+	- Multiuser.
 	- Packet speed limit.
-	- Export packet informations as txt.
+	- Export packet informations as txt and xml.
 	- RSDF files support.
 	- DLC files support.
 	- RapidShare.com (Free and Pro) support.
+	- Download files which are not hostet by one-click-hoster.
 
 Install
 	1. git clone git://github.com/TheFox/phpdl.git phpdl
