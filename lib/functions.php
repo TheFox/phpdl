@@ -271,4 +271,19 @@ function getPacketFilename($id, $name){
 	return $path;
 }
 
+function getIecBinPrefix($byte, $maxlevel = null){
+	$prefixes = array('Byte', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB');
+	$prefixesc = count($prefixes);
+	if($maxlevel === null || $maxlevel >= $prefixesc)
+		$maxlevel = $prefixesc - 1;
+	
+	for($level = 0; $byte >= 1024 && $level < $maxlevel; $byte /= 1024)
+		$level++;
+	
+	$format = '%.2f %s';
+	$rv = sprintf($format, $byte, $prefixes[$level]);
+	
+	return $rv;
+}
+
 ?>
