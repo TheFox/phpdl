@@ -251,14 +251,13 @@ function printd($text = ''){
 function rmdirr($dir){
 	if(is_dir($dir) && $dir != '.'){
 		$objects = scandir($dir);
-		foreach($objects as $object){
+		foreach($objects as $object)
 			if($object != '.' && $object != '..'){
 				if(filetype($dir.'/'.$object) == 'dir')
 					rmdirr($dir.'/'.$object);
 				else
 					unlink($dir.'/'.$object);
 			}
-		}
 		reset($objects);
 		rmdir($dir);
 	}
@@ -284,6 +283,14 @@ function getIecBinPrefix($byte, $maxlevel = null){
 	$rv = sprintf($format, $byte, $prefixes[$level]);
 	
 	return $rv;
+}
+
+function trafficUpdate($dbh, $tday, $byte){
+	$res = mysql_fetch_assoc(mysql_query("select id from traffic where tday = '$tday' limit 1;"));
+	if(isset($res['id']))
+		mysql_query("update traffic set traffic = traffic + ".(int)$byte." where id = ".$res['id']." limit 1;");
+	else
+		mysql_query("insert into traffic(tday, traffic, ctime) values ('$tday', '".(int)$byte."', '".mktime()."');");
 }
 
 ?>

@@ -1011,6 +1011,120 @@ else{
 			
 		break;
 		
+		case 'traffic':
+			
+			$type = $_GET['type'];
+			
+			$smarty->caching = true;
+			$smarty->cache_lifetime = 7200; # 2h
+			$tpl = $a.'.tpl';
+			$cacheId = md5($a.$type);
+			if(!$smarty->isCached($tpl, $cacheId)){
+				smartyAssignStd($smarty);
+				smartyAssignMenu($smarty, $user);
+				
+				$dbh = dbConnect();
+				$traffic = getDbTable($dbh, 'traffic');
+				dbClose($dbh);
+				
+				
+				$list = '';
+				$n = 0;
+				$trafficTotal = 0;
+				$typeOut = '';
+				
+				switch($type){
+					
+					default:
+						$type = 'days';
+					
+					case 'days':
+						$typeOut = 'Days';
+					break;
+					
+					case 'months':
+						$typeOut = 'Months';
+					break;
+					
+					case 'years':
+						$typeOut = 'Years';
+					break;
+					
+				}
+				
+				$trafficSorted = array();
+				$itemsNum = 0;
+				
+				foreach($traffic as $itemId => $item){
+					
+					switch($type){
+						case 'days':
+							$trafficSorted[$item['tday']] = $item;
+						break;
+						
+						case 'months':
+							if(preg_match('/^(\d{4}-\d{2})-/', $item['tday'], $res)){
+								if(isset($trafficSorted[$res[1]]))
+									$trafficSorted[$res[1]]['traffic'] += $item['traffic'];
+								else{
+									$item['tday'] = $res[1];
+									$trafficSorted[$res[1]] = $item;
+								}
+							}
+						break;
+						
+						case 'years':
+							if(preg_match('/^(\d{4})-/', $item['tday'], $res)){
+								if(isset($trafficSorted[$res[1]]))
+									$trafficSorted[$res[1]]['traffic'] += $item['traffic'];
+								else{
+									$item['tday'] = $res[1];
+									$trafficSorted[$res[1]] = $item;
+								}
+							}
+						break;
+						
+					}
+					
+					$trafficTotal += $item['traffic'];
+				}
+				
+				
+				
+				ksort($trafficSorted);
+				$trafficSorted = array_reverse($trafficSorted);
+				
+				$n = 0;
+				foreach($trafficSorted as $itemId => $item){
+					$trClass = '';
+					if($n % 2 == 0)
+						$trClass = 'trafficRow';
+					$list .= '
+						<tr>
+							<td class="'.$trClass.'">'.$item['tday'].'</td>
+							<td class="'.$trClass.'">'.getIecBinPrefix($item['traffic']).'</td>
+						</tr>
+					';
+					
+					$n++;
+				}
+				
+				
+				$smarty->assign('listColspan', 2);
+				$smarty->assign('itemsNum', $n);
+				$smarty->assign('type', $typeOut);
+				$smarty->assign('trafficTotal', getIecBinPrefix($trafficTotal));
+				$smarty->assign('list', $list);
+				
+				$smarty->assign('smartyCacheId', $cacheId);
+				$smarty->assign('smartyTpl', $tpl);
+				
+				
+			}
+			$smarty->display($tpl, $cacheId);
+			
+		break;
+		
 		case 'superuser':
 			
 			if($user->get('superuser')){
@@ -1143,6 +1257,20 @@ else{
 			setcookie('userSessionId', 'x', mktime());
 			$user->save('sessionId', 'y');
 			header('Location: ?');
+			
+		break;
+		
+		case 'smartyCacheClear':
+			
+			if($_GET['tpl'] != '')
+				$smarty->cache->clear($_GET['tpl']);
+			
+			if(!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == ''){
+				print 'no referer found. but try <a href="?a=smartyCacheClear">this</a>.';
+				exit(1);
+			}
+			header('Location: '.$_SERVER['HTTP_REFERER']);
+			
 			
 		break;
 		

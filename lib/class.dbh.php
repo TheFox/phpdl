@@ -98,6 +98,11 @@ class dbh{
 		$this->dataChanges[$item] = true;
 	}
 	
+	function getDbh(){
+		$this->_dbhCheck();
+		
+		return $this->dbh;
+	}
 	
 	// Internal functions.
 	

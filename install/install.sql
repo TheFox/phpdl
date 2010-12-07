@@ -1,4 +1,4 @@
--- Created @ 2010/12/06 19:54:29 by TheFox@fox21.at
+-- Created @ 2010/12/07 13:58:33 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -93,6 +93,21 @@ CREATE TABLE `users` (
   KEY `sessionId` (`sessionId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `traffic`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `traffic` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tday` date NOT NULL,
+  `traffic` bigint(20) NOT NULL DEFAULT '0',
+  `ctime` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -103,7 +118,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-12-06 19:54:30
+-- Dump completed on 2010-12-07 13:58:34
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -172,7 +187,7 @@ CREATE TABLE `scheduler` (
   `download` enum('0','1') NOT NULL DEFAULT '1',
   `ctime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -181,7 +196,7 @@ CREATE TABLE `scheduler` (
 
 LOCK TABLES `scheduler` WRITE;
 /*!40000 ALTER TABLE `scheduler` DISABLE KEYS */;
-INSERT INTO `scheduler` VALUES (1,1,0,'Default scheduler','',0,0,'1','0',0,86399,1,'1',1289689794);
+INSERT INTO `scheduler` VALUES (1,1,0,'Default scheduler','',0,0,'1','0',0,86399,1,'1',1289689794),(2,1,0,'RS Happy Hour','',0,0,'0','0',7200,36000,2,'1',1291671855);
 /*!40000 ALTER TABLE `scheduler` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -194,4 +209,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-12-06 19:54:30
+-- Dump completed on 2010-12-07 13:58:34

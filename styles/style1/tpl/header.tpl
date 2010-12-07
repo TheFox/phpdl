@@ -17,6 +17,7 @@
 									<a href="?">Stack</a><br />
 									<a href="?a=packetArchive">Archive</a><br />
 									<a href="?a=scheduler">Scheduler</a><br />
+									<a href="?a=traffic">Traffic</a><br />
 									<br />
 									Tools<br />
 									<a href="?a=container&amp;c=rsdf">RSDF</a><br />

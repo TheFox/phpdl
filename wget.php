@@ -108,6 +108,9 @@ if(count($argv) >= 2){
 					elseif(!($size = filesize($filePath)))
 						$error = $DLFILE_ERROR['ERROR_FILE_SIZE_IS_NULL'];
 					
+					if($size)
+						trafficUpdate($file->getDbh(), date('Y-m-d'), $size);
+					
 					if($error){
 						if(file_exists($filePath) && $filePath != '')
 							unlink($filePath);
