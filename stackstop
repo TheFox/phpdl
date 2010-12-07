@@ -1,0 +1,13 @@
+#!/bin/sh
+# Created @ 07.12.2010 by TheFox@fox21.at
+
+export DATE
+DATE=`date +"%Y%m%d"`
+SH_SOURCE=`dirname $0`
+
+
+cd $SH_SOURCE
+touch tmp/.stack.php.sd
+echo "stack.php will shutdown ..."
+
+# EOF
