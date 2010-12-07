@@ -254,7 +254,7 @@ else{
 				
 				$status = '';
 				if(!file_exists($CONFIG['PHPDL_STACK_PIDFILE']))
-					$status .= '<div class="msgError">stack.php is not running. Run "./startstack" in your terminal.</div>';
+					$status .= '<div class="msgError">stack.php is not running. Run "./stackstart" in your terminal.</div>';
 				$smarty->assign('status', $status);
 				
 				$smarty->assign('stackColspan', 13);

@@ -26,7 +26,7 @@ Install
 	4. Run install/install.php in your browser.
 	5. Change the mode for file "lib/config.php" to 644 (rw-r--r--).
 	6. Change the mode for directory "install" to 755 (rwxr-xr-x).
-	7. Run ./startstack in your terminal. stack.php must always run.
+	7. Run ./stackstart in your terminal. stack.php must always run.
 
 Security
 	wget is used to download the files. Each file has a own wget process. If you have a pro account it could be that the password is shown in the process list of your pc/server! If you don't want to show other users your one click hoster password, don't enter it in the hosters table!

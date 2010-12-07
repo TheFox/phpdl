@@ -504,7 +504,7 @@ function htmlInstallFinished(){
 		<ul>
 			<li>Change the mode for file "<b>lib/config.php</b>" to 644 (rw-r--r--).</li>
 			<li>Change the mode for directory "<b>install</b>" to 755 (rwxr-xr-x).</li>
-			<li>Run <b>./startstack</b> in your terminal. stack.php must always run.</li>
+			<li>Run <b>./stackstart</b> in your terminal. stack.php must always run.</li>
 			<li>Click <a href="..">here</a>.</li>
 		</ul>
 	';

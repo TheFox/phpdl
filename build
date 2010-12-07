@@ -9,7 +9,7 @@ VERSION="0.1.0"
 TARF="$NAME-$VERSION.tar"
 GZIPF="$TARF.gz"
 DIRS="img install lib styles tpl"
-FILES="build startstack index.php stack.php wget.php LICENSE README"
+FILES="build stackstart index.php stack.php wget.php LICENSE README"
 
 
 #echo "$DATE $USER" >> $LOG
