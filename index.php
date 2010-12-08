@@ -313,12 +313,11 @@ else{
 						$smarty->assign('sortnr', $packet->get('sortnr'));
 						
 						if($packet->loadFiles())
-							foreach($packet->files as $fileId => $file)
-								#if($packetIsFinished && $file->get('error'))
+							foreach($packet->files as $fileId => $file){
 								if($file->get('error'))
-									$filesErrorOut = $file->get('uri').' # '.getDlFileErrorMsg($file->get('error'))."\n";
-								else
-									$filesOut .= $file->get('uri')."\n";
+									$filesErrorOut .= $file->get('uri').' # '.getDlFileErrorMsg($file->get('error'))."\n";
+								$filesOut .= $file->get('uri')."\n";
+							}
 					}
 				}
 				else{
