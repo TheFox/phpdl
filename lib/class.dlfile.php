@@ -23,6 +23,7 @@
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 include_once('class.dbh.php');
+include_once('class.dlpacket.php');
 
 
 $DLFILE_ERROR = array(
@@ -49,6 +50,8 @@ function getDlFileErrorMsg($errno){
 
 class dlfile extends dbh{
 	
+	public $packet;
+	
 	function __construct($dbHost, $dbName, $dbUser, $dbPass){
 		
 		$this->dbh = null;
@@ -56,6 +59,13 @@ class dlfile extends dbh{
 		$this->data = array();
 		$this->dataChanges = array();
 		
+		$this->packet = null;
+		
+	}
+	
+	function packetLoad(){
+		$this->packet = new dlpacket($this->dbhConfig['DB_HOST'], $this->dbhConfig['DB_NAME'], $this->dbhConfig['DB_USER'], $this->dbhConfig['DB_PASS']);
+		return $this->packet->loadById($this->data['_packet']);
 	}
 	
 	function __destruct(){

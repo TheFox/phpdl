@@ -37,27 +37,32 @@ if(count($argv) >= 2){
 	if(!$fileId)
 		exit();
 	
-	$packetDownloadDir = '';
-	if(isset($argv[2]))
-		$packetDownloadDir = $argv[2];
-	if($packetDownloadDir == '')
-		$packetDownloadDir = '.';
 	
-	$speed = 0;
-	if(isset($argv[3]))
-		$speed = (int)$argv[3];
-	
-	printd("file id: $fileId\n");
-	printd("download dir: '$packetDownloadDir'\n");
-	printd("speed: $speed\n");
 	
 	$dbh = dbConnect();
 	$file = new dlfile($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 	$hosters = getDbTable($dbh, 'hosters');
 	dbClose($dbh);
 	
+	
+	
 	if($file->loadById($fileId)){
+		
+		$file->packetLoad();
+		$packetDirBn = getPacketFilename($file->packet->get('id'), $file->packet->get('name'));
+		$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
+		$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
+		
+		printd("packet id: ".$file->packet->get('id')."\n");
+		printd("file id: $fileId\n");
+		printd("download dir: '$packetDownloadDir'\n");
+		printd("speed: ".$file->packet->get('speed')."\n");
 		printd("uri: '".$file->get('uri')."'\n");
+		
+		if(!file_exists($packetDownloadDir)){
+			mkdir($packetDownloadDir);
+			chmod($packetDownloadDir, 0755);
+		}
 		
 		$thisHoster = null;
 		foreach($hosters as $id => $hostersThisHoster)
@@ -87,7 +92,7 @@ if(count($argv) >= 2){
 			printd("hoster plugin loaded: $libThisHosterPath\n");
 			
 			if(function_exists('hosterExec')){
-				if(preg_match('/^http:/', $file->get('uri'))){
+				if(preg_match('/^https?:/', $file->get('uri'))){
 					
 					$file->set('error', $DLFILE_ERROR['ERROR_NO_ERROR']);
 					$file->set('stime', mktime());
@@ -95,7 +100,7 @@ if(count($argv) >= 2){
 					$file->save();
 					
 					printd("hoster plugin: hosterExec()\n");
-					$filePath = hosterExec($file, $thisHoster, $packetDownloadDir, $speed);
+					$filePath = hosterExec($thisHoster, $file->packet, $packetDownloadDir, $file);
 					printd("hoster plugin: hosterExec() done: '$filePath'\n");
 					
 					$error = $DLFILE_ERROR['ERROR_NO_ERROR'];

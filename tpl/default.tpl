@@ -53,9 +53,9 @@
 </script>
 
 <table border="0">
-	<tr><td colspan="{$stackColspan}">Stack</td></tr>
-	<tr><td colspan="{$stackColspan}"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a> | Set all packets to [<a href="?a=packetActiveAllExec&amp;active=1">active</a> or <a href="?a=packetActiveAllExec&amp;active=0">inactive</a>]</td></tr>
-	<tr><td colspan="{$stackColspan}"><div id="status">{$status}</div></td></tr>
+	<tr><td colspan="{$tableColspan}">Stack</td></tr>
+	<tr><td colspan="{$tableColspan}"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a> | Set all packets to [<a href="?a=packetActiveAllExec&amp;active=1">active</a> or <a href="?a=packetActiveAllExec&amp;active=0">inactive</a>]</td></tr>
+	<tr><td colspan="{$tableColspan}"><div id="status">{$status}</div></td></tr>
 	<tr>
 		<td>&nbsp;</td>
 		<td>id</td>

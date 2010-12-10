@@ -167,20 +167,28 @@ function getDateLongFromTs($ts = 0){
 	return date($CONFIG['DATE_FORMAT_LONG'], $ts);
 }
 
-function checkInput($val, $pattern, $len = -1){
-	$val = preg_replace('/[^'.$pattern.']*/', '', $val);
-	if($len != -1)
+function checkInput($val, $pattern, $len = null){
+	if($pattern !== null)
+		$val = preg_replace('/[^'.$pattern.']*/', '', $val);
+	if($len !== null)
 		$val = substr($val, 0, $len);
 	return $val;
 }
 
-function wget($bin, $uri, $o, $speed = 0){
+function wget($bin, $uri, $outDoc, $speed = null, $httpUser = null, $httpPassword = null){
 	$shSpeed = '';
+	$shHttpUserPassword = '';
 	
-	if($speed)
-		$shSpeed = '--limit-rate='.$speed.'k';
+	if($speed !== null)
+		$shSpeed = '--limit-rate="'.$speed.'k"';
+	if($httpUser !== null && $httpPassword !== null)
+		if($httpUser != '' && $httpPassword != '')
+			$shHttpUserPassword = '--user="'.$httpUser.'" --password="'.$httpPassword.'"';
 	
-	system($bin.' -U "Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10" -t 5 --waitretry=10 '.$shSpeed.' -O "'.$o.'" "'.$uri.'"');
+	$sh = $bin.' -U "Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10" -t 5 --waitretry=10 --no-check-certificate '.$shHttpUserPassword.' '.$shSpeed.' -O "'.$outDoc.'" "'.$uri.'"';
+	#print "sh '$sh'\n"; # TODO
+	system($sh);
+	return $sh;
 }
 
 function hex2bin($hexstr) {

@@ -23,7 +23,7 @@
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 
-function hosterExec($file, $thisHoster, $loadingDir, $speed = 0){
+function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 	global $CONFIG;
 	$retval = '';
 	$rapidpro = $thisHoster['user'] != '' && $thisHoster['password'] != '';
@@ -42,7 +42,7 @@ function hosterExec($file, $thisHoster, $loadingDir, $speed = 0){
 		
 		print "link '$url'\n";
 		$tmp = './tmp/'.$filename.'.tmp';
-		wget($CONFIG['WGET'], $url, $tmp, $speed);
+		wget($CONFIG['WGET'], $url, $tmp, $packet->get('speed'));
 		if(preg_match('/DL:([^,]*),([^,]*),([^,]*),(.*)/', file_get_contents($tmp), $res)){
 			$hostname = $res[1];
 			$dlauth = $res[2];
@@ -71,8 +71,8 @@ function hosterExec($file, $thisHoster, $loadingDir, $speed = 0){
 			print "link '$url'\n";
 			$file->save('md5', $md5);
 			
-			$tmpfile = $loadingDir.'/.'.$filename;
-			wget($CONFIG['WGET'], $url, $tmpfile, $speed);
+			$tmpfile = $packetDownloadDir.'/.'.$filename;
+			wget($CONFIG['WGET'], $url, $tmpfile, $packet->get('speed'));
 			$error = 0;
 			if(file_exists($tmpfile)){
 				
@@ -85,7 +85,7 @@ function hosterExec($file, $thisHoster, $loadingDir, $speed = 0){
 				if($md5 == strtolower(md5_file($tmpfile)))
 					$file->save('md5Verified', 1);
 				
-				$newfilePath = $loadingDir.'/'.$filename;
+				$newfilePath = $packetDownloadDir.'/'.$filename;
 				rename($tmpfile, $newfilePath);
 				
 				if(file_exists($newfilePath))

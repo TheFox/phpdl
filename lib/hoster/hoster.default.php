@@ -23,21 +23,21 @@
 if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 
-function hosterExec($file, $thisHoster, $loadingDir, $speed = 0){
+function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 	global $CONFIG;
 	$retval = '';
 	
 	$url = $file->get('uri');
 	$filename = basename($url);
-	print "hoster.default.php hosterExec '$url'\n";
+	#printd("hoster.default.php hosterExec '$url'\n");
 			
-	$tmpfile = $loadingDir.'/.'.$filename;
-	wget($CONFIG['WGET'], $url, $tmpfile, $speed);
+	$tmpfile = $packetDownloadDir.'/.'.$filename;
+	wget($CONFIG['WGET'], $url, $tmpfile, $packet->get('speed'), $packet->get('httpUser'), $packet->get('httpPassword'));
 	$error = 0;
 	
 	if(file_exists($tmpfile)){
 		$size = filesize($tmpfile);
-		$newfilePath = $loadingDir.'/'.$filename;
+		$newfilePath = $packetDownloadDir.'/'.$filename;
 		rename($tmpfile, $newfilePath);
 		if(file_exists($newfilePath))
 			$retval = $newfilePath;

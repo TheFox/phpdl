@@ -169,6 +169,7 @@ else{
 						$packetFilesFinishedPercent = 0;
 						$packetFilesErrorsTypes = $packet->getFilesErrorsTypes();
 						$packetIsFinished = $packet->isFinished();
+						$packetIsOwnedByUser = $user->get('id') == $packet->get('_user');
 						
 						if($packetFilesC)
 							$packetFilesFinishedPercent = (int)($packetFilesFinished / $packetFilesC * 100);
@@ -236,7 +237,7 @@ else{
 								<td class="'.$trClass.'"><div id="'.$progressBarId.'" class="progressBar"></div></td>
 								<td class="'.$trClass.'">'.join(', ', $status).'</td>
 								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packetId.'">txt</a> <a href="?a=packetExportXml&amp;id='.$packetId.'">xml</a></td>
-								<td class="'.$trClass.'" align="center"><span id="packetArchiveExecButton'.$packetId.'" class="ui-state-default ui-icon ui-icon-circle-minus" onClick="packetArchiveExec('.$packetId.');"></span></td>
+								<td class="'.$trClass.'" align="center">'.($packetIsOwnedByUser || $user->get('superuser') ? '<span id="packetArchiveExecButton'.$packetId.'" class="ui-state-default ui-icon ui-icon-circle-minus" onClick="packetArchiveExec('.$packetId.');"></span>' : '&nbsp;').'</td>
 							</tr>
 						';
 						#'.($packet->get('_user') == $user->get('id') ? '<input  type="button" value="+"  />' : '').'
@@ -257,7 +258,7 @@ else{
 					$status .= '<div class="msgError">stack.php is not running. Run "./stackstart" in your terminal.</div>';
 				$smarty->assign('status', $status);
 				
-				$smarty->assign('stackColspan', 13);
+				$smarty->assign('tableColspan', 13);
 				$smarty->assign('jsDocumentReady', $jsDocumentReady);
 				
 				dbClose($dbh);
@@ -275,6 +276,8 @@ else{
 				smartyAssignStd($smarty);
 				smartyAssignMenu($smarty, $user);
 				
+				$tableColspan = 2;
+				
 				$error = '';
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				
@@ -286,7 +289,8 @@ else{
 						
 						$packetIsFinished = $packet->isFinished();
 						
-						if($user->get('id') != $packet->get('_user'))
+						$packetIsOwnedByUser = $user->get('id') == $packet->get('_user');
+						if(!$packetIsOwnedByUser)
 							$error .= '<li>This packet is owned by another user.</li>';
 						
 						if($packet->isArchived())
@@ -301,7 +305,7 @@ else{
 						if($packet->get('ftime') || $packet->get('archive'))
 							$smarty->assign('reset', '
 								<tr>
-									<td colspan="2"><a href="?a=packetResetExec&amp;id='.$packet->get('id').'">Packet Reset</td>
+									<td colspan="'.$tableColspan.'"><a href="?a=packetResetExec&amp;id='.$packet->get('id').'">Packet Reset</td>
 								</tr>
 							');
 					
@@ -309,6 +313,10 @@ else{
 						$smarty->assign('nameDisabled', 'disabled="disabled"');
 						$smarty->assign('source', $packet->get('source'));
 						$smarty->assign('password', $packet->get('password'));
+						if($packetIsOwnedByUser){
+							$smarty->assign('httpUser', $packet->get('httpUser'));
+							$smarty->assign('httpPassword', $packet->get('httpPassword'));
+						}
 						$smarty->assign('speed', $packet->get('speed'));
 						$smarty->assign('sortnr', $packet->get('sortnr'));
 						
@@ -354,6 +362,8 @@ else{
 					
 				}
 				
+				$smarty->assign('tableColspan', $tableColspan);
+				
 			}
 			$smarty->display($tpl, $cacheId);
 			
@@ -387,6 +397,10 @@ else{
 			
 			$source = preg_replace('/["\']/', '', $_POST['source']);
 			$password = preg_replace('/["\']/', '', $_POST['password']);
+			$httpUser = checkInput($_POST['httpUser'], null, 256);
+			$httpUser = preg_replace('/["\']/', '', $httpUser);
+			$httpPassword = checkInput($_POST['httpPassword'], null, 256);
+			$httpPassword = preg_replace('/["\']/', '', $httpPassword);
 			$speed = checkInput($_POST['speed'], '0-9', 11);
 			$sortnr = (int)$_POST['sortnr'];
 			
@@ -425,13 +439,13 @@ else{
 						
 					}
 					
-					mysql_query("update packets set source = '$source', password = '$password', speed = '$speed', sortnr = '$sortnr' where id = '$id' limit 1;");
+					mysql_query("update packets set source = '$source', password = '$password', httpUser = '$httpUser', httpPassword = '$httpPassword', speed = '$speed', sortnr = '$sortnr' where id = '$id' limit 1;");
 					
 				}
 			}
 			else{
 				// Add new
-				mysql_query("insert into packets(_user, name, archive, source, password, speed, sortnr, ctime) values ('".$user->get('id')."', '$name', '1', '$source', '$password', '$speed', '$sortnr', '".mktime()."');", $dbh);
+				mysql_query("insert into packets(_user, name, archive, source, password, httpUser, httpPassword, speed, sortnr, ctime) values ('".$user->get('id')."', '$name', '1', '$source', '$password', '$httpUser', '$httpPassword', '$speed', '$sortnr', '".mktime()."');", $dbh);
 				$pid = mysql_insert_id($dbh);
 				foreach($urls as $url)
 					mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$pid', '$url', '".mktime()."');", $dbh);
@@ -538,10 +552,10 @@ else{
 			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 			if($packet->loadById($id)){
 				
-				if($user->get('id') != $packet->get('_user'))
+				if($user->get('id') == $packet->get('_user') || $user->get('superuser'))
+					$packet->save('archive', 1);
+				else
 					exit(1);
-				
-				$packet->save('archive', 1);
 				
 			}
 			
@@ -706,7 +720,6 @@ else{
 				$packet->set('md5Verified', 0);
 				$packet->set('stime', 0);
 				$packet->set('ftime', 0);
-				$packet->set('active', 1);
 				$packet->save();
 				
 				$dbh = dbConnect();
@@ -1109,7 +1122,7 @@ else{
 				}
 				
 				
-				$smarty->assign('listColspan', 2);
+				$smarty->assign('tableColspan', 2);
 				$smarty->assign('itemsNum', $n);
 				$smarty->assign('type', $typeOut);
 				$smarty->assign('trafficTotal', getIecBinPrefix($trafficTotal));

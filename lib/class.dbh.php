@@ -43,10 +43,8 @@ class dbh{
 			
 			$row = mysql_fetch_assoc($res);
 			if(isset($row['id'])){
-				#print "dbh.loadById ".$row['id']."<br>\n";
 				foreach($row as $key => $val)
 					$this->data[$key] = $val;
-				#ve($this->data);
 				return true;
 			}
 		}
@@ -60,12 +58,10 @@ class dbh{
 	}
 	
 	function save($item = null, $value = null){
-		#print "dbh.save $item && $value<br>\n";
 		$this->_dbhCheck();
 		
 		if($item !== null && $value !== null)
 			$this->set($item, $value);
-		
 		
 		$dataChangesLen = count($this->dataChanges);
 		if($dataChangesLen){
@@ -79,13 +75,11 @@ class dbh{
 			}
 			$sql .= " where id = '".$this->get('id')."' limit 1;";
 			
-			#print "dbh.save ".$this->dbh." '$sql'\n";
 			mysql_query($sql, $this->dbh);
 			
 			$this->dataChanges = array();
 		}
 		
-		#print "dbh.save ok $dataChangesLen<br>\n";
 	}
 	
 	function get($item){
@@ -93,7 +87,6 @@ class dbh{
 	}
 	
 	function set($item, $value){
-		#print "dbh.set<br>\n";
 		$this->data[$item] = $value;
 		$this->dataChanges[$item] = true;
 	}
@@ -103,6 +96,7 @@ class dbh{
 		
 		return $this->dbh;
 	}
+	
 	
 	// Internal functions.
 	
