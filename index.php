@@ -197,9 +197,10 @@ else{
 							$status[] = 'waiting';
 						}
 						elseif($packet->isDownloading()){
-							if($packet->filesDownloading()){
+							$packetFilesDownloading = $packet->filesDownloading();
+							if($packetFilesDownloading){
 								$trClass = 'packetIsDownloading';
-								$status[] = 'downloading';
+								$status[] = 'downloading ('.$packetFilesDownloading.')';
 							}
 							else{
 								$trClass = 'packetInProgress';
@@ -349,7 +350,7 @@ else{
 						<td valign="top">Failed links</td>
 						<td>
 							<textarea rows="20" cols="60">'.$filesErrorOut.'</textarea><br />
-							<a href="?a=packetFilesErrorReset&amp;id='.$id.'">Reset all files with errors</a><!-- | <a href="?a=packetFilesErrorNew&amp;id='.$id.'">Assume all files with errors to a new packet</a>//-->
+							<a href="?a=packetFilesErrorResetExec&amp;id='.$id.'">Reset all files with errors</a><!-- | <a href="?a=packetFilesErrorNew&amp;id='.$id.'">Assume all files with errors to a new packet</a>//-->
 						</td>
 					</tr>
 				');
@@ -720,6 +721,7 @@ else{
 				
 				$packet->set('archive', 0);
 				$packet->set('md5Verified', 0);
+				$packet->set('sizeVerified', 0);
 				$packet->set('stime', 0);
 				$packet->set('ftime', 0);
 				$packet->save();
@@ -735,7 +737,7 @@ else{
 			
 		break;
 		
-		case 'packetFilesErrorReset':
+		case 'packetFilesErrorResetExec':
 			
 			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 			if($packet->loadById($id))
@@ -752,6 +754,7 @@ else{
 								}
 						$packet->set('archive', 0);
 						$packet->set('md5Verified', 0);
+						$packet->set('sizeVerified', 0);
 						$packet->set('ftime', 0);
 						$packet->save();
 				}
