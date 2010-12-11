@@ -25,7 +25,7 @@ if(!defined('ANTIHACK')) die('Hacking attempt.');
 
 $CONFIG = array(
 	
-	'PHPDL_VERSION' => '0.6.0-dev',
+	'PHPDL_VERSION' => '0.6.0',
 	'PHPDL_RELEASEID' => 0,
 	'PHPDL_STACK_PIDFILE' => 'tmp/.stack.php.pid',
 	'PHPDL_STACK_SDFILE' => 'tmp/.stack.php.sd',
