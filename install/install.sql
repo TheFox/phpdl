@@ -1,4 +1,4 @@
--- Created @ 2010/12/07 13:58:33 by TheFox@fox21.at
+-- Created @ 2010/12/12 00:48:59 by TheFox@fox21.at
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -31,6 +31,7 @@ CREATE TABLE `files` (
   `md5` varchar(32) NOT NULL,
   `md5Verified` enum('0','1') NOT NULL DEFAULT '0',
   `size` bigint(20) NOT NULL DEFAULT '0',
+  `sizeVerified` enum('0','1') NOT NULL DEFAULT '0',
   `error` smallint(4) NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL DEFAULT '0',
   `stime` int(11) NOT NULL DEFAULT '0',
@@ -55,10 +56,11 @@ CREATE TABLE `packets` (
   `name` varchar(256) NOT NULL,
   `archive` enum('0','1') NOT NULL DEFAULT '0',
   `md5Verified` enum('0','1') NOT NULL DEFAULT '0',
+  `sizeVerified` enum('0','1') NOT NULL DEFAULT '0',
   `source` text NOT NULL,
   `password` text NOT NULL,
-  `httpUser` varchar(255) NOT NULL,
-  `httpPassword` varchar(255) NOT NULL,
+  `httpUser` varchar(256) NOT NULL,
+  `httpPassword` varchar(256) NOT NULL,
   `speed` int(11) NOT NULL DEFAULT '0' COMMENT 'Max speed in kbps',
   `sortnr` smallint(4) NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL DEFAULT '0',
@@ -102,6 +104,7 @@ CREATE TABLE `users` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `traffic` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `_user` int(11) NOT NULL DEFAULT '0',
   `tday` date NOT NULL,
   `traffic` bigint(20) NOT NULL DEFAULT '0',
   `ctime` int(11) NOT NULL,
@@ -118,7 +121,7 @@ CREATE TABLE `traffic` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-12-07 13:58:34
+-- Dump completed on 2010-12-12  0:48:59
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl
@@ -209,4 +212,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-12-07 13:58:34
+-- Dump completed on 2010-12-12  0:49:00
