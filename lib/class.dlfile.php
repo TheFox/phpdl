@@ -27,13 +27,20 @@ include_once('class.dlpacket.php');
 
 
 $DLFILE_ERROR = array(
+	
 	'ERROR_NO_ERROR' => 0,
-	'ERROR_UNKOWN' => 1,
-	'ERROR_NO_FREE_SLUTS' => 2,
-	'ERROR_MD5_FAILED' => 3,
-	'ERROR_DOWNLOAD_FAILED' => 4,
-	'ERROR_FILE_SIZE_IS_NULL' => 5,
-	'ERROR_NO_HOSTERPLUGIN_FOUND' => 6,
+	
+	'ERROR_UNKOWN' => 100,
+	'ERROR_DOWNLOAD_FAILED' => 101,
+	'ERROR_NO_FREE_SLUTS' => 200,
+	
+	
+	'ERROR_FILE_SIZE_IS_NULL' => 300,
+	'ERROR_FILE_SIZE_IS_WRONG' => 301,
+	'ERROR_FILE_MD5_FAILED' => 320,
+	
+	'ERROR_HOSTERPLUGIN_NOT_FOUND' => 600,
+	
 );
 
 function getDlFileErrorMsg($errno){

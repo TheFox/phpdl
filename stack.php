@@ -119,6 +119,7 @@ function main(){
 								$packet->set('stime', mktime());
 							$packet->save('ftime', mktime());
 							$packet->md5Verify();
+							$packet->sizeVerify();
 							
 							if(!$packet->fileErrors()){
 								if(file_exists($packetFinishedDir)){

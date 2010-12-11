@@ -220,7 +220,9 @@ else{
 							$status[] = '<a href="#" onMouseOver="onMouseOverTip(this, \'This packet has the following errors: '.join(', ', $packetFilesErrors).'\')">errors</a>';
 						}
 						if($packet->get('md5Verified'))
-							$status[] = 'verified';
+							$status[] = 'md5 verified';
+						if($packet->get('sizeVerified'))
+							$status[] = 'size verified';
 						
 						$progressBarId = 'progressBar'.$packetId;
 						$stack .= '

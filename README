@@ -28,8 +28,8 @@ Install
 	6. Change the mode for directory "install" to 755 (rwxr-xr-x).
 	7. Run ./stackstart in your terminal. stack.php must always run.
 
-Security
-	wget is used to download the files. Each file has a own wget process. If you have a pro account it could be that the password is shown in the process list of your pc/server! If you don't want to show other users your one click hoster password, don't enter it in the hosters table!
+Security warning
+	The passwords for the hosters are stored in the "hoster" table. If you don't want to show other users your one click hoster password, don't enter it in the hosters table!
 
 Created with help from many libraries and frameworks including:
 	- jQuery (http://jquery.com/)

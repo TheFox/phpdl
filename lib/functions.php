@@ -175,20 +175,61 @@ function checkInput($val, $pattern, $len = null){
 	return $val;
 }
 
-function wget($bin, $uri, $outDoc, $speed = null, $httpUser = null, $httpPassword = null){
-	$shSpeed = '';
-	$shHttpUserPassword = '';
+function wget($url, $filePath = null, $speed = null, $httpUser = null, $httpPassword = null){
+	$rv = null;
+	$fh = null;
 	
-	if($speed !== null)
-		$shSpeed = '--limit-rate="'.$speed.'k"';
-	if($httpUser !== null && $httpPassword !== null)
-		if($httpUser != '' && $httpPassword != '')
-			$shHttpUserPassword = '--user="'.$httpUser.'" --password="'.$httpPassword.'"';
+	if($filePath)
+		$fh = fopen($filePath, 'w');
 	
-	$sh = $bin.' -U "Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10" -t 5 --waitretry=10 --no-check-certificate '.$shHttpUserPassword.' '.$shSpeed.' -O "'.$outDoc.'" "'.$uri.'"';
-	#print "sh '$sh'\n"; # TODO
-	system($sh);
-	return $sh;
+	$ch = curl_init($url);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10');
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+	
+	if($filePath){
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_FILE, $fh);
+	}
+	else{
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	}
+	if($httpUser && $httpPassword)
+		curl_setopt($ch, CURLOPT_USERPWD, "$httpUser:$httpPassword");
+	
+	$rv = curl_exec($ch);
+	curl_close($ch);
+	
+	if($filePath)
+		fclose($fh);
+	
+	return $rv;
+}
+
+function wgetHeaderSize($url, $httpUser = null, $httpPassword = null){
+	$rv = null;
+	
+	$ch = curl_init($url);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10');
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+	curl_setopt($ch, CURLOPT_HEADER, true);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_NOBODY, true);
+	
+	if($httpUser && $httpPassword)
+		curl_setopt($ch, CURLOPT_USERPWD, "$httpUser:$httpPassword");
+	
+	$header = curl_exec($ch);
+	curl_close($ch);
+	
+	if(preg_match('/Content-Length: ?(\d+)/i', $header, $res))
+		$rv = (int)$res[1];
+	
+	return $rv;
 }
 
 function hex2bin($hexstr) {

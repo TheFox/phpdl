@@ -45,7 +45,6 @@ $EXTCONFIG = array(
 	'DATE_FORMAT' => 'd.m.Y H:i',
 	'DATE_FORMAT_LONG' => 'd.m.Y H:i:s T',
 	
-	'WGET' => '{$WGET}',
 	'PS' => '{$PS}',
 	
 );

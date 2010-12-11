@@ -221,6 +221,10 @@ switch($a){
 						<td>microtime()</td>
 						<td><?php print function_exists('microtime') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
 					</tr>
+					<tr>
+						<td>curl_init()</td>
+						<td><?php print function_exists('curl_init') ? '<b><font color="#009900">OK</font></b>' : '<b><font color="#cc0000">Failed</font></b>'; ?></td>
+					</tr>
 				</table>
 			</td>
 		</tr>

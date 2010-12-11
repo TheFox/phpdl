@@ -30,9 +30,11 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 	$url = $file->get('uri');
 	$filename = basename($url);
 	#printd("hoster.default.php hosterExec '$url'\n");
+	
+	$file->save('size', wgetHeaderSize($url, $packet->get('httpUser'), $packet->get('httpPassword')));
 			
 	$tmpfile = $packetDownloadDir.'/.'.$filename;
-	wget($CONFIG['WGET'], $url, $tmpfile, $packet->get('speed'), $packet->get('httpUser'), $packet->get('httpPassword'));
+	wget($url, $tmpfile, null, $packet->get('httpUser'), $packet->get('httpPassword'));
 	$error = 0;
 	
 	if(file_exists($tmpfile)){

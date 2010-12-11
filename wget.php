@@ -106,15 +106,23 @@ if(count($argv) >= 2){
 					$error = $DLFILE_ERROR['ERROR_NO_ERROR'];
 					$size = 0;
 					
+					$fileSize = $file->get('size');
+					
 					if(is_numeric($filePath))
 						$error = $filePath;
 					elseif($filePath == '')
 						$error = $DLFILE_ERROR['ERROR_DOWNLOAD_FAILED'];
 					elseif(!($size = filesize($filePath)))
 						$error = $DLFILE_ERROR['ERROR_FILE_SIZE_IS_NULL'];
+					elseif($fileSize && $fileSize != $size)
+						$error = $DLFILE_ERROR['ERROR_FILE_SIZE_IS_WRONG'];
 					
-					if($size)
+					if($size){
 						trafficUpdate($file->getDbh(), date('Y-m-d'), $size);
+						
+						if($fileSize && $fileSize == $size)
+							$file->set('sizeVerified', 1);
+					}
 					
 					if($error){
 						if(file_exists($filePath) && $filePath != '')

@@ -128,6 +128,17 @@ class dlpacket extends dbh{
 			$this->save('md5Verified', 1);
 	}
 	
+	function sizeVerify(){
+		$v = true;
+		foreach($this->files as $id => $file)
+			if(!$file->get('sizeVerified')){
+				$v = false;
+				break;
+			}
+		if($v)
+			$this->save('sizeVerified', 1);
+	}
+	
 	function isDownloading(){
 		return $this->get('stime') && !$this->get('ftime');
 	}

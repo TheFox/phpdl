@@ -42,7 +42,7 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 		
 		print "link '$url'\n";
 		$tmp = './tmp/'.$filename.'.tmp';
-		wget($CONFIG['WGET'], $url, $tmp, $packet->get('speed'));
+		wget($url, $tmp);
 		if(preg_match('/DL:([^,]*),([^,]*),([^,]*),(.*)/', file_get_contents($tmp), $res)){
 			$hostname = $res[1];
 			$dlauth = $res[2];
@@ -69,10 +69,13 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 			}
 			
 			print "link '$url'\n";
-			$file->save('md5', $md5);
+			
+			$file->set('size', wgetHeaderSize($url));
+			$file->set('md5', $md5);
+			$file->save();
 			
 			$tmpfile = $packetDownloadDir.'/.'.$filename;
-			wget($CONFIG['WGET'], $url, $tmpfile, $packet->get('speed'));
+			wget($url, $tmpfile);
 			$error = 0;
 			if(file_exists($tmpfile)){
 				
