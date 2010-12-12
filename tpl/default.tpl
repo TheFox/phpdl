@@ -3,22 +3,29 @@
 
 <script type="text/javascript">
 	
+	var packetsReloadsInterval = 10 * 1000;
+	var packetProgressbarBaseId = '{$packetProgressbarBaseId}';
+	
 	$(document).ready(function(){
 		
 		// autorefresh
 		setTimeout(function(){
 			document.location.href = document.location.href;
-		}, 1000 * 60);
+		}, 1000 * 3600);
+		
+		setTimeout(function(){
+			packetsReload();
+		}, packetsReloadsInterval);
 		
 		{$jsDocumentReady}
 		
 	});
 	
-	function packetArchiveExec(id){
+	function packetArchiveExec(id, name){
 		var button = $('#packetArchiveExecButton' + id);
 		button.hide();
 		
-		$.ajax({
+		$.ajaxSync({
 			type: 'GET',
 			url: '?a=packetArchiveExec&id=' + id + '&noredirect=1',
 			success: function(){
@@ -27,9 +34,23 @@
 				packetTr.remove();
 				
 				var div = $('<div>');
-				div.css('background-color', '#00ff00');
-				div.html('Packet (' + id + ') successfully archived.');
+				//div.css('background-color', '#00ff00');
+				div.css('margin-top', '1px');
+				div.css('padding', '0 1px');
+				div.addClass('ui-state-highlight ui-corner-all');
+				
+				//var p = $('<p>');
+				
+				var spanicon = $('<span>');
+				spanicon.css('float', 'left');
+				spanicon.css('margin-right', '1px');
+				spanicon.addClass('ui-icon ui-icon-info');
+				div.append(spanicon);
+				div.append("Packet '" + name + "' (" + id + ") successfully archived.");
+				
+				//div.append(p);
 				div.hide();
+				
 				$('#status').append(div);
 				div.slideDown('slow', function(){
 					setTimeout(function(){
@@ -43,11 +64,37 @@
 	}
 	
 	function packetActiveExec(id, obj){
-		$.ajax({
+		$.ajaxSync({
 			type: 'GET',
 			url: '?a=packetActiveExec&id=' + id + '&active=' + ($(obj).is(':checked') ? 1 : 0) + '&noredirect=1',
 			success: function(){}
 		});
+	}
+	
+	function packetsReload(){
+		$.ajaxSync({
+			type: 'GET',
+			url: '?a=packetsReload',
+			success: function(data){
+				var packets = eval('(' + data + ')');
+				
+				for(var packetId in packets){
+					var packet = packets[packetId];
+					var packetProgressBarId = '#' + packetProgressbarBaseId + packet.id;
+					
+					$(packetProgressBarId).progressbar({ value: packet.filesFinishedPercent });
+					$(packetProgressBarId).bt(packet.filesFinishedPercent + ' %, ' + packet.filesFinished + '/' + packet.filesC + ' files', { trigger: 'hover', positions: 'top' });
+					
+					if(packet.filesDownloading)
+						$('#packetStatus' + packet.id).html('downloading (' + packet.filesDownloading + ')');
+					
+				}
+			}
+		});
+		
+		setTimeout(function(){
+			packetsReload();
+		}, packetsReloadsInterval);
 	}
 	
 </script>
@@ -55,7 +102,7 @@
 <table border="0">
 	<tr><td colspan="{$tableColspan}">Stack</td></tr>
 	<tr><td colspan="{$tableColspan}"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a> | Set all packets to [<a href="?a=packetActiveAllExec&amp;active=1">active</a> or <a href="?a=packetActiveAllExec&amp;active=0">inactive</a>]</td></tr>
-	<tr><td colspan="{$tableColspan}"><div id="status">{$status}</div></td></tr>
+	<tr><td colspan="{$tableColspan}"><div id="status" class="ui-widget">{$status}</div></td></tr>
 	<tr>
 		<td>&nbsp;</td>
 		<td>id</td>

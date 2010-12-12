@@ -144,6 +144,7 @@ else{
 				smartyAssignStd($smarty);
 				smartyAssignMenu($smarty, $user);
 				
+				$packetProgressbarBaseId = 'packetProgressBar';
 				
 				$dbh = dbConnect();
 				$users = getDbTable($dbh, 'users');
@@ -225,7 +226,7 @@ else{
 						if($packet->get('sizeVerified'))
 							$status[] = 'size verified';
 						
-						$progressBarId = 'progressBar'.$packetId;
+						$progressBarId = $packetProgressbarBaseId.$packetId;
 						$stack .= '
 							<tr id="packetTr'.$packetId.'">
 								<td class="'.$trClass.'"><input id="packetActive'.$packetId.'" type="checkbox" value="1" '.($packet->get('active') ? 'checked="checked"' : '').' onChange="packetActiveExec('.$packetId.', this)" tabindex="'.$packetC.'" /></td>
@@ -238,14 +239,12 @@ else{
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'"><div id="'.$progressBarId.'" class="progressBar"></div></td>
-								<td class="'.$trClass.'">'.join(', ', $status).'</td>
+								<td class="'.$trClass.'"><div id="packetStatus'.$packetId.'">'.join(', ', $status).'</div></td>
 								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packetId.'">txt</a> <a href="?a=packetExportXml&amp;id='.$packetId.'">xml</a></td>
-								<td class="'.$trClass.'" align="center">'.($packetIsOwnedByUser || $user->get('superuser') ? '<span id="packetArchiveExecButton'.$packetId.'" class="ui-state-default ui-icon ui-icon-circle-minus" onClick="packetArchiveExec('.$packetId.');"></span>' : '&nbsp;').'</td>
+								<td class="'.$trClass.'" align="center">'.($packetIsOwnedByUser || $user->get('superuser') ? '<span id="packetArchiveExecButton'.$packetId.'" class="ui-state-default ui-icon ui-icon-circle-minus" onClick="packetArchiveExec('.$packetId.', \''.$packet->get('name').'\');"></span>' : '&nbsp;').'</td>
 							</tr>
 						';
-						#'.($packet->get('_user') == $user->get('id') ? '<input  type="button" value="+"  />' : '').'
 						
-						#$jsDocumentReady .= "$('#$progressBarId').progressBar($packetFilesFinishedPercent, { showText: false, boxImage: 'img/progressbar.gif', barImage: 'img/progressbg_green.gif'}); $('#$progressBarId').bt('$packetFilesFinishedPercent %, $packetFilesFinished/$packetFilesC files', { trigger: 'hover', positions: 'top' });\n";
 						$jsDocumentReady .= 
 							"$('#$progressBarId').progressbar({ value: $packetFilesFinishedPercent });\n".
 							"$('#$progressBarId').bt('$packetFilesFinishedPercent %, $packetFilesFinished/$packetFilesC files', { trigger: 'hover', positions: 'top' });\n"
@@ -258,16 +257,68 @@ else{
 				
 				$status = '';
 				if(!file_exists($CONFIG['PHPDL_STACK_PIDFILE']))
-					$status .= '<div class="msgError">stack.php is not running. Run "./stackstart" in your terminal.</div>';
+					$status .= '
+						<div class="ui-state-error ui-corner-all" style="padding: 0 1px;"> 
+							<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>stack.php is not running. Run "./stackstart" in your terminal.</p>
+						</div>
+					';
 				$smarty->assign('status', $status);
 				
 				$smarty->assign('tableColspan', 13);
 				$smarty->assign('jsDocumentReady', $jsDocumentReady);
+				$smarty->assign('packetProgressbarBaseId', $packetProgressbarBaseId);
 				
 				dbClose($dbh);
 				
 			}
 			$smarty->display($tpl, $cacheId);
+			
+		break;
+		
+		case 'packetsReload':
+			
+			$dbh = dbConnect();
+			$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
+			
+			$stack = array();
+			$res = mysql_query("select id from packets where archive = '0' order by sortnr, id;", $dbh);
+			$packetNum = mysql_num_rows($res);
+			$packetC = 0;
+			while($row = mysql_fetch_assoc($res)){
+				
+				if($packet->reloadById($row['id'])){
+					
+					$packetC++;
+					
+					$packet->loadFiles();
+					$packetId = $packet->get('id');
+					$packetFilesFinished = $packet->filesFinished();
+					$packetFilesC = $packet->filesC();
+					$packetFilesFinishedPercent = 0;
+					$packetFilesDownloading = $packet->filesDownloading();
+					$packetIsFinished = $packet->isFinished();
+					
+					if($packetFilesC)
+						$packetFilesFinishedPercent = (int)($packetFilesFinished / $packetFilesC * 100);
+					
+					if($packet->isDownloading()){
+						$stack[$packetId] = array(
+							'id' => $packetId,
+							'filesC' => $packetFilesC,
+							'filesFinished' => $packetFilesFinished,
+							'filesFinishedPercent' => $packetFilesFinishedPercent,
+							'filesDownloading' => $packetFilesDownloading,
+						);
+					}
+					
+				}
+				
+			}
+			
+			print json_encode($stack);
+			flush();
+			
+			dbClose($dbh);
 			
 		break;
 		
@@ -762,6 +813,8 @@ else{
 			header('Location: ?a=packetEdit&id='.$id);
 			
 		break;
+		
+		
 		
 		case 'container':
 			
