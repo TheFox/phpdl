@@ -691,8 +691,8 @@ else{
 				smartyAssignMenu($smarty, $user);
 				
 				$errorsOut = '';
-				foreach($DLFILE_ERROR as $name => $id)
-					$errorsOut .= '<error id="'.$id.'" name="'.$name.'" />';
+				foreach($DLFILE_ERROR as $errorName => $errorId)
+					$errorsOut .= '<error id="'.$errorId.'" name="'.$errorName.'" />';
 				$smarty->assign('dlfileErrors', $errorsOut);
 				
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
@@ -717,7 +717,6 @@ else{
 					$smarty->assign('files', $filesOut);
 					
 				}
-				
 			}
 			
 			header('Content-Type: application/xml');
