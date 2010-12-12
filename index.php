@@ -345,15 +345,15 @@ else{
 						
 						$packetIsOwnedByUser = $user->get('id') == $packet->get('_user');
 						if(!$packetIsOwnedByUser)
-							$error .= '<li>This packet is owned by another user.</li>';
+							$error .= '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>This packet is owned by another user. You can not modify this packet.</p>';
 						
 						if($packet->isArchived())
-							$error .= '<li>This packet is archived. Press <i><u>Packet Reset</u></i> to restart/reset the packet and all links.</li>';
+							$error .= '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>This packet is archived. Press <i><u>Packet Reset</u></i> to restart/reset the packet and all links.</p>';
 						else{
 							if($packet->isDownloading())
-								$error .= '<li>You can not modify a downloading packet.</li>';
+								$error .= '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>You can not modify a downloading packet.</p>';
 							elseif($packet->isFinished())
-								$error .= '<li>You can not modify a finished packet.</li>';
+								$error .= '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>You can not modify a finished packet.</p>';
 						}
 						
 						if($packet->get('ftime') || $packet->get('archive'))
@@ -407,7 +407,7 @@ else{
 				');
 				
 				if($error != ''){
-					$smarty->assign('error', '<ul>'.$error.'</ul>');
+					$smarty->assign('status', '<div class="ui-state-error ui-corner-all" style="padding: 0 1px;">'.$error.'</div>');
 				}
 				else{
 					$smarty->assign('formBegin', '<form action="?a=packetEditExec&amp;id='.$id.'" method="post">');

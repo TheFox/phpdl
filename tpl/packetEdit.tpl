@@ -7,7 +7,7 @@
 			<td colspan="{$tableColspan}">{$save}</td>
 		</tr>
 		<tr>
-			<td colspan="{$tableColspan}" class="packetHasError">{$error}</td>
+			<td colspan="{$tableColspan}" class="ui-widget">{$status}</td>
 		</tr>
 		<tr>
 			<td width="120">Packet Name</td>
