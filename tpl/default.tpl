@@ -85,8 +85,8 @@
 					$(packetProgressBarId).progressbar({ value: packet.filesFinishedPercent });
 					$(packetProgressBarId).bt(packet.filesFinishedPercent + ' %, ' + packet.filesFinished + '/' + packet.filesC + ' files', { trigger: 'hover', positions: 'top' });
 					
-					if(packet.filesDownloading)
-						$('#packetStatus' + packet.id).html('downloading (' + packet.filesDownloading + ')');
+					/*if(packet.filesDownloading)
+						$('#packetStatus' + packet.id).html('downloading (' + packet.filesDownloading + ')');*/
 					
 				}
 			}
