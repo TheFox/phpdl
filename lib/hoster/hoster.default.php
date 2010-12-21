@@ -27,9 +27,9 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 	global $CONFIG;
 	$retval = '';
 	
+	printd("hoster.default.php hosterExec\n");
 	$url = $file->get('uri');
 	$filename = basename($url);
-	#printd("hoster.default.php hosterExec '$url'\n");
 	
 	$file->save('size', wgetHeaderSize($url, $packet->get('httpUser'), $packet->get('httpPassword')));
 			

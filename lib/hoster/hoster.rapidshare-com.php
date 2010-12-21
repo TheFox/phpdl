@@ -28,7 +28,7 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 	$retval = '';
 	$rapidpro = $thisHoster['user'] != '' && $thisHoster['password'] != '';
 	
-	print "hoster.rapidshare-com.php hosterExec '".$file->get('uri')."'\n";
+	printd("hoster.rapidshare-com.php hosterExec\n");
 	if(preg_match('/files\/([^\/]*)\/(.*)/i', $file->get('uri'), $res)){
 		#var_export($res);
 		$fileid = $res[1];
@@ -40,19 +40,22 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 			$path .= "&login=".$thisHoster['user']."&password=".$thisHoster['password'];
 		$url = "$protocol://api.rapidshare.com/$path";
 		
-		print "link '$url'\n";
+		
 		$tmp = './tmp/'.$filename.'.tmp';
+		
+		printd("wget '$url'\n");
 		wget($url, $tmp);
+		
 		if(preg_match('/DL:([^,]*),([^,]*),([^,]*),(.*)/', file_get_contents($tmp), $res)){
 			$hostname = $res[1];
 			$dlauth = $res[2];
 			$countdown = (int)$res[3] + 5;
 			$md5 = strtolower($res[4]);
 			
-			print "host: '$hostname'\n";
-			print "auth: '$dlauth'\n";
-			print "ct: '$countdown'\n";
-			print "md5: '$md5'\n";
+			printd("host: '$hostname'\n");
+			printd("auth: '$dlauth'\n");
+			printd("ct: '$countdown'\n");
+			printd("md5: '$md5'\n");
 			
 			$url = "$protocol://".$hostname."/$path";
 			if(!$rapidpro){
@@ -64,18 +67,21 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 				#	which download ONE file as a free user from RapidShare.
 				#	It is NOT allowed to implement queuing mechanisms.
 				
-				print "wait $countdown\n";
+				printd("wait $countdown\n");
 				sleep($countdown);
 			}
 			
-			print "link '$url'\n";
+			
 			
 			$file->set('size', wgetHeaderSize($url));
 			$file->set('md5', $md5);
 			$file->save();
 			
 			$tmpfile = $packetDownloadDir.'/.'.$filename;
+			
+			printd("wget '$url'\n");
 			wget($url, $tmpfile);
+			
 			$error = 0;
 			if(file_exists($tmpfile)){
 				
