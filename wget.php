@@ -94,6 +94,7 @@ if(count($argv) >= 2){
 			if(function_exists('hosterExec')){
 				if(preg_match('/^https?:/', $file->get('uri'))){
 					
+					$file->set('pid', posix_getpid());
 					$file->set('error', $DLFILE_ERROR['ERROR_NO_ERROR']);
 					$file->set('stime', mktime());
 					$file->set('ftime', 0);
