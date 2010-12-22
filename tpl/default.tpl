@@ -11,7 +11,7 @@
 		// autorefresh
 		setTimeout(function(){
 			document.location.href = document.location.href;
-		}, 1000 * 3600);
+		}, 1000 * 300);
 		
 		setTimeout(function(){
 			packetsReload();
