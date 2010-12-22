@@ -125,13 +125,16 @@ if(count($argv) >= 2){
 							$file->set('sizeVerified', 1);
 					}
 					
+					printd("file size: $fileSize bytes\n");
+					printd("real file size: $size bytes\n");
+					
 					if($error){
 						if(file_exists($filePath) && $filePath != '')
 							unlink($filePath);
 						printd("file failed: ".getDlFileErrorMsg($error)."\n");
 					}
 					else
-						printd("file ok: $size byte\n");
+						printd("file ok\n");
 					
 					
 					$file->set('error', $error);
