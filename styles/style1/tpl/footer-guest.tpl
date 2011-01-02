@@ -7,7 +7,7 @@
 						<tr>
 							<td class="copyright">
 								This site was generated @ {$dateLong} by {$siteGenerator}.<br />
-								Copyright &copy; {$dateYear} <a href="http://fox21.at/">TheFox</a>
+								Copyright &copy; 2010 <a href="http://fox21.at/">TheFox</a>
 							</td>
 						</tr>
 					</table>
