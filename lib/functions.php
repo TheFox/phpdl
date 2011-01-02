@@ -253,14 +253,20 @@ function scheduler($dbh){
 			== 0	Machted no scheduler entry. Download inactive.
 	*/
 	
+	$now = mktime();
+	$dayBegin = mktime(0, 0, 0, date('n'), date('j'), date('Y'));
 	$res = mysql_query("select * from scheduler where active = '1' order by sortnr;", $dbh);
 	while($sched = mysql_fetch_assoc($res)){
 		$active = false;
 		
-		$activeDayTimeBegin = mktime(0, 0, 0, date('n'), date('j'), date('Y')) + $sched['activeDayTimeBegin'];
-		$activeDayTimeEnd = mktime(0, 0, 0, date('n'), date('j'), date('Y')) + $sched['activeDayTimeEnd'];
+		$activeDayTimeBegin = $activeDayTimeEnd = $dayBegin;
 		
-		if(mktime() >= $activeDayTimeBegin && mktime() <= $activeDayTimeEnd)
+		if($sched['activeDayTimeBegin'] > $sched['activeDayTimeEnd'])
+			$activeDayTimeBegin -= 3600 * 24;
+		$activeDayTimeBegin += $sched['activeDayTimeBegin'];
+		$activeDayTimeEnd += $sched['activeDayTimeEnd'];
+		
+		if($now >= $activeDayTimeBegin && $now <= $activeDayTimeEnd)
 			$active = true;
 		
 		$active = $sched['activeDayTimeInvert'] ? !$active : $active;
