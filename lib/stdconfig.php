@@ -44,7 +44,7 @@ $CONFIG = array(
 	'SITE_ONLINESINCE' => '2010',
 	'SITE_MENU' => array(),
 	'SITE_STYLE_DIR' => 'styles',
-	'SITE_FAVICON' => 'http://img.fox21.at/favicon.ico',
+	'SITE_FAVICON' => 'img/redsun.gif',
 	
 	'SMARTY_DEBUG' => false,
 	'SMARTY_CACHING' => false,
