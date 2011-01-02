@@ -936,6 +936,7 @@ else{
 				
 				$dbh = dbConnect();
 				if($id){
+					// Edit old.
 					$scheduler = getDbTable($dbh, 'scheduler', "where id = '$id'");
 					$sched = $scheduler[$id];
 					
@@ -957,10 +958,13 @@ else{
 					');
 				}
 				else{
+					// Insert new.
 					$res = mysql_fetch_assoc(mysql_query("select max(sortnr) m from scheduler;", $dbh));
 					$sortnr = $res['m'] + 1;
 					
 					$smarty->assign('activeChecked', 'checked="checked"');
+					$smarty->assign('activeDayTimeBegin', date('H:i:s', mktime(date('H'), 0, 0, date('n'), date('j'), date('Y'))));
+					$smarty->assign('activeDayTimeEnd', date('H:i:s', mktime(date('H'), 59, 59, date('n'), date('j'), date('Y')) + $sched['activeDayTimeEnd']));
 					$smarty->assign('downloadChecked', 'checked="checked"');
 					$smarty->assign('sortnr', $sortnr);
 				}
