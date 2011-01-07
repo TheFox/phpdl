@@ -21,7 +21,7 @@
 */
 
 define('ANTIHACK', 1);
-if(isset($_SERVER['SERVER_ADDR'])) die('Hacking attempt.');
+if(PHP_SAPI != 'cli') die('Please start this script from terminal with <b>./stackstart</b>');
 
 
 chdir(substr($_SERVER['SCRIPT_FILENAME'], 0, strlen($_SERVER['SCRIPT_FILENAME']) - strlen(basename($_SERVER['SCRIPT_FILENAME']))));
