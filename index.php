@@ -231,7 +231,6 @@ else{
 							<tr id="packetTr'.$packetId.'">
 								<td class="'.$trClass.'"><input id="packetActive'.$packetId.'" type="checkbox" value="1" '.($packet->get('active') ? 'checked="checked"' : '').' onChange="packetActiveExec('.$packetId.', this)" tabindex="'.$packetC.'" /></td>
 								<td class="'.$trClass.'">'.$packetId.'</td>
-								<td class="'.$trClass.'">'.$move.'</td>
 								<td class="'.$trClass.'">'.$packet->get('sortnr').'</td>
 								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
 								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packetId.'">'.$packet->get('name').'</a>'.($packetIsFinished && file_exists($packetFinishedDir) ? ' [<a href="'.$packetFinishedDir.'" target="_blank">dir</a>]' : '').'</td>
@@ -264,7 +263,7 @@ else{
 					';
 				$smarty->assign('status', $status);
 				
-				$smarty->assign('tableColspan', 13);
+				$smarty->assign('tableColspan', 12);
 				$smarty->assign('jsDocumentReady', $jsDocumentReady);
 				$smarty->assign('packetProgressbarBaseId', $packetProgressbarBaseId);
 				
@@ -727,23 +726,16 @@ else{
 		
 		case 'packetMoveExec':
 			
-			$direction = checkInput($_GET['dir'], 'du', 1);
-			$sortnr = (int)$_GET['sortnr'];
+			$ids = split(',', $_POST['ids']);
 			
 			$dbh = dbConnect();
-			
-			if($direction == 'd'){
-				mysql_query("update packets set sortnr = sortnr - 1 where sortnr = ".($sortnr + 1).";", $dbh);
-				mysql_query("update packets set sortnr = sortnr + 1 where id = '$id' limit 1;", $dbh);
+			$sortnr = 1; 
+			foreach($ids as $id){
+				$iddb = checkInput($id, '0-9', 11);
+				mysql_query("update packets set sortnr = $sortnr where id = $iddb limit 1;");
+				$sortnr++;
 			}
-			else{
-				mysql_query("update packets set sortnr = sortnr + 1 where sortnr = ".($sortnr - 1).";", $dbh);
-				mysql_query("update packets set sortnr = sortnr - 1 where id = '$id' limit 1;", $dbh);
-			}
-			
 			dbClose($dbh);
-			
-			header('Location: ?');
 			
 		break;
 		

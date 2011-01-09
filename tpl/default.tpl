@@ -17,8 +17,33 @@
 			packetsReload();
 		}, packetsReloadsInterval);
 		
-		{$jsDocumentReady}
+		$('#stack').tableDnD({
+			onDrop: function(table, row){
+				var ids = new Array();
+				var rows = table.tBodies[0].rows;
+				for(var i = 0; i < rows.length; i++){
+					var id = rows[i].id;
+					if(id != ''){
+						id = id.substr(8);
+						ids.push(id + '');
+					}
+				}
+				$.ajaxSync({
+					type: 'POST',
+					url: '?a=packetMoveExec',
+					data: 'ids=' + ids,
+					success: function(){
+						statusAddInfo("Order saved.");
+					}
+				});
+			}
+		});
 		
+		$('.ui-state-default.ui-icon.ui-icon-circle-minus').each(function(){
+			$(this).css('cursor', 'default');
+		});
+		
+		{$jsDocumentReady}
 	});
 	
 	function statusAddInfo(text){
@@ -105,7 +130,6 @@
 	<tr>
 		<td>&nbsp;</td>
 		<td>id</td>
-		<td>move</td>
 		<td>sortnr</td>
 		<td>user</td>
 		<td><a href="#" id="nameHelp">name</a></td>
