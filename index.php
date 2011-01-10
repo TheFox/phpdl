@@ -350,12 +350,12 @@ else{
 							$error .= '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>This packet is archived. Press <i><u>Packet Reset</u></i> to restart/reset the packet and all links.</p>';
 						else{
 							if($packet->isDownloading())
-								$error .= '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>You can not modify a downloading packet.</p>';
+								$error .= '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>Downloading. You can not modify links.</p>';
 							elseif($packet->isFinished())
-								$error .= '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>You can not modify a finished packet.</p>';
+								$error .= '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 1px;"></span>Finished. You can not modify links.</p>';
 						}
 						
-						if($packet->get('ftime') || $packet->get('archive'))
+						if($packet->isFinished() || $packet->isArchived())
 							$smarty->assign('reset', '
 								<tr>
 									<td colspan="'.$tableColspan.'"><a href="?a=packetResetExec&amp;id='.$packet->get('id').'">Packet Reset</td>
@@ -408,12 +408,9 @@ else{
 				if($error != ''){
 					$smarty->assign('status', '<div class="ui-state-error ui-corner-all" style="padding: 0 1px;">'.$error.'</div>');
 				}
-				else{
-					$smarty->assign('formBegin', '<form action="?a=packetEditExec&amp;id='.$id.'" method="post">');
-					$smarty->assign('formEnd', '</form>');
-					$smarty->assign('save', '<input type="submit" value="Save" />');
-					
-				}
+				$smarty->assign('formBegin', '<form action="?a=packetEditExec&amp;id='.$id.'" method="post">');
+				$smarty->assign('formEnd', '</form>');
+				$smarty->assign('save', '<input type="submit" value="Save" />');
 				
 				$smarty->assign('tableColspan', $tableColspan);
 				
@@ -463,33 +460,35 @@ else{
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				if($packet->loadById($id)){
 					
-					if($user->get('id') != $packet->get('_user') || $packet->filesDownloading() || $packet->get('ftime'))
+					if($user->get('id') != $packet->get('_user'))
 						exit();
 					
-					$files = getDbTable($dbh, 'files', "where _packet = '$id'");
-					foreach($files as $fileId => $file)
-						foreach($urls as $urlNum => $url)
-							if($file['uri'] == $url){
-								$files[$fileId]['__hold'] = true;
-								break;
-							}
-					
-					foreach($files as $fileId => $file)
-						if(!isset($file['__hold']))
-							mysql_query("delete from files where id = '".$file['id']."' limit 1;", $dbh);
-					
-					// Add new
-					foreach($urls as $urlNum => $url){
-						$found = false;
+					if(!$packet->isDownloading() && !$packet->isFinished()){
+						$files = getDbTable($dbh, 'files', "where _packet = '$id'");
 						foreach($files as $fileId => $file)
-							if($file['uri'] == $url){
-								$found = true;
-								break;
-							}
+							foreach($urls as $urlNum => $url)
+								if($file['uri'] == $url){
+									$files[$fileId]['__hold'] = true;
+									break;
+								}
 						
-						if(!$found)
-							mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$id', '$url', '".mktime()."');", $dbh);
+						foreach($files as $fileId => $file)
+							if(!isset($file['__hold']))
+								mysql_query("delete from files where id = '".$file['id']."' limit 1;", $dbh);
 						
+						// Add new
+						foreach($urls as $urlNum => $url){
+							$found = false;
+							foreach($files as $fileId => $file)
+								if($file['uri'] == $url){
+									$found = true;
+									break;
+								}
+							
+							if(!$found)
+								mysql_query("insert into files(_user, _packet, uri, ctime) values ('".$user->get('id')."', '$id', '$url', '".mktime()."');", $dbh);
+							
+						}
 					}
 					
 					mysql_query("update packets set source = '$source', password = '$password', httpUser = '$httpUser', httpPassword = '$httpPassword', speed = '$speed', sortnr = '$sortnr' where id = '$id' limit 1;");
