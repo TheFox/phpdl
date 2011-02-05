@@ -233,7 +233,7 @@ else{
 								<td class="'.$trClass.'">'.$packetId.'</td>
 								<td class="'.$trClass.'">'.$packet->get('sortnr').'</td>
 								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
-								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packetId.'">'.$packet->get('name').'</a>'.($packetIsFinished && file_exists($packetFinishedDir) ? ' [<a href="'.$packetFinishedDir.'" target="_blank">dir</a>]' : '').'</td>
+								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packetId.'"><b>'.$packet->get('name').'</b></a>'.($packetIsFinished && file_exists($packetFinishedDir) ? ' [<a href="'.$packetFinishedDir.'" target="_blank">dir</a>]' : '').'</td>
 								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
 								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
 								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
