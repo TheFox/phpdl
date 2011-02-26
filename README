@@ -13,6 +13,7 @@ Features
 	- Multiuser.
 	- Traffic statistics.
 	- Scheduler.
+	- Hooks.
 	- Export packet informations as txt and xml.
 	- RSDF files support.
 	- DLC files support.

@@ -73,7 +73,9 @@ function main(){
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				if($packet->loadById($row['id'])){
 					
-					$packetDirBn = getPacketFilename($packet->get('id'), $packet->get('name'));
+					$packetId = $packet->get('id');
+					$packetName = $packet->get('name');
+					$packetDirBn = getPacketFilename($packetId, $packetName);
 					$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
 					$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
 					
@@ -85,8 +87,11 @@ function main(){
 								
 								if($filesDownloading < $CONFIG['DL_SLOTS']){
 									
-									if(!$packet->get('stime'))
+									if(!$packet->get('stime')){
 										$packet->save('stime', mktime());
+										printd("hook: packet_download_start.sh\n");
+										system("./lib/hook/packet_download_start.sh $packetId '$packetName'");
+									}
 									
 									if($nextfile = $packet->getFileNextUnfinished()){
 										
@@ -99,7 +104,7 @@ function main(){
 										}
 										
 										if($nextfile){
-											printd("packet ".$packet->get('id').": download ".$nextfile->get('id')."\n");
+											printd("packet $packetId: download ".$nextfile->get('id')."\n");
 											$sh = 'php wget.php '.$nextfile->get('id').' 1>> log/wget.'.$date.'.log 2>> log/wget.'.$date.'.log &';
 											printd("exec '$sh'\n");
 											system($sh);
@@ -114,7 +119,7 @@ function main(){
 						}
 						else{
 							
-							printd("packet ".$packet->get('id').": all files finished\n");
+							printd("packet $packetId: all files finished\n");
 							if(!$packet->get('stime'))
 								$packet->set('stime', mktime());
 							$packet->save('ftime', mktime());
@@ -135,6 +140,10 @@ function main(){
 									rename($packetDownloadDir, $packetFinishedDir);
 								
 							}
+							
+							printd("hook: packet_download_end.sh\n");
+							system("./lib/hook/packet_download_end.sh $packetId '$packetName'");
+							
 						}
 					}
 				}

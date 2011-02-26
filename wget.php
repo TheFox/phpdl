@@ -49,11 +49,13 @@ if(count($argv) >= 2){
 	if($file->loadById($fileId)){
 		
 		$file->packetLoad();
-		$packetDirBn = getPacketFilename($file->packet->get('id'), $file->packet->get('name'));
+		$packetId = $file->packet->get('id');
+		$packetName = $file->packet->get('name');
+		$packetDirBn = getPacketFilename($packetId, $packetName);
 		$packetDownloadDir = 'downloads/loading/'.$packetDirBn;
 		$packetFinishedDir = 'downloads/finished/'.$packetDirBn;
 		
-		printd("packet id: ".$file->packet->get('id')."\n");
+		printd("packet id: $packetId\n");
 		printd("file id: $fileId\n");
 		printd("download dir: '$packetDownloadDir'\n");
 		printd("speed: ".$file->packet->get('speed')."\n");
@@ -100,9 +102,15 @@ if(count($argv) >= 2){
 					$file->set('ftime', 0);
 					$file->save();
 					
+					printd("hook: file_download_start.sh\n");
+					system("./lib/hook/file_download_start.sh $packetId '$packetName' $fileId");
+					
 					printd("hoster plugin: hosterExec()\n");
 					$filePath = hosterExec($thisHoster, $file->packet, $packetDownloadDir, $file);
 					printd("hoster plugin: hosterExec() done: '$filePath'\n");
+					
+					printd("hook: file_download_end.sh\n");
+					system("./lib/hook/file_download_end.sh $packetId '$packetName' $fileId");
 					
 					$error = $DLFILE_ERROR['ERROR_NO_ERROR'];
 					$size = 0;
