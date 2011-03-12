@@ -8,6 +8,7 @@ DATE=`date +"%Y/%m/%d %H:%M:%S"`
 PACKET_ID=$1
 PACKET_NAME=$2
 FILE_ID=$3
+FILE_PATH=$4
 
 
 #echo "$DATE $USER $PACKET_ID '$PACKET_NAME' $FILE_ID" >> $LOG
