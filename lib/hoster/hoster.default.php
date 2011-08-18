@@ -31,10 +31,10 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 	$url = $file->get('uri');
 	$filename = basename($url);
 	
-	$file->save('size', wgetHeaderSize($url, $packet->get('httpUser'), $packet->get('httpPassword')));
+	$file->save('size', wgetHeaderSize($url, $packet->get('httpUser'), $packet->get('httpPassword'), $CONFIG['DL_IP_OUT']));
 			
 	$tmpfile = $packetDownloadDir.'/.'.$filename;
-	wget($url, $tmpfile, null, $packet->get('httpUser'), $packet->get('httpPassword'));
+	wget($url, $tmpfile, null, $packet->get('httpUser'), $packet->get('httpPassword'), $CONFIG['DL_IP_OUT']);
 	$error = 0;
 	
 	if(file_exists($tmpfile)){

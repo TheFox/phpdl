@@ -44,7 +44,7 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 		$tmp = './tmp/'.$filename.'.tmp';
 		
 		printd("wget '$url'\n");
-		wget($url, $tmp);
+		wget($url, $tmp, null, null, null, $CONFIG['DL_IP_OUT']);
 		
 		if(preg_match('/DL:([^,]*),([^,]*),([^,]*),(.*)/', file_get_contents($tmp), $res)){
 			$hostname = $res[1];
@@ -73,14 +73,14 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 			
 			
 			
-			$file->set('size', wgetHeaderSize($url));
+			$file->set('size', wgetHeaderSize($url, null, null, $CONFIG['DL_IP_OUT']));
 			$file->set('md5', $md5);
 			$file->save();
 			
 			$tmpfile = $packetDownloadDir.'/.'.$filename;
 			
 			printd("wget '$url'\n");
-			wget($url, $tmpfile);
+			wget($url, $tmpfile, null, null, null, $CONFIG['DL_IP_OUT']);
 			
 			$error = 0;
 			if(file_exists($tmpfile)){

@@ -39,6 +39,7 @@ $EXTCONFIG = array(
 	'USER_SESSION_TTL' => {$USER_SESSION_TTL},
 	
 	'DL_SLOTS' => 1,
+	'DL_IP_OUT' => '', # Bind to a ip address.
 	
 	'SITE_STYLE' => 'style1',
 	

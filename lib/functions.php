@@ -175,7 +175,7 @@ function checkInput($val, $pattern, $len = null){
 	return $val;
 }
 
-function wget($url, $filePath = null, $speed = null, $httpUser = null, $httpPassword = null){
+function wget($url, $filePath = null, $speed = null, $httpUser = null, $httpPassword = null, $ipOut = null){
 	$rv = null;
 	$fh = null;
 	
@@ -199,6 +199,8 @@ function wget($url, $filePath = null, $speed = null, $httpUser = null, $httpPass
 	}
 	if($httpUser && $httpPassword)
 		curl_setopt($ch, CURLOPT_USERPWD, "$httpUser:$httpPassword");
+	if($ipOut)
+		curl_setopt($ch, CURLOPT_INTERFACE, $ipOut);
 	
 	$rv = curl_exec($ch);
 	curl_close($ch);
@@ -209,7 +211,7 @@ function wget($url, $filePath = null, $speed = null, $httpUser = null, $httpPass
 	return $rv;
 }
 
-function wgetHeaderSize($url, $httpUser = null, $httpPassword = null){
+function wgetHeaderSize($url, $httpUser = null, $httpPassword = null, $ipOut = null){
 	$rv = null;
 	
 	$ch = curl_init($url);
@@ -224,6 +226,8 @@ function wgetHeaderSize($url, $httpUser = null, $httpPassword = null){
 	
 	if($httpUser && $httpPassword)
 		curl_setopt($ch, CURLOPT_USERPWD, "$httpUser:$httpPassword");
+	if($ipOut)
+		curl_setopt($ch, CURLOPT_INTERFACE, $ipOut);
 	
 	$header = curl_exec($ch);
 	curl_close($ch);
