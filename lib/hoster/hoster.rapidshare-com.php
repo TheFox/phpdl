@@ -35,7 +35,7 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 		$filename = $res[2];
 		
 		$protocol = 'http'.($thisHoster['ssl'] && $rapidpro ? 's' : '');
-		$path = "cgi-bin/rsapi.cgi?sub=download_v1&fileid=$fileid&filename=$filename&withmd5hex=1";
+		$path = "cgi-bin/rsapi.cgi?sub=download&fileid=$fileid&filename=$filename&withmd5hex=1";
 		if($rapidpro)
 			$path .= "&login=".$thisHoster['user']."&password=".$thisHoster['password'];
 		$url = "$protocol://api.rapidshare.com/$path";
