@@ -77,7 +77,7 @@ function smartyAssignStd(&$smarty, $siteTitleSuffix = ''){
 	$smarty->assign('siteContact', $CONFIG['SITE_CONTACT']);
 	$smarty->assign('siteContactSite', $CONFIG['SITE_CONTACT_SITE']);
 	#$smarty->assign('siteGenerator', $CONFIG['SITE_GENERATOR']);
-	$smarty->assign('siteGenerator', $smarty->_version);
+	$smarty->assign('siteGenerator', Smarty::SMARTY_VERSION);
 	$smarty->assign('siteDescription', $CONFIG['SITE_DESCRIPTION']);
 	$smarty->assign('siteKeywords', $CONFIG['SITE_KEYWORDS']);
 	$smarty->assign('siteRevisitafter', $CONFIG['SITE_REVISITAFTER']);

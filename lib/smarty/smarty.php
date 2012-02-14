@@ -20,6 +20,6 @@
 	along with PHPDL.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-include_once('Smarty-3.0rc4/Smarty.class.php');
+include_once('Smarty-3.1.7/Smarty.class.php');
 
 ?>
