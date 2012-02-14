@@ -1,4 +1,4 @@
-<!-- BEGIN OF head.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="{$siteAuthor}" />
 <meta name="publisher" content="{$siteAuthor}" />
@@ -27,4 +27,4 @@
 <script type="text/javascript" src="lib/phpdl.js"></script>
 
 {$htmlHeadExt}
-<!-- END OF head.tpl //-->
+<!-- END OF {$smarty.template} //-->

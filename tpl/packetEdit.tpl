@@ -1,4 +1,4 @@
-<!-- BEGIN OF packetEdit.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 {$formBegin}
@@ -44,4 +44,4 @@
 {$formEnd}
 
 {include file="{$siteStyleTplDir}/footer.tpl"}
-<!-- END OF packetEdit.tpl //-->
+<!-- END OF {$smarty.template} //-->

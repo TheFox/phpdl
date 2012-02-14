@@ -1,4 +1,4 @@
-<!-- BEGIN OF footer-guest.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 				</td>
 			</tr>
 			<tr>
@@ -16,4 +16,4 @@
 		</table>
 	</body>
 </html>
-<!-- END OF footer-guest.tpl //-->
+<!-- END OF {$smarty.template} //-->

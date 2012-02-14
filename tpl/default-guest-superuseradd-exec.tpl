@@ -1,4 +1,4 @@
-<!-- BEGIN OF default-guest-superuseradd-exec.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header-guest.tpl"}
 
 <table>
@@ -8,4 +8,4 @@
 </table>
 
 {include file="{$siteStyleTplDir}/footer-guest.tpl"}
-<!-- END OF default-guest-superuseradd-exec.tpl //-->
+<!-- END OF {$smarty.template} //-->

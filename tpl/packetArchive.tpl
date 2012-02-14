@@ -1,4 +1,4 @@
-<!-- BEGIN OF packetArchive.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 <script type="text/javascript">
@@ -33,4 +33,4 @@
 </table>
 
 {include file="{$siteStyleTplDir}/footer.tpl"}
-<!-- END OF packetArchive.tpl //-->
+<!-- END OF {$smarty.template} //-->

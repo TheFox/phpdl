@@ -1,4 +1,4 @@
-<!-- BEGIN OF default.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 <script type="text/javascript">
@@ -145,4 +145,4 @@
 </table>
 
 {include file="{$siteStyleTplDir}/footer.tpl"}
-<!-- END OF default.tpl //-->
+<!-- END OF {$smarty.template} //-->

@@ -1,4 +1,4 @@
-<!-- BEGIN OF default-guest-superuseradd.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header-guest.tpl"}
 
 <form action="?a=superuserAddExec" method="post">
@@ -23,4 +23,4 @@
 </form>
 
 {include file="{$siteStyleTplDir}/footer-guest.tpl"}
-<!-- END OF default-guest-superuseradd.tpl //-->
+<!-- END OF {$smarty.template} //-->

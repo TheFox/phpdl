@@ -1,6 +1,6 @@
-<!-- BEGIN OF default-guest.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header-guest.tpl"}
-
+1111
 <form action="?a=loginExec" method="post">
 	<table border="0">
 		<tr>
@@ -21,4 +21,4 @@
 </form>
 
 {include file="{$siteStyleTplDir}/footer-guest.tpl"}
-<!-- END OF default-guest.tpl //-->
+<!-- END OF {$smarty.template} //-->

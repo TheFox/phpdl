@@ -1,4 +1,4 @@
-<!-- BEGIN OF scheduler.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 <form action="?a=schedulerEditExec&amp;id={$id}" method="post">
@@ -39,4 +39,4 @@
 </form>
 
 {include file="{$siteStyleTplDir}/footer.tpl"}
-<!-- END OF scheduler.tpl //-->
+<!-- END OF {$smarty.template} //-->

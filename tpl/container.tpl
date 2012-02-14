@@ -1,4 +1,4 @@
-<!-- BEGIN OF container.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 
@@ -26,4 +26,4 @@
 
 
 {include file="{$siteStyleTplDir}/footer.tpl"}
-<!-- END OF container.tpl //-->
+<!-- END OF {$smarty.template} //-->

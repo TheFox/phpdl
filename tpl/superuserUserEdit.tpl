@@ -1,4 +1,4 @@
-<!-- BEGIN OF superuserUserEdit.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 <form action="?a=superuserUserEditExec&amp;id={$id}" method="post">
@@ -29,4 +29,4 @@
 </form>
 
 {include file="{$siteStyleTplDir}/footer.tpl"}
-<!-- END OF superuserUserEdit.tpl //-->
+<!-- END OF {$smarty.template} //-->

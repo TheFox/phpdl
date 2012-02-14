@@ -1,4 +1,4 @@
-<!-- BEGIN OF superuser.tpl //-->
+<!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
 <table border="0">
@@ -8,4 +8,4 @@
 </table>
 
 {include file="{$siteStyleTplDir}/footer.tpl"}
-<!-- END OF superuser.tpl //-->
+<!-- END OF {$smarty.template} //-->
