@@ -1,6 +1,14 @@
 <!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
+<style type="text/css">
+	
+	.msgBlack{
+		background-color: #000000;
+	}
+	
+</style>
+
 <script type="text/javascript">
 	
 	var packetsReloadsInterval = 10 * 1000;
@@ -43,30 +51,18 @@
 			$(this).css('cursor', 'default');
 		});
 		
+		statusAddInfo('test');
+		
 		{$jsDocumentReady}
 	});
 	
 	function statusAddInfo(text){
-		var div = $('<div>');
-		div.css('margin-top', '1px');
-		div.css('padding', '0 1px');
-		div.addClass('ui-state-highlight ui-corner-all');
-		
-		var spanicon = $('<span>');
-		spanicon.css('float', 'left');
-		spanicon.css('margin-right', '1px');
-		spanicon.addClass('ui-icon ui-icon-info');
-		div.append(spanicon);
-		div.append(text);
-		div.hide();
-		
-		$('#status').append(div);
-		div.slideDown('slow', function(){
-			setTimeout(function(){
-				div.slideUp('slow', function(){
-					$(this).remove();
-				});
-			}, 3000);
+		$.gritter.add({
+			title: 'Notification',
+			text: text,
+			sticky: false,
+			time: 3000,
+			class_name: 'msgBlack'
 		});
 	}
 	
@@ -123,25 +119,31 @@
 	
 </script>
 
-<table border="0" id="stack">
-	<tr><td colspan="{$tableColspan}">Stack</td></tr>
-	<tr><td colspan="{$tableColspan}"><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a> | Set all packets to [<a href="?a=packetActiveAllExec&amp;active=1">active</a> or <a href="?a=packetActiveAllExec&amp;active=0">inactive</a>]</td></tr>
+<table border="0">
+	<tr><td>Stack</td></tr>
+	<tr><td><a href="?a=packetEdit&amp;id=0">Add</a> | <a href="?a=packetSortExec">Sort</a> | Set all packets to [<a href="?a=packetActiveAllExec&amp;active=1">active</a> or <a href="?a=packetActiveAllExec&amp;active=0">inactive</a>]</td></tr>
 	<tr><td colspan="{$tableColspan}"><div id="status" class="ui-widget">{$status}</div></td></tr>
 	<tr>
-		<td>&nbsp;</td>
-		<td>id</td>
-		<td>sortnr</td>
-		<td>user</td>
-		<td><a href="#" id="nameHelp">name</a></td>
-		<td><a href="#" id="ctimeHelp">ctime</a></td>
-		<td><a href="#" id="stimeHelp">stime</a></td>
-		<td><a href="#" id="ftimeHelp">ftime</a></td>
-		<td><a href="#" id="progressHelp">progress</a></td>
-		<td>status</td>
-		<td><a href="#" id="exportHelp">exp</a></td>
-		<td><a href="#" id="archiveHelp">archive</a></td>
+		<td>
+			<table border="0" id="stack">
+				<tr>
+					<td>&nbsp;</td>
+					<td>id</td>
+					<td>sortnr</td>
+					<td>user</td>
+					<td><a href="#" id="nameHelp">name</a></td>
+					<td><a href="#" id="ctimeHelp">ctime</a></td>
+					<td><a href="#" id="stimeHelp">stime</a></td>
+					<td><a href="#" id="ftimeHelp">ftime</a></td>
+					<td><a href="#" id="progressHelp">progress</a></td>
+					<td>status</td>
+					<td><a href="#" id="exportHelp">exp</a></td>
+					<td><a href="#" id="archiveHelp">archive</a></td>
+				</tr>
+				{$stack}
+			</table>
+		</td>
 	</tr>
-	{$stack}
 </table>
 
 {include file="{$siteStyleTplDir}/footer.tpl"}

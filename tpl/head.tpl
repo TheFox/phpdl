@@ -19,12 +19,18 @@
 
 <title>{$siteTitle} {$phpdlVersion}</title>
 
+<!--<script type="text/javascript" src="lib/jquery/jquery-1.4.3.js"></script>-->
 <script type="text/javascript" src="lib/jquery/jquery-1.7.1.js"></script>
 <script type="text/javascript" src="lib/jquery/jqueryui/jquery-ui-1.8.18.js"></script>
 <script type="text/javascript" src="lib/jquery/jquery.bt-0.9.5-rc1.js"></script>
-<script type="text/javascript" src="lib/jquery/jquery.tablednd-0.5.js"></script>
+<!--<script type="text/javascript" src="lib/jquery/jquery.tablednd-0.5.js"></script>-->
+<script type="text/javascript" src="lib/jquery/jquery.tablednd.js"></script>
+
 <script type="text/javascript" src="lib/jquery/jquery.timepicker.js"></script>
 <link rel="stylesheet" type="text/css" href="lib/jquery/jquery.timepicker.css" />
+
+<script type="text/javascript" src="lib/jquery/jquery.gritter-1.7.4.js"></script>
+<link rel="stylesheet" type="text/css" href="lib/jquery/jquery.gritter.css" />
 
 <script type="text/javascript" src="lib/phpdl.js"></script>
 

@@ -36,6 +36,8 @@ Created with help from many libraries and frameworks including:
 	- jQuery (http://jquery.com/)
 		- jQuery UI (http://jqueryui.com/)
 		- BeautyTips (http://plugins.jquery.com/project/bt)
+		- Timepicker (http://jonthornton.github.com/jquery-timepicker/)
+		- Gritter (https://github.com/jboesch/Gritter)
 	- Smarty (http://www.smarty.net/)
 
 # EOF

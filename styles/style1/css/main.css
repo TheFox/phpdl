@@ -22,7 +22,6 @@
 html{
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 12px;
-	background-color: #ffffff;
 }
 
 a:link, a:active, a:hover, a:visited{
@@ -48,7 +47,6 @@ img{
 }
 
 .content{
-	background-color: #ffffff;
 	vertical-align: top;
 }
 
@@ -80,10 +78,6 @@ img{
 
 .centerText{
 	text-align: center;
-}
-
-.packetIsDownloading, .packetHasFinished, .packetHasError{
-	/*vertical-align: top;*/
 }
 
 .packetIsDownloading{
