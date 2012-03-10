@@ -1,6 +1,24 @@
 <!-- BEGIN OF {$smarty.template} //-->
 {include file="{$siteStyleTplDir}/header.tpl"}
 
+<script type="text/javascript">
+	
+	var packetsReloadsInterval = 10 * 1000;
+	var packetProgressbarBaseId = '{$packetProgressbarBaseId}';
+	
+	{literal}
+	$(document).ready(function(){
+		
+		$('#activeDayTimeBegin, #activeDayTimeEnd').timepicker({
+			timeFormat: 'H:i:s',
+			scrollDefaultNow: true
+		});
+		
+	});
+	{/literal}
+	
+</script>
+
 <form action="?a=schedulerEditExec&amp;id={$id}" method="post">
 	<table border="0">
 		<tr>
@@ -21,11 +39,11 @@
 		</tr>
 		<tr>
 			<td>Day time begin (hh:mm[:ss])</td>
-			<td><input type="text" name="activeDayTimeBegin" value="{$activeDayTimeBegin}" maxlength="8" /></td>
+			<td><input type="text" id="activeDayTimeBegin" name="activeDayTimeBegin" value="{$activeDayTimeBegin}" maxlength="8" class="time" /></td>
 		</tr>
 		<tr>
 			<td>Day time end (hh:mm[:ss])</td>
-			<td><input type="text" name="activeDayTimeEnd" value="{$activeDayTimeEnd}" maxlength="8" /></td>
+			<td><input type="text" id="activeDayTimeEnd" name="activeDayTimeEnd" value="{$activeDayTimeEnd}" maxlength="8" /></td>
 		</tr>
 		<tr>
 			<td>Sortnr</td>
