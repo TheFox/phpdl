@@ -808,9 +808,6 @@ else{
 		
 		case 'container':
 			
-			$container = checkInput($_GET['c'], 'a-z0-9', 8);
-			$containerLibPath = './lib/container/container.'.$container.'.php';
-			
 			$tpl = $a.'.tpl';
 			$cacheId = $a;
 			if(!$smarty->isCached($tpl, $cacheId)){
@@ -818,27 +815,22 @@ else{
 				smartyAssignMenu($smarty, $user);
 				
 				$error = '';
-				if(!file_exists($containerLibPath))
-					$error .= '<li>Container path "'.$containerLibPath.'" does not exist.</li>';
-				
-				$smarty->assign('container', $container);
-				$smarty->assign('error', $error != '' ? '
-					<tr>
-						<td colspan="2" class="msgError"><ul>'.$error.'</ul></td>
-					</tr>
-				' : '');
 				
 				if($sa == 'exec'){
+					
+					$fileInfo = pathinfo($_FILES['file']['name']);
+					$container = checkInput(isset($fileInfo['extension']) ? $fileInfo['extension'] : '', 'a-z0-9', 8);
+					$containerLibPath = './lib/container/container.'.$container.'.php';
+					
 					if(file_exists($containerLibPath)){
 						include_once($containerLibPath);
 						
-						$content = $_POST['content'];
+						$content = '';
 						$contentPlain = '';
 						
-						if($content == '')
-							if(isset($_FILES['file']))
-								if($_FILES['file']['size'] > 0 && $_FILES['file']['error'] == 0)
-									$content = file_get_contents($_FILES['file']['tmp_name']);
+						if(isset($_FILES['file']))
+							if($_FILES['file']['size'] > 0 && $_FILES['file']['error'] == 0)
+								$content = file_get_contents($_FILES['file']['tmp_name']);
 						
 						if($content != '')
 							$contentPlain = containerExec($content);
@@ -851,7 +843,15 @@ else{
 							<tr><td colspan="2">&nbsp;</td></tr>
 						' : '');
 					}
+					else
+						$error .= '<li>Container path "'.$containerLibPath.'" does not exist.</li>';
 				}
+				
+				$smarty->assign('error', $error != '' ? '
+					<tr>
+						<td colspan="2" class="msgError"><ul>'.$error.'</ul></td>
+					</tr>
+				' : '');
 				
 			}
 			$smarty->display($tpl, $cacheId);

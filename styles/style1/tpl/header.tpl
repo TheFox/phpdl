@@ -20,8 +20,7 @@
 									<a href="?a=traffic">Traffic</a><br />
 									<br />
 									Tools<br />
-									<a href="?a=container&amp;c=rsdf">RSDF</a><br />
-									<a href="?a=container&amp;c=dlc">DLC</a><br />
+									<a href="?a=container">Container</a><br />
 									<br />
 									{$superuserMenu}
 									<a href="?a=logoutExec">Logout</a><br />
