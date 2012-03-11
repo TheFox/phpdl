@@ -151,7 +151,7 @@ else{
 				
 				$packet = new dlpacket($CONFIG['DB_HOST'], $CONFIG['DB_NAME'], $CONFIG['DB_USER'], $CONFIG['DB_PASS']);
 				
-				$stack = '';
+				$stack = array();
 				$jsDocumentReady = '';
 				
 				$res = mysql_query("select id from packets where archive = '0' order by sortnr, id;", $dbh);
@@ -227,22 +227,27 @@ else{
 							$status[] = 'size verified';
 						
 						$progressBarId = $packetProgressbarBaseId.$packetId;
-						$stack .= '
-							<tr id="packetTr'.$packetId.'">
-								<td class="'.$trClass.'"><input id="packetActive'.$packetId.'" type="checkbox" value="1" '.($packet->get('active') ? 'checked="checked"' : '').' onChange="packetActiveExec('.$packetId.', this)" tabindex="'.$packetC.'" /></td>
-								<td class="'.$trClass.'">'.$packetId.'</td>
-								<td class="'.$trClass.'">'.$packet->get('sortnr').'</td>
-								<td class="'.$trClass.'">'.$users[$packet->get('_user')]['login'].'</td>
-								<td class="'.$trClass.'"><a href="?a=packetEdit&amp;id='.$packetId.'"><b>'.$packet->get('name').'</b></a>'.($packetIsFinished && file_exists($packetFinishedDir) ? ' [<a href="'.$packetFinishedDir.'" target="_blank">dir</a>]' : '').'</td>
-								<td class="'.$trClass.'">'.date($CONFIG['DATE_FORMAT'], $packet->get('ctime')).'</td>
-								<td class="'.$trClass.'">'.($packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;').'</td>
-								<td class="'.$trClass.'">'.($packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;').'</td>
-								<td class="'.$trClass.'"><div id="'.$progressBarId.'" class="progressBar"></div></td>
-								<td class="'.$trClass.'"><div id="packetStatus'.$packetId.'">'.join(', ', $status).'</div></td>
-								<td class="'.$trClass.'"><a href="?a=packetExportTxt&amp;id='.$packetId.'">txt</a> <a href="?a=packetExportXml&amp;id='.$packetId.'">xml</a></td>
-								<td class="'.$trClass.'" align="center">'.($packetIsOwnedByUser || $user->get('superuser') ? '<span id="packetArchiveExecButton'.$packetId.'" class="ui-state-default ui-icon ui-icon-circle-minus" onClick="packetArchiveExec('.$packetId.', \''.$packet->get('name').'\');"></span>' : '&nbsp;').'</td>
-							</tr>
-						';
+						
+						
+						$stack[$packetId] = array(
+							'id' => $packetId,
+							'counter' => $packetC,
+							'trClass' => $trClass,
+							'activeChecked' => $packet->get('active') ? 'checked="checked"' : '',
+							'sortnr' => $packet->get('sortnr'),
+							'userLogin' => $users[$packet->get('_user')]['login'],
+							'name' => $packet->get('name'),
+							'ctime' => date($CONFIG['DATE_FORMAT'], $packet->get('ctime')),
+							'stime' => $packet->get('stime') ? date($CONFIG['DATE_FORMAT'], $packet->get('stime')) : '&nbsp;',
+							'ftime' => $packet->get('ftime') ? date($CONFIG['DATE_FORMAT'], $packet->get('ftime')) : '&nbsp;',
+							'progressBarId' => $progressBarId,
+							'isFinished' => $packetIsFinished,
+							'isOwnedByUser' => $packetIsOwnedByUser,
+							'userIsSuperuser' => $user->get('superuser'),
+							'finishDir' => $packetFinishedDir,
+							'finishDirExists' => file_exists($packetFinishedDir),
+							'status' => join(', ', $status),
+						);
 						
 						$jsDocumentReady .= 
 							"$('#$progressBarId').progressbar({ value: $packetFilesFinishedPercent });\n".
@@ -252,7 +257,7 @@ else{
 					}
 					
 				}
-				$smarty->assign('stack', $stack);
+				$smarty->assign('stackArray', $stack);
 				
 				$status = '';
 				if(!file_exists($CONFIG['PHPDL_STACK_PIDFILE']))

@@ -75,8 +75,7 @@
 			url: '?a=packetArchiveExec&id=' + id + '&noredirect=1',
 			success: function(){
 				var packetTr = $('#packetTr' + id);
-				packetTr.hide();
-				packetTr.remove();
+				packetTr.fadeOut('slow', function(){ $(this).remove(); });
 				
 				statusAddInfo("Packet '" + name + "' (" + id + ") successfully archived.");
 			}
@@ -140,7 +139,24 @@
 					<td><a href="#" id="exportHelp">exp</a></td>
 					<td><a href="#" id="archiveHelp">archive</a></td>
 				</tr>
-				{$stack}
+				
+				{foreach from=$stackArray item=packet}
+					<tr id="packetTr{$packet.id}">
+						<td class="{$packet.trClass}"><input id="packetActive{$packet.id}" type="checkbox" value="1" onChange="packetActiveExec('.$packetId.', this)" tabindex="{$packet.counter}" {$packet.activeChecked} /></td>
+						<td class="{$packet.trClass}">{$packet.id}</td>
+						<td class="{$packet.trClass}">{$packet.sortnr}</td>
+						<td class="{$packet.trClass}">{$packet.userLogin}</td>
+						<td class="{$packet.trClass}"><a href="?a=packetEdit&amp;id={$packet.id}"><b>{$packet.name}</b></a>{if $packet.isFinished && $packet.finishDirExists} [<a href="{$finishDir}" target="_blank">dir</a>]{/if}</td>
+						<td class="{$packet.trClass}">{$packet.ctime}</td>
+						<td class="{$packet.trClass}">{$packet.stime}</td>
+						<td class="{$packet.trClass}">{$packet.ftime}</td>
+						<td class="{$packet.trClass}"><div id="{$packet.progressBarId}" class="progressBar"></div></td>
+						<td class="{$packet.trClass}"><div id="packetStatus{$packet.id}">{$packet.status}</div></td>
+						<td class="{$packet.trClass}"><a href="?a=packetExportTxt&amp;id={$packet.id}">txt</a> <a href="?a=packetExportXml&amp;id={$packet.id}">xml</a></td>
+						<td class="{$packet.trClass}" align="center">{if $packet.isOwnedByUser || $packet.userIsSuperuser}<span id="packetArchiveExecButton{$packet.id}" class="ui-state-default ui-icon ui-icon-circle-minus" onClick="packetArchiveExec({$packet.id}, '{$packet.name}');"></span>{else}&nbsp;{/if}</td>
+					</tr>
+				{/foreach}
+				
 			</table>
 		</td>
 	</tr>
