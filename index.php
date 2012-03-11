@@ -445,8 +445,15 @@ else{
 					$url = preg_replace('/^ +/', '', $url);
 					$url = preg_replace('/ +$/', '', $url);
 					
+					$isBlacklisted = false;
+					foreach($CONFIG['PHPDL_URL_BLACKLIST'] as $blacklistItem)
+						if(preg_match('/'.$blacklistItem.'/i', $url)){
+							$isBlacklisted = true;
+							break;
+						}
+					
 					// Check after truncate and trim.
-					if($url != '')
+					if($url != '' && !$isBlacklisted)
 						$urls[] = $url;
 				}
 			

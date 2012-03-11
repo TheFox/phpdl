@@ -68,7 +68,6 @@
 	
 	function packetArchiveExec(id, name){
 		var button = $('#packetArchiveExecButton' + id);
-		button.hide();
 		
 		$.ajaxSync({
 			type: 'GET',

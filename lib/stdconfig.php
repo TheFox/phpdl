@@ -29,6 +29,7 @@ $CONFIG = array(
 	'PHPDL_RELEASEID' => 0,
 	'PHPDL_STACK_PIDFILE' => 'tmp/.stack.php.pid',
 	'PHPDL_STACK_SDFILE' => 'tmp/.stack.php.sd',
+	'PHPDL_URL_BLACKLIST' => array('linkcrypt.ws', 'ncrypt.in', 'relink.us', 'rs-layers.com', 'share-links.biz',),
 	
 	'SITE_HOST' => '',
 	'SITE_NAME' => 'PHP Downloader',
