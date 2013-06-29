@@ -1,0 +1,1898 @@
+
+checkfiles_v1
+download_v1
+
+
+
+
+
+
+
+RapidShare API - Last updates and revision history on bottom of this document
+
+This is the final technical documentation to the RapidShare API for coders.
+
+If you are no programmer: Technical means, this documentation's purpose is solely to give coders (people creating cool tools) a documentation on how to
+implement the back-end API in their tools, so their programs get even cooler and easier to be created, so you can use RapidShare even more comfortably.
+If you know a good coder, do not hesitate to tell him or her about this documentation.
+
+Since RapidShare is always extending its functionality, new routines will be added from time to time and existing routines will be adjusted slightly.
+We will take care that existing routines will not be changed too much, so that existing programs keep running. Tell us if you are missing an API call
+and we will see what we can do.
+
+Routines giving back many values are subject of many changes. For example the routine getaccountdetails_v1 returns many key-value pairs. Those pairs
+might be sorted differently in the future. Some values might disappear, new values may appear. Make sure your program can handle this changes without
+a need for an update. If a value disappears, you should assume a "0" value. If a new value appears, your program should just ignore it. Your program
+must not rely on the sort-order of the list.
+
+In case we plan major adjustments, we will create a different function-call for it. This is reflected by the appendix "_v1" "_v2" etc. However, if there
+are security issues by design in existing functions, we reserve the right to disable or change existing functions without prior notice. So check the
+version history at the bottom of this document from time to time.
+
+WARNING: Since RapidShare serves a very large community, programming errors in popular tools might cause an unwanted DDOS attack to the RapidShare servers.
+When programming tools, always keep in mind that your tool might be used by millions of people at the same time. So make sure you do not kill our API servers,
+which might cause some big financial issues on your side. Always make sure your program STOPS retrying a failed request after 3 tries. Always make sure you
+do not make more API calls than necessary. Our servers use a IP-based credit system, which will ban a IP making very many small requests or just a few
+unnecessary big requests. Everything you do will add POINTS to your IP address. If you exceed a certain point limit, API calls are denied for 30 minutes.
+If you exceed this limit multiple times, your account is banned as well. This especially happens with listfiles_v1 abuses on accounts having many files.
+How many points your calls will add to your balance depend heavily on the routine you call. For example calling nextuploadserver_v1 adds nearly no points
+to your balance, while listfiles_v1 is certainly the most expensive routine if you have many files in your account and you request a very detailed list.
+
+http://api.rapidshare.com/cgi-bin/rsapi.cgi?sub=subroutine (finalpoints=points)
+or https://api.rapidshare.com/cgi-bin/rsapi.cgi?sub=subroutine (finalpoints=points*2 (this means using SSL doubles points!))
+
+Additional parameters can be added via http://api.rapidshare.com/cgi-bin/rsapi.cgi?sub=subroutine&param1=value1&param2=value2
+
+In case you get an error, the reply always starts with "ERROR: " followed by a plain string telling you what is wrong. You should always check this.
+The best is if you just output the string to the user. The string is self-explanatory and every user should know what went wrong.
+
+Be careful when giving too many wrong passwords. The password brute-force protection will block your IP when you enter too many wrong passwords and/or killcodes.
+This protection has nothing to do with the point system mentioned above and works independently.
+
+Every routine taking login and password parameters also accepts the parameter "cookie". If you give "cookie=63AC34AA98443H....", RapidShare will decrypt
+the cookie and overwrite the parameters login and password with the parameters stored in the encrypted cookie. This can be understood as a login override.
+
+Every routine also accepts the global parameters "cbf" (callback-function) and "cbid" (callback-ID). If these parameters are given and valid, the reply
+of the API-function will be compatible to JavaScript by returning a function call. For example, cbf=myfunction cbid=123 results in myfunction(123,"$output");
+
+Every routine, which requires a deactivated security lock also accepts the optional parameter "rsantihack". If rsantihack=yourunlockcode is given,
+the function is executed successfully, but the security lock will not be disabled.
+
+
+
+subroutine=nextuploadserver_v1
+Description:	Gives the next available upload server to use without fearing rejection.
+Parameters:	None
+Reply fields:	1:The upload server. Complete it with rs$uploadserver.rapidshare.com
+Reply format:	integer
+
+
+
+
+
+subroutine=getapicpu_v1
+Description:	Gives the CURRENT and MAX api cpu value for your IP address. If you reach MAX points, all further API requests from your IP will be blocked.
+		Every minute the server will subtract 1000 points from your balance.
+Parameters:	None
+Reply fields:	1:How many points you already have. (CURRENT)
+		2:How many points you may have before getting blocked. (MAX)
+Reply format:	integer,integer
+
+
+
+
+
+subroutine=checkincomplete_v1
+Description:	You need this to resume an incomplete file. You can try without it, but you might get rejected if the file is invalid.
+		This routine needs the file ID and the kill code for authentication.
+Parameters:	fileid=The file ID in question
+		killcode=The killcode of the file ID
+Reply fields:	1:The size already saved on the server. You should use this to resume the upload, so you know where to start.
+Reply format:	integer
+
+
+
+
+
+subroutine=renamefile_v1
+Description:	Renames a file to something else. Be aware that your users will not be able to download the file anymore by using the old link!
+Parameters:	login=ID or username
+		password=password of the login
+		fileid=The file ID in question
+		newname=A new name for the file. Invalid characters will automatically be converted to "_"
+Reply fields:	1:new filename
+Reply format:	string
+
+
+
+
+
+subroutine=movefilestorealfolder_v1
+Description:	Moves one or more files to a RealFolder. (files parameter limited to 10000 bytes)
+Parameters:	login=ID or username
+		password=password of the login
+		disabledownloads=1 If given, downloading of this files is no longer possible. (set bodtype=9)
+		enabledownloads=1 If given, downloading of this files is possible again. (set bodtype=0)
+		files=comma separated list of file ids
+		realfolder=ID of the RealFolder
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=renamerealfolder_v1
+Description:	Renames an existing RealFolder.
+Parameters:	login=ID or username
+		password=password of the login
+		realfolder=ID of the RealFolder
+		newname=New name of the RealFolder (limited to 100 chars.)
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=deletefiles_v1
+Description:	Deletes one or more files forever. (files parameter limited to 10000 bytes)
+Parameters:	login=ID or username
+		password=password of the login
+		files=comma separated list of file ids, or ONE RealFolder ID. This deletes all files in the RealFolder ID
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=deletefreefile_v1
+Description:	Deletes one file forever, which is not connected to any account.
+Parameters:	fileid=File ID
+		killcode=Killcode of the file
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=addrealfolder_v1
+Description:	Adds a new RealFolder
+Parameters:	login=ID or username
+		password=password of the login
+		name=Name of the folder (Max. 100 byte)
+		parent=ID of parent folder. 0=root
+Reply fields:	1:RealFolder ID
+		OR
+		1:-1 (if no space left, it returns -1)
+Reply format:	integer
+
+
+
+
+
+subroutine=delrealfolder_v1
+Description:	Deletes existing RealFolders (without the files, so just the RealFolder entry)
+Parameters:	login=ID or username
+		password=password of the login
+		realfolder=ID of the RealFolder (multiple RealFolders allowed by passing a comma-separated list)
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=moverealfolder_v1
+Description:	Changes the parent ID of existing RealFolders.
+Parameters:	login=ID or username
+		password=password of the login
+		realfolder=ID of the RealFolder (multiple RealFolders allowed by passing a comma-separated list)
+		newparent=New parent ID
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=listfiles_v1
+Description:	Lists all files in a given format in a given RealFolder or in all RealFolders. Warning: Flooding the server with this routine will block your IP!
+Parameters:	login=ID or username
+		password=password of the login
+		realfolder=ID of the real folder to list files from. 0=root all=All folders
+		filename=Optional. Give a filename to get only results where filename=$filename. Good for finding dupes.
+		fileids=Optional. Give a comma-separated list of file IDs to get only results with the corresponding file IDs. fileids=1545615,1345154,215143
+		fields=A comma separated list of database columns you want to receive. You will always receive the fileid.
+			Example: fields=downloads,size will reply many lines in the format "$fileid,$downloads,$size\n"
+			The following file columns are available: downloads,lastdownload,filename,size,killcode,serverid,type,x,y,realfolder,bodtype,killdeadline,licids
+			The following history columns are available: uploadtime,ip,md5hex
+			WARNING: History columns will always be appended after the file columns. Do NOT use them if you don't need to, since this will boost your points!
+			WARNING: "licids" CAN contain commas! To safely use licids, it has to be the last field so you effectively limit the split operation to x fields.
+			Example: fields=size,filename,md5hex,killcode,ip,x,y will result in "$size,$filename,$killcode,$x,$y,$md5hex,$ip
+			Format: Everything is human readable except timestamps, which are unix timestamps (integers).
+		order=Reply will be ordered by this column. All file columns are valid. (optional. Avoid this parameter to pay less penalty points!)
+		desc=0 or 1. 1 means, the result will be ordered descending. (optional)
+Reply fields:	1:fileid
+		2:dynamically adjusted
+		OR
+		"NONE" (if no results, it returns "NONE")
+Reply format:	integer,fields (fields depending on fields you request)
+
+
+
+
+
+subroutine=listrealfolders_v1
+Description:	Returns all available RealFolders and their topology.
+Parameters:	login=ID or username
+		password=password of the login
+Reply fields:	1:RealFolder ID
+		2:Parent RealFolder ID
+		3:Name of the folder
+		OR
+		"NONE" (if no results, it returns NONE)
+Reply format:	integer,integer,string
+
+
+
+
+
+subroutine=getaccountdetails_v1
+Description:	Returns key-pair values for the specific account. Warning: The order may change, and we will probably add or remove values in the future.
+		You should make sure that your program does not stop working if new values appear or existing values disappear.
+Parameters:	login=ID or username
+		password=password of the login
+		withpublicid=Optional. If given, the reply also contains publicid=STRING. You need the public ID to be contacted by other users. See FAQ for further information.
+			withpublicid=1: PubID Version 1 no longer used. This is an alias for withpublicid=2.
+			withpublicid=2: The public ID is always the same. (PubID Version 2.)
+			withpublicid=3: The public ID is ALWAYS different. No way to get the same string twice. Of course it always refers to your account. (PubID Version 3)
+			Don't be worried. Every routine asking for a public ID (public ID decoder) accepts all three versions without problems.
+		withcookie=1 (Optional. If given, the reply also contains cookie=STRING. You need this string only if you need to set a valid encryped cookie.)
+Reply fields:	1:key 2:value
+Reply format:	string=string or integer\n...
+Reply example:	accountid=integer
+		servertime=integer
+		addtime=integer
+		username=string
+		directstart=integer
+		verified=integer
+		rsantihack=integer
+		mirrors=string
+		jsconfig=string
+		email=string
+		curfiles=integer
+		curspace=integer
+		kff=integer (means keepfilesforever)
+		autoextend=integer
+		autorefill=integer
+		tskb=integer
+		rapids=integer
+		billeduntil=integer
+		newmsgs=integer
+		onlyssldls=integer
+		vipuntil=integer
+		happyhours=integer (0 or 1)
+		rcbotauth=string
+		publicid=string (Optional. See 'withpublicid' above.)
+		cookie=string (Optional. See 'withcookie' above.)
+
+
+
+
+
+subroutine=setaccountdetails_v1
+Description:	Changes the settings of an account. Every parameter is optional. Not transmitting a parameter name means not changing it. If you want to clear a value,
+		send "username=" for example. Enabled RSAntiHAck causes a block if you try to change email, username, password, keepfilesforever, autoextend or autorefill.
+Parameters:	login=ID or username
+		password=Password of the login
+		newpassword=Sets a new password.
+		email=Sets a new e-mail address.
+		username=Sets a new username to login as an alias.
+		mirrors=Sets a new mirror list to use. Mostly you do not need to tune this parameter.
+		directstart=1 or 0. Downloads will start instantly.
+		jsconfig=A custom value, which can be set as you like. Max. 64 alphanumeric characters.
+		keepfilesforever=0 or 1. 0=(default) Unlimited space for free (with automatic inactive file deletion) 1=Files will never be deleted. You pay for additional space.
+		autoextend=1 or 0. 1=default When your account is expired, we automatically extend it with your available Rapids. 0=We do not touch your Rapids for this purpose.
+		autorefill=1 or 0. 1=default When your traffic is depleted, we automatically refill it with your available Rapids. 0=We do not touch your Rapids for this purpose.
+		onlyssldls=0 or 1. 0=default When 1 and you try to download a file without having a secure SSL connection, you just get an error instead. Only works with download_v1.
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=enablersantihack_v1
+Description:	Enabled the RS AntiHack mode. This mode is highly recommended for every account, as it makes account manipulations impossible without unlocking it first.
+		Calling this routine gives an error if no valid e-mail has been saved by the user.
+Parameters:	login=ID or username
+		password=Password of the login
+		noemail=1 (Optional parameter. If true, avoids sending an e-mail.)
+Reply fields:	1:The unlock code (This is also sent to the e-mail address assigned with the account.)
+Reply format:	integer
+
+
+
+
+
+subroutine=disablersantihack_v1
+Description:	Disables the RS AntiHack mode, so the user can change the account settings again.
+Parameters:	login=ID or username
+		password=Password of the login
+		unlockcode=The unlock code as seen in the e-mail sent by enablersantihack.
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=sendrsantihackmail_v1
+Description:	Sends the e-mail again containing the unlock code. It is the same e-mail as you called enablersantihack.
+Parameters:	login=ID or username
+		password=Password of the login
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=filemigrator_v1
+Description:	Access to the powerful file migrator to move files between different accounts and account types. LinkLists also supported.
+		Please notice that every transfer is logged. If you use this function to break the general user agreement, your account will be closed.
+Parameters:	login=ID or username
+		password=Password of the login
+		fileids=What files to move. Either a three digit ID for all files in the respective RealFolder, or a comma separated list of file IDs.
+			If movetype is freeprem, fileids has to be like: fileids=fFILEIDkKILLCODEfFILEIDkKILLCODE and (only then) it is limited to 100 files per run.
+		targetaccount=Login of the target account
+		targetpassword=Password of the target account
+		targetrealfolder=The RealFolder ID in the target account. All files will be moved in this RealFolder in the target account.
+		movetype=freeprem OR premprem OR llpremprem
+Reply fields:	IF MOVETYPE=LLPREMPREM
+		1:Number of moved link lists
+		ELSE
+		1:Number of moved files
+		2:Files in source account before action
+		3:Space in source account before action
+		4:Files in target account before action
+		5:Space in target account before action
+		6:Files in source account after action
+		7:Space in source account after action
+		8:Files in target account after action
+		9:Space in target account after action
+Reply format:	IF MOVETYPE=LLPREMPREM
+		integer
+		ELSE
+		integer,integer,integer,integer,integer,integer,integer,integer,integer
+
+
+
+
+
+subroutine=newlinklist_v1
+Description:	Creates a new LinkList.
+Parameters:	login=ID or username
+		password=Password of the login
+		foldername=The name of the new LinkList
+		folderheadline=A headline for the new LinkList
+		nickname=Your nick name to display in the LinkList view mode
+		folderpassword=An optional folder password visitors have to enter before being able to browse your LinkList
+Reply fields:	1:LinkList ID
+Reply format:	string
+
+
+
+
+
+subroutine=editlinklist_v1
+Description:	Edits an existing LinkList. Keeping any value empty means deleting the value.
+Parameters:	login=ID or username
+		password=Password of the login
+		folderid=The ID of the existing LinkList
+		foldername=The new name of the LinkList
+		folderheadline=A new headline for the LinkList
+		nickname=A new nick name to display in the LinkList view mode
+		folderpassword=An optional folder password visitors have to enter before being able to browse your LinkList
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=getlinklist_v1
+Description:	Receives a full list of all available link lists OR details about a specific link list. WARNING: Reply separator is a " instead of a comma!
+		This is the administrator view. For the end user view, use "viewlinklist_v1".
+Parameters:	login=ID or username
+		password=Password of the login
+		folderid=LinkList ID. Set this to receive the first reply field group. Do not set this to receive the second reply field group.
+		withsubfolders=1 gives also all sub-folders if folderid is empty.
+Reply fields:	1:Subfolder ID (string)
+		2:File ID (integer)
+		3:Filename (string)
+		4:Size (integer in bytes)
+		5:Description (string)
+		6:Addtime (unix timestamp)
+		OR (if folderid is empty):
+		1:Folder ID (string)
+		2:Name (string)
+		3:Headline (string)
+		4:Views (integer)
+		5:Last view (unix timestamp)
+		6:Folder password (string)
+		7:Nick (string)
+Reply format:	string"integer"string"integer"string"integer\n...
+		OR (if folderid is empty)
+		string"string"string"integer"integer"string"string\n...
+
+
+
+
+
+subroutine=copyfilestolinklist_v1
+Description:	Copys several files to the given LinkList. Please notice that the files are not copied, but a link entry is generated in the LinkList pointing to the respective file.
+		It takes the size and the filename and saves it in the link-list for every file ID you provide. Please notice that the files have to be in your respective zone
+		in order to be copied to your LinkList.
+Parameters:	login=ID or username
+		password=Password of the login
+		folderid=The folder ID to copy the files to
+		subfolderid=The sub-folder ID to copy the files to (0=root, default is 0)
+		files=A comma separated list of file IDs
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=newlinklistsubfolder_v1
+Description:	Creates a new LinkList sub-folder.
+Parameters:	login=ID or username
+		password=Password of the login
+		folderid=The folder ID to create the entry in
+		subfolderid=The sub-folder ID to create the entry in
+		newsubfoldername=A reasonable sub-folder name
+		newsubfolderpassword=An optional numeric access password for that sub-folder.
+		newsubfolderdescription=An optional description
+Reply fields:	1:New sub-folder ID
+Reply format:	string
+
+
+
+
+
+subroutine=deletelinklist_v1
+Description:	Deletes an existing LinkList. Please notice that it will not delete the files itself, just the LinkList alone.
+Parameters:	login=ID or username
+		password=Password of the login
+		folderid=The folder ID to delete
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=deletelinklistentries_v1
+Description:	Deletes LinkList entries. Also supports deleting sub folders. Be careful that it is possible to delete sub folders without deleting the links itself!
+		A messed up LinkList can always be completely deleted with deletelinklist_v1.
+Parameters:	login=ID or username
+		password=Password of the login
+		folderid=The folder ID to delete entries from
+		subfolderid=The sub-folder ID to delete entries from. Defaults to 0 (root).
+		files=The comma-separated file IDs to delete. Notice that sub-folders are file IDs less than 1000.
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=editlinklistentry_v1
+Description:	Edits a LinkList entry. If length of file ID is <= 3, it is a folder and you may edit description and password. If it is > 3, it is a file and you may only change the description.
+Parameters:	login=ID or username
+		password=Password of the login
+		folderid=The folder ID containing the file-id
+		subfolderid=The sub-folder ID containing the file-id. Defaults to 0 (root).
+		fileid=The file ID to modify.
+		newdescription=The new description of the file or sub LinkList.
+		newpassword=The new access password of the sub LinkList. Only valid if you edit a sub LinkList.
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=trafficsharetype_v1
+Description:	Sets a new TrafficShare type for a list of files. (files parameter limited to 10000 bytes)
+Parameters:	login=ID or username
+		password=password of the login
+		files=comma separated list of file ids
+		trafficsharetype=0,1,2,101,102 (0=off 1=on 2=on with encryption. value + 100 = With logging. Logging requires a verified premium account.)
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=masspoll_v1
+Description:	Saves your vote on a running mass poll.
+Parameters:	login=ID or username
+		password=password of the login
+		pollid=ID of the poll
+		a1=Your vote for question 1 (number between 1 and 250)
+		a2=Your vote for question 2 (number between 1 and 250)
+		a3=Your vote for question 3 (number between 1 and 250)
+		a4=Your vote for question 4 (number between 1 and 250)
+		a5=Your vote for question 5 (number between 1 and 250)
+Reply fields:	1:OK
+Reply format:	string
+
+
+
+
+
+subroutine=checkfiles_v1
+Description:	Gets status details about a list of given files. (files parameter limited to 3000 bytes. filenames parameter limited to 30000 bytes.)
+Parameters:	files=comma separated list of file ids
+		filenames=comma separated list of the respective filename. Example: files=50444381,50444382 filenames=test1.rar,test2.rar
+		incmd5=if set to 1, field 7 is the hex-md5 of the file. This will double your points! If not given, all md5 values will be 0
+Reply fields:	1:File ID
+		2:Filename
+		3:Size (in bytes. If size is 0, this file does not exist.)
+		4:Server ID
+		5:Status integer, which can have the following numeric values:
+			0=File not found
+			1=File OK (Anonymous downloading)
+			3=Server down
+			4=File marked as illegal
+			5=Anonymous file locked, because it has more than 10 downloads already
+			50+n=File OK (TrafficShare direct download type "n" without any logging.)
+			100+n=File OK (TrafficShare direct download type "n" with logging. Read our privacy policy to see what is logged.)
+		6:Short host (Use the short host to get the best download mirror: http://rs$serverid$shorthost.rapidshare.com/files/$fileid/$filename)
+		7:md5 (See parameter incmd5 in parameter description above.)
+Reply format:	integer,string,integer,integer,integer,string,string
+
+
+
+
+
+subroutine=trafficsharelogs_v1
+Description:	Gets detailed download logs for your offered TrafficShare files. To make this work, you first have to enable logging for the respective TrafficShare files.
+		No logs are generated by default.
+Parameters:	login=ID or username
+		password=password of the login
+		fileid=ID of the file
+Reply fields:	1: Start time, unix timestamp
+		2: Stop time, unix timestamp (You can easily calculate the download speed. If this is 0, then the client is still downloading.)
+		3: Size of the whole file in bytes
+		4: Starting position of the download
+		5: How many bytes the client has really downloaded
+		6: Range parameter. Download-accelerators might give those parameters.
+		7: Custom parameter. You can include information in the download link, like the customer ID or billing informations. Those can be tracked here as well.
+Reply format:	integer"integer"integer"integer"integer"string"string (the separator here is ", because the last two values may contain commas!)
+
+
+
+
+
+subroutine=sendmail_v1
+Description:	You may send an e-mail to someone to inform him/her about a file you have just uploaded. E-mail sending is restricted and has several anti-spam methods included.
+Parameters:	name=YOUR name
+		comment=A comment you want to attach to your e-mail. HTML will be filtered.
+		email1=First e-mail address to send to
+		email2=Second e-mail address (optional)
+		email3=Third e-mail address (optional)
+		withkillcode1=1 means that e-mail #1 will also receive the delete links for the files. Optional.
+		withkillcode2=1 optional
+		withkillcode3=1 optional
+		fileid1=File ID 1 to inform the receiver about
+		killcode1=The killcode for fileid1 (required)
+		fileidX=Same as above. Supported up to fileid10.
+		killcodeX=Supported up to killcode10.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+
+
+subroutine=sendmail_v2
+Description:	You may send an e-mail to someone to inform him/her about a file you have just uploaded. E-mail sending is restricted and has several anti-spam methods included.
+Parameters:	name=YOUR name
+		replyemail=YOUR e-mail address (required, so users can reply to their received e-mails)
+		subject=Max. 64 bytes of a freely chooseable subject
+		comment=A comment you want to attach to your e-mail. "<" and ">" are substituted by "_". \n is substituted by <br>.
+		email1=First e-mail address to send to
+		email2=Second e-mail address (optional)
+		email3=Third e-mail address (optional)
+		fileid1=File ID 1 to inform the receiver about
+		killcode1=The killcode for fileid1 (required)
+		custom1=Optional custom parameter (http://rapidshare.com/files/$fileid/$custom$filename)
+		fileidX=Same as above. Supported up to fileid99
+		killcodeX=Supported up to killcode99
+		customX=Supported up to custom99
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+
+
+subroutine=premiumzonelogs_v1
+Description:	Downloads the log files from your premium zone. Thus which IP network has downloaded how much data on what day from your premium account. Ordered by date descending.
+Parameters:	login=ID or username
+		password=password of the login
+Reply fields:	1: date (YYYY-MM-DD)
+		2: ipnet (10.10.0.XXX)
+		3: dlkb (How many Kilobytes you have downloaded)
+Reply format:	string,string,integer\nstring,string,integer\nstring,string,integer\nstring,string,integer\n...
+
+
+
+
+
+subroutine=getrapidtranslogs_v1
+Description:	Downloads log files to give you detailed infos about your Rapids Transactions. Max. 1000 entries will be displayed.
+Parameters:	login=ID or username
+		password=password of the login
+Reply fields:	1: time
+		2: ip
+		3: rapids (Positive number = received Rapids, negative number = Spent Rapids)
+		4: reason
+Reply format:	integer,integer,integer,string
+
+
+
+
+
+subroutine=getpendingcredits_v1
+Description:	Downloads a list of your pending credits. Here you can see when you will receive how many Rapids. Received by gifts, sold licenses or other opportunities.
+Parameters:	login=ID or username
+		password=password of the login
+Reply fields:	1: deadline (How many minutes left until you get the Rapids)
+		2: time (When the sender initiated the transfer)
+		3: rapids (How many Rapids you will get)
+		4: reason (The reason you will then see in your RapidPayLogs (getrapidpaylogs_v1))
+Reply format:	integer,integer,integer,string\n... (One line per record)
+
+
+
+
+
+subroutine=remotegets_v1
+Description:	Manages your remote uploads to RapidShare.
+Parameters:	login=ID or username
+		password=password of the login
+		cmd=Command. See descriptions below.
+
+		cmd=addjob
+			Description:	Adds a job to the queue. 
+			+Parameters:	urls=A long text field separated by new lines. Every line contains one URL.
+			Reply fields:	OK
+			Reply format:	string
+
+		cmd=killfinishedjobs
+			Description:	Deletes all finished jobs from the queue.
+			Reply fields:	OK
+			Reply format:	string
+
+		cmd=killjobs
+			Description:	Deletes jobs with the job identifiers ID. Notice that its not possible to delete jobs currently being processed.
+					You will not get an error, but the job is just not deleted.
+			+Parameters:	jobids=ID,ID,ID,ID.....
+
+		cmd=listjobs
+			Description:	Gives a detailed list of all currently stored jobs.
+			Reply fields:	id,size,status,fileid,url
+					id=Unique job identifier.
+					size=Bytes currently downloaded.
+					status=	0:  Unprocessed
+						1:  Processing
+						2:  Download aborted because the file became too big.
+						3:  Download aborted because the file downloaded too long.
+						4:  Download finished. Uploading to RapidShare.
+						5:  Upload to RapidShare finished. Job finished.
+						7:  Upload failed 3 times for unknown reasons. Job aborted.
+						8:  Upload failed because the file is black listed.
+						9:  Download failed for unknown reasons.
+						11: Enqueued for later processing because this account already downloads 5 files at the same time.
+						12: Upload failed! Account is full.
+					fileid=After a finished upload, the RapidShare file ID is stored here.
+					url=The URL where the file is downloaded from.
+			Reply fields:	integer,integer,integer,integer,string
+
+
+
+
+
+subroutine=ppcforextension_v1 (OBSOLETE! Will be removed in the future. Use claimcoupon_v1 instead.)
+Description:	Extend your premium account by using a purchased prepaid card.
+Parameters:	login=ID or username
+		password=password of the login
+		ppcaccountid=Login as written on your prepaid-card.
+		ppcpassword=Password as written on your prepaid-card.
+Reply fields:	1: rapids (how many Rapids your account got)
+Reply format:	integer
+
+
+
+
+
+subroutine=claimcoupon_v1
+Description:	Claims a coupon and transfers the Rapids to your RapidShare account.
+Parameters:	login=ID or username
+		password=password of the login
+		couponcode=The coupon code.
+Reply fields:	1: rapids (how many Rapids your account got)
+Reply format:	integer
+
+
+
+
+
+subroutine=customdb_v1
+Description:	In order to help you create much cooler programs, we offer you the possibility to use a simple account-based key-value database.
+		Every account can store up to 10 independent records. If you need to store user dependent data, you should choose a keyword,
+		which probably will not be chosen by someone else by coincidence. You should avoid general keywords like "data" or "test". Keywords can contain
+		up to 16 alphanumeric characters. If your program name is called "Cool Download Manager V2", we recommend using something like "cdn2_data".
+		IMPORTANT: If you need to store several values, do not fall to the bad habit to create a db-key for every value. Create ONE key for your
+		application and use a container format for all your values. Maybe comma separated, or new-line separated. Whatever you can work with.
+Parameters:	login=ID or username
+		password=password of the login
+		keyword=The keyword to apply the command to.
+		cmd=Command to execute within this module. See below.
+
+		cmd=write
+			Description:	Overwrites (or creates) the key "keyword". Returns an error if the maximum amount of allowed keys is exceeded.
+			+Parameters:	value=Up to 30.000 bytes of arbitrary data. Binary data is allowed. (If you need more, consider compressing your data before storing it.)
+			Reply fields:	OK
+			Reply format:	string
+
+		cmd=read
+			Description:	Reads the value stored with the given keyword. Returns "0" if the key does not exist.
+			Reply fields:	value stored
+			Reply format:	unfiltered binary data
+
+		cmd=delete
+			Description:	Deletes the given key completely.
+			Reply fields:	OK
+			Reply format:	string
+
+
+
+subroutine=newpremiumaccount_v1
+Description:	Creates a new premium account and sends an e-mail to "email". The user has to click the validation link in the e-mail in order to activate the account.
+Parameters:	username=your free choice
+		email=a valid e-mail address
+		password=the password or your choice
+		ref=The referrer page. 0-255
+Reply fields:	1: the new account ID
+		2: the encrypted cookie string
+Reply format:	integer,string
+
+
+
+subroutine=validateaccount_v1
+Description:	Activates a new created premium account.
+Parameters:	accountid=the account ID
+		authcode=the authentification code as seen in the e-mail sent to the user.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=wiretransfer_v1
+Description:	Generates a wire transfer payment ID. Send us the money via bank transfer to get your TrafficShare.
+Parameters:	email=Your e-mail address
+		name=Your full name
+		accountid=If you already own an account, the payment will be credited to this account.
+Reply fields:	1: This text has to be inserted in the description field of your bank. In other words: This string HAS TO REACH US with your payment.
+Reply format:	string
+
+
+
+subroutine=giverapids_v1
+Description:	Transfers an amount of Rapids to another Premium account. The Rapids will be deducted immediately, but can only be used by the
+		recipient after 5 hours (this is for security reasons). The recipient can see the incoming Rapids in the logs immediately.
+Parameters:	login=your ID or username
+		password=your password
+		recipient=The recipient. See rtype.
+		rtype=The recipient type. "pubid" for a public ID, "fileid" for a file ID, "accountid" for a RapidShare account ID or "addtime" for a RapidContact contact list entry.
+		rapids=how many Rapids you want to send. Valid range: 10-5000.
+		message=an optional short message to the recipient (max. 100 characters and only attachable if you send >= 50 Rapids.)
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=licensemanager_v1
+Description:	---=== THIS FUNCTION (AND THE WHOLE DOCUMENTATION) IS UNDER CONSTRUCTION. DON'T TAKE ANYTHING FOR REAL YET! (But enjoy our preview) ===---
+		Earn money with RapidShare! RapidShare has a large customer database. Most of them owning Rapids, which is nothing else than real money.
+		If you have some attractive product they want, they can spend their Rapids on your product to get a legal license to download and use it.
+		This license manager does not protect you from copyright infringements. There are always ways your software can be copied. It does not replace
+		runtime copyright protections like Internet Activation or similar methods. The only thing it does is checking if the downloader owns the license,
+		which is attached to the file. If so, the download will start. If not, the downloader will be forwarded to our License Shop.
+		The option "hours valid" can be used to define a license, which will expire after x hours after purchase. This does NOT mean the user can't
+		use the file after that time! It only means that the user can't re-download the file (or download other files having the same license).
+		The users can see (and thus legally prove) the purchased license at anytime in their accounts. Do not underestimate the symbolic power
+		of this feature. The license manager is VERY flexible. The following scenarios have been thought of:
+		Scenario: You have a product consisting of 5 files. Of course the customer only wants to buy the product once and not every single file.
+		Solution: Create one license and attach the license to all 5 files. RapidShare checks for each file if the customer owns the license.
+		Scenario: You have several products you are selling for different prices each, but you also want to offer a time limited flat rate for
+		3000 Rapids as an alternative. The normal purchase never expires, but the flat rate should expire after one month.
+		Solution: Create as many licenses as neccessary for your files. Then create another license with a value of 3000 Rapids. Also add the
+		available per-customer hoursvalid option and set it to 30*24 hours. Now attach the license to every file you want to make available within your
+		alternative flat rate offer as well. You can add multiple licenses to your files. This way you can maybe add a monthy-based subscription PLUS
+		a cheaper yearly-based subscription. Its all up to you. Just consider not flooding your customers with all the available options at once.
+Parameters:	login=ID or username
+		password=password of the login
+		cmd=Command to execute within this module. See below.
+
+		cmd=listlicenses
+			Description:	Returns a list of all your created licenses.
+			Reply fields:	1: License ID
+					2: Name
+					3: Description
+					4: Rapids (Price)
+					5: Hours valid
+					6: Internal string (intstring)
+					7: Add time (Unix-Timestamp)
+					8: Last edit time (Unix-Timestamp)
+			Reply format:	"string","string","string","integer","integer","string","integer","integer"\n (one line per record)
+
+		cmd=addlicense
+			Description:	Creates a new license. You need to create a license first before you can sell products.
+			Parameters:	name=The name of the product. This will be shown as a headline to your customers.
+					description=The description of the product. This will be written below the name and of course smaller than the name.
+					rapids=How many Rapids are needed to buy this license.
+					hoursvalid=Optional. How many hours the license is valid after purchase. (0-65000)
+					intstring=Optional. An internal string only shown to you and never to your customers. (Your product ID for example)
+					validuntil=Optional. If given, this is a unix-timestamp describing how long one can purchase this license. 0=Unlimited
+			Reply fields:	1: License ID
+			Reply format:	string
+
+		cmd=editlicense
+			Description:	Edits an existing license. Skipping a parameter means setting it to 0 or ""!.
+			Parameters:	licid=License ID to edit.
+					name=The name of the product. This will be shown as a headline to your customers.
+					description=The description of the product. This will be written below the name and of course smaller than the name.
+					rapids=How many Rapids are needed to buy this license.
+					hoursvalid=Optional. How many hours the license is valid after purchase. (0-65000)
+					intstring=Optional. An internal string only shown to you and never to your customers. (Your product ID for example)
+					validuntil=Optional. If given, this is a unix-timestamp describing how long one can purchase this license. 0=Unlimited
+			Reply fields:	OK
+			Reply format:	string
+
+		cmd=deletelicense
+			Description:	Deletes the given license ID. This will fail if you still have files connected to this license ID.
+			Parameters:	licid=License ID to delete.
+			Reply fields:	OK
+			Reply format:	string
+
+		cmd=addlicidstofiles
+			Description:    Connects the given licenses to the given files. If the files already have a license connected, it will return an error and change nothing.
+			Parameters:	licids=A comma separated list of license-IDs to add
+					files=Comma separated list of file IDs you want to add the license(s) to.
+					overwrite=If set to 1, it will OVERWRITE the existing license IDs in the given files instead of returning an error.
+			Reply fields:   1: Number of affected files.
+			Reply format:	integer
+
+		cmd=removelicidsfromfiles
+			Description:    Deletes all licenses from the files given. WARNING: This practically means everyone can download the respective files for free!
+			Parameters:	files=Comma separated list of file IDs you want to clear any licenses from.
+			Reply fields:   1: Number of affected files.
+			Reply format:	integer
+
+
+
+subroutine=getfilelicenses_v1
+Description:	Returns a list of available license choices for the given file ID.
+Parameters:	fileid=The file ID to get the available license options from.
+Reply fields:	1: License ID
+		2: Name
+		3: Description
+		4: Rapids (Price)
+		5: Hours valid after purchase per customer (0=Unlimited)
+		6: Valid until (Unix-timestamp 0=Unlimited)
+Reply format:	"string","string","string","integer","integer","$integer"\n (one line per record)
+
+
+
+subroutine=getpurchasedlicenses_v1
+Description:	Returns a list of all purchased licenses.
+Parameters:	login=your ID or username
+		password=your password
+Reply fields:	1: License ID
+		2: Valid until (unix-timestamp. 0 = unlimited)
+		3: Paid Rapids (How many Rapids you have paid to own this license.)
+		4: Purchased at (Unix-Timestamp)
+		5: IP address you had when you purchased this license
+		6: Name
+		7: Description
+		8: Rapids (Actual value of the license. NOT what you have paid, but what the actual price is right now.)
+Reply format:	"string","integer","integer","integer","string","string","string","integer"\n (one line per record)
+
+
+
+subroutine=buytraffic_v1
+Description:	Buys additional traffic. This function naturally only makes sense if you decided to disable the autorefill option.
+Parameters:	login=your ID or username
+		password=your password
+		gb=How many Gigabytes to purchase. Has to be a multiple of 5. (Range: 5-1000 GB)
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=extendrapidpro_v1
+Description:	Extend your RapidPro package manually. This function only makes sense if you decided to disable the autoextend option,
+		or if you want to become a VIP by extending for one year.
+Parameters:	login=your ID or username
+		password=your password
+		months=How many months to extend. If 12, you get 1 year VIP status as well and a better pricing.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=purchaselicense_v1
+Description:	Purchases the given license. For security reasons, you have to enter your password by hand. Coders MUST NEVER automate this process.
+Parameters:	login=Your ID or username
+		password=Your password
+		licid=License ID
+		password2=Your password, entered by your own hands.
+		rapids=How many Rapids you want to pay. (Yes, you MAY pay more than neccessary. You get an error if this is lower than the price.)
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=listfilesinlicense_v1
+Description:	Lists all files in a given format in a given license
+Parameters:	login=ID or username
+		password=password of the login
+		licid=License ID
+		fields=A comma separated list of database columns you want to receive. You will always receive the fileid.
+			Example: fields=filename,size will reply many lines in the format "$fileid,$filename,$size\n"
+			The following file columns are available: filename,size,serverid,type,x,y,bodtype,killdeadline,licids
+			WARNING: "licids" CAN contain commas! To safely use licids, it has to be the last field so you effectively limit the split operation to x fields.
+			Format: Everything is human readable except timestamps, which are unix timestamps (integers).
+Reply fields:	1:fileid
+		2:dynamically adjusted
+		OR
+		"NONE" (if no results, it returns "NONE")
+Reply format:	integer,fields (fields depending on fields you request)
+
+
+
+subroutine=resendauthcode_v1
+Description:	Resends the auth code to unlock a new unused premium account.
+Parameters:	login=Your account ID or your username
+		password=Your password
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=paypalok_v1
+Description:	Status request for pending PayPal payments.
+Parameters:	token=The payment token
+Reply fields:	1: Transcode
+		2: Status
+		3: Error code
+		4: Account ID
+		5: Password (only given for new accounts)
+		6: How many Rapids given
+Reply format:	string,string,integer,integer,string,integer
+
+
+
+subroutine=paymentok_v1
+Description:	Status request for pending payments.
+Parameters:	result=The result of the transaction.
+		transcode=The transaction code.
+Reply fields:	1: Account ID
+		2: Password
+		3: Transaction code
+		4: Payment provider
+		5: Encrypted cookie
+		6: Status
+Reply format:	integer,string,string,string,string,integer
+
+
+
+subroutine=download_v1
+Description:	Call this function to download a file from RapidShare as a free user or a RapidPro user. This function also supports encrypted SSL downloads.
+		Just call it via https:// instead of http://. By using SSL, we bill the traffic twice! Encrpyting high speed downloads is very expensive.
+		For this reason, encrypted SSL downloads are a RapidPro feature.
+		WARNING: Since this function can also be called by browsers, we append a JavaScript to every error message, which redirects the user to our homepage.
+		Line 1 is the plain error string as usual. Line 2 is JavaScript code for browser redirection. Example: ERROR: My error string.\n<script>.....
+Parameters:	fileid=File ID
+		filename=Filename
+		dlauth=The download authentication string (only used by free users)
+		try=If 1, it will always return only "DL:$hostname,$dlauth,$countdown"
+		login=Your login (if using premium downloads)
+		password=Your password (if using premium downloads)
+		withmd5hex=1 Includes the MD5 sum of the file (This way you can verify if the downloaded file is consistent. TCP/IP also takes care about data integrity,
+			but locally broken memory banks can also corrupt your files and TCP/IP only guarantees integrity until the data has reached your network card.)
+			Do not request the MD5 if you do not need this. Requesting MD5 costs more API-Call points than skipping it.
+		[start|range]=<x|x-y> You can specifiy where to start downloading. Valid examples are: start=123000 start=0-10000 position=5000-10000 position=50000
+		seclinkmd5=MD5 hex of the secured TrafficShare link.
+		seclinktimeout=Unix timestamp when the link becomes invalid.
+Reply:		The reply is highly dynamic. As always, errors start with "ERROR: <string>". The different scenarios are now explained.
+		We always assume that no error will be given. If there is an error, you should display it to your user (or parse it and display something else).
+
+		Downloading as a free user:
+			Step 1: Call this function with fileid and filename. You will get "DL:$hostname,$dlauth,$countdown,$md5hex".
+			Step 2: Call an internal function in your tool, which waits $countdown seconds.
+			Step 3: Call the server $hostname with download authentication string $dlauth after $countdown seconds. You instantly get the file.
+				WARNING: In our terms of service, we prohibit the automation of downloads for free users. It IS allowed to create tools,
+				which download ONE file as a free user from RapidShare. It is NOT allowed to implement queuing mechanisms. Resuming aborted
+				downloads is technically disabled.
+
+		Downloading as a RapidPro user:
+			Step 1: Call this function with fileid, filename, login and password.
+				If you called the right server and "try" is not given, you will instantly receive the file. If you called the wrong server,
+				or try=1 is given, you will get "DL:$hostname,$dlauth,$countdown,$md5hex". See side note #1.
+			Step 2: Call the same function on the server $hostname. You instantly get the file. Since you are a RapidPro user, $dlauth and
+				$countdown are always 0.
+
+Side notes:	#1: The instant download request can only be fulfilled on the server hosting the file. To completely avoid this error, you have to know the server ID,
+		where the file is hosted. There are scenarios where the server ID is available. For example if you call checkfiles_v1 before. If so, you will not get
+		this error message if you directly call the correct server. If you do not know the server ID, you just have to parse for this error and send your request
+		again to the correct server.
+
+
+
+subroutine=viewlinklist_v1
+Description:	Gets details about the respective link list as a visitor. For the administration function, use "getlinklist_v1".
+Parameters:	linklist=The link list its all about
+		linklistpassword=Optional access password
+		subfolder=An optional subfolder of the link list.
+		subfolderpassword=An optional subfolder access password.
+Header fields:	1: Folder name
+		2: Headline
+		3: Nick name
+Header format:	"string","string","string"\n
+Reply fields:	1: Entry type (1=File 2=Folder 3=PW protected folder)
+		2: File type (0=Unspecified 1=JPEG 2=PNG 3=BMP 4=TIFF 5=GIF)
+		3: File ID
+		4: Filename
+		5: Size (In bytes. If its a folder, this is the sum of the size of all files in this folder)
+		6: X (X dimension of the image, if it is an image)
+		7: Y (Y dimension of the image, if it is an image)
+		8: Description
+		9: Add time (Unix timestamp)
+		10: Number of files in the folder (Only if it is a folder, else it shows 0)
+Reply format:	"integer","integer","integer","string","integer","integer","integer","string","integer","integer"\n (One line per record)
+
+
+
+subroutine=movelinklistentries_v1
+Description:	Moves several linklist entries at once to the respective target linklist.
+Parameters:	login=ID or username
+		password=Password of the login
+		folderid=The folder ID to copy the files from
+		subfolderid=The sub-folder ID to copy the files from (0=root, default is 0)
+		files=A comma separated list of file IDs to copy
+		tofolderid=The folder ID to copy the files to
+		tosubfolderid=The sub-folder ID to copy the files to (0=root, default is 0)
+Reply fields:	1: Number of copied entries
+Reply format:	integer
+
+
+
+subroutine=forgotpw_v1
+Description:	Don't remember your password? Request it with this function. The password will be sent to all accounts with the given e-mail address.
+Parameters:	email=The e-mail address you registered your account with.
+Reply fields:	1: Number of e-mails sent.
+Reply format:	integer
+
+
+
+subroutine=sendmailtosupport_v1
+Description:	Sends an e-mail to the RapidShare support.
+Parameters:	from=Your own e-mail address, which is required so that we can contact you.
+		subject=One of "payment", "upload", "download", "account", "rapids", "rapidpro", "bugreport"
+		text=Your Text. Unicode allowed. Max. 20000 letters
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_contactuser_v1
+Description:	Sends a message to a RapidShare user. If the user does not have his/her RapidContact profile enabled, the call returns with an error.
+Parameters:	login=ID or username
+		password=Password of the login
+		contact=The user to contact
+		ctype=The data-type of "contact". See description below. Use addtime whenever possible.
+			"name" = A RapidContact username.
+			"addtime" = The add time of a certain existing contact
+			"pubid" = A RapidShare public ID
+			"fileid" = A RapidShare file ID
+		message=The message to send. Max. 1.000 bytes.
+		paycfee=Some users require a contact fee to be contacted. If you want to contact such users, give paycfee=cfee of the user.
+		flag=0 to 250. A user flag. This flag can be edited at anytime and has only meanings within the front end.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_cfeedispute_v1
+Description:	The contact fee is a great way to avoid spam. Users are encouraged to refund the contact fee (or keep it if they think they are VIPs).
+		However, there is a great potential for fraud. People might create an account with a contact fee and just ignore people contacting them.
+		To fight this form of abuse, every user having paid the contact fee can call this routine. The contact fee dispute counter of the person
+		will be incremented by 1 and everyone will know about it. We reserve the right to ban people with a too high dispute counter.
+Parameters:	login=ID or username
+		password=Password of the login
+		contact=The contact of the respective user.
+		ctype=The data-type of "contact". "name" = RapidContact username, "addtime" = The add time of a contact in your list.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_listcontacts_v1 (USE ONLY IF THE RCBOT IS NOT AVAILABLE FOR YOU! The bot returns all contacts in real time plus online-status and realtime events.)
+Description:	You get a list of all your saved contacts.
+Parameters:	login=ID or username
+		password=Password of the login
+Reply fields:	1: Add time (Unix timestamp)
+		2: RapidContact username.
+		3: Category (0=New users 1=Known people 2=Good fellows 3=Friends 4=Family members)
+		4: How many new messages are waiting for you.
+		5: Your own saved comment about this user.
+		5: When you last received a message from this user. (unix timestamp)
+		6: When you last sent an alert to this user. (unix timestamp)
+		7: A secret string needed for avatar JPG loading.
+		8: 1 if the user is online, 0 if the user is offline. This API function ALWAYS returns 0. Only the real time bot returns 1 if applicable.
+Reply format:	integer~string~integer~integer~string~integer~integer~string~integer\n (One line per record)
+
+
+
+subroutine=rc_comparecontacts_v1
+Description:	Compares the names in your contact list with the user's real names. This way you can find out if someone has been renamed.
+Parameters:	login=ID or username
+		password=Password of the login
+Reply fields:	1: Contact list username.
+		2: RapidContact username.
+Reply format:	string~string\n (One line per record)
+
+
+
+subroutine=rc_editcontact_v1
+Description:	Edits an existing contact. Every parameter is optional. Not transmitting a parameter means not changing it. If you want to clear a value, send "parameter=".
+Parameters:	login=ID or username
+		password=Password of the login
+		addtime=The addtime of the contact name you want to edit.
+		newname=You can rename your contact here. Of course this change is only visible for you.
+		category=Save your contact in a category in your contact list. Valid range 0-99.
+		comment=Save a comment about this contact. Limited to 1000 bytes. Only you can see this comment by calling listcontacts_v1.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_editcontactcategories_v1
+Description:	Changes the category of multiple contacts at once.
+Parameters:	login=ID or username
+		password=Password of the login
+		addtimes=The addtimes of the contacts you want to edit.
+		category=Save your contact in a category in your contact list. Valid range 0-99.
+Reply fields:	1: Number of updated records
+Reply format:	integer
+
+
+
+subroutine=rc_setaccountdetails_v1
+Description:	Edits your own RapidContact profile. Every parameter is optional. Not transmitting a parameter name means not changing it. To clear a value, send "parameter=".
+		Notice: cfee* is a contact fee. If someone wants to contact you via a file-ID and you have set 100 Rapids in cfeefileid, he first will be asked to pay 100 Rapids
+		to you in order to be allowed to contact you. This is to avoid massive spam attacks and.. hey... if a spammer annoys you but gives you 100 Rapids for it, who are you
+		to reject this? Feel free to adjust this values to what suits you best. And never forget, you can always pay the Rapids back if it was no spammer at all.
+Parameters:	login=ID or username
+		password=Password of the login
+		new=1 If given, it will create a new RapidContact profile. You can call this only once for every RapidShare account you own.
+		name=Your own RapidContact username.
+		cfeename=0-1000 Rapids to contact you by using your RapidContact username.
+		cfeepubid=0-1000 Rapids to contact you by using your RapidShare public ID.
+		cfeefileid=0-1000 Rapids to contact you by using the file ID if any file you have uploaded to RapidShare.
+		findme=This is the key to get in touch with other people. If this is empty, no one will ever find you. People can search for words you enter here. Limited to 250 characters.
+		pubprofile=Your public profile. People can't search for this, but when they have found you, they can always access it. Limited to 30.000 characters.
+		categories=Your categories for your contacts. Limited to 1000 bytes.
+		yob=Year of birth - 1900. 0 for undefined.
+		gender=0 for undefined, 1 for male or 2 for female
+		country='' for undefined, 2-letter code for country ID
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_downloadcontact_v1
+Description:	Downloads RapidContact account details for any user you specify.
+Parameters:	login=ID or username
+		password=Password of the login
+		contact=The RapidContact username to view the profile.
+		ctype=The data-type of "contact". "name" = RapidContact username, "addtime" = The add time of a contact in your list.
+Reply fields:	Many key value pairs in random order.
+Reply format:	key~value\n
+Reply example:  name~string
+		addtime~integer
+		findme~string
+		pubprofile~string
+		cfeename~integer
+		cfeepubid~integer
+		cfeefileid~integer
+		cfeedisputes~integer
+		grouprights~string
+		avatarstring~string
+		yob~integer
+		gender~integer
+		country~string
+
+
+subroutine=rc_downloadmyprofile_v1
+Description:	Downloads your own RapidContact profile.
+Parameters:	login=ID or username
+		password=Password of the login
+Reply fields:	Many key value pairs in random order.
+Reply format:	key~value\n
+Reply example:  name~string
+		addtime~integer
+		findme~string
+		pubprofile~string
+		categories~string
+		cfeename~integer
+		cfeepubid~integer
+		cfeefileid~integer
+		cfeedisputes~integer
+		grouprights~string
+                avatarstring~string
+		yob~integer
+		gender~integer
+		country~string
+
+
+subroutine=rc_listmessages_v1
+Description:	Lists your saved conversation with the respective RapidContact user.
+Parameters:	login=ID or username
+		password=Password of the login
+		addtime=The add time of the RapidContact user you want to see the conversation of.
+		pastseconds=How many seconds to go to into the past. Defaults to one week.
+		limit=How many records to display. Defaults to 10. (1-300)
+		onlynew=If 1, it returns only unread messages.
+		markmessages=If 1, it instantly marks all new messages as read after returning the list.
+Reply fields:	1: Time when the message was sent
+		2: 0 or 1. 1=The message is sent by you. 0=The message was sent by your contact to you.
+		3: If 1, then this message is not marked read yet.
+		4: The user editable flag.
+		5: The message.
+Reply format:	integer~integer~integer~integer~string\n (One line per record)
+
+
+
+subroutine=rc_markmessages_v1
+Description:	Marks the selected messages as read and/or changes the user flag of them.
+Parameters:	login=ID or username
+		password=Password of the login
+		addtime=The RapidContact addtime of the user.
+		timestamps=You have to give all message IDs (the time stamps) to mark the messages read.
+		action1=givenids (Processes all messages given in timestamps) or uptoid (Processes all messages up to the ONE given timestamp)
+		action2=mark (Marks messages), flag (flags all messages) or markandflag (Marks and flags all messages)
+		flag=The new user flag. 0 to 250.
+Reply fields:	1: How many records have been updated.
+Reply format:	integer
+
+
+
+subroutine=rc_deletecontact_v1
+Description:	Deletes an existing contact foever. In order to reestablish communication, you have to add the contact again.
+		Saved messages are not deleted, but you	can only see messages by or to users you have in your contact list.
+Parameters:	login=ID or username
+		password=Password of the login
+		addtime=The contact addtime you want to delete.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_searchcontacts_v1
+Description:	Searchs all available RapidContact FindMe profiles for your query and retuns them.
+Parameters:	login=ID or username
+		password=Password of the login
+		query=A query string to search for.
+		type=users or groups. Define if you want to search for users or for groups.
+		listgroupmembers=If 1 and type=users, it takes query as a group name and lists all members of that group. First line is your group rights.
+IF type=users
+	Reply fields:	1: Username
+			2: When the user joined RapidContact
+			3: The full FindMe profile
+			4: Contact fee in Rapids when contacting via RapidContact username.
+			5: Contact fee in Rapids when contacting via the RapidShare public ID.
+			6: Contact fee in Rapids when contacting via a RapidShare file ID.
+			7: Number of disputes. (People paid the fee and got no contact for example.)
+			8: All joined groups with the respective rights.
+			9: A secret string needed for avatar JPG loading.
+			10: Year of birth (0=undefined. Add 1900 to returned value.)
+			11: Gender (0=undefined 1=male 2=female)
+			12: Country
+	Reply format:	string~integer~string~integer~integer~integer~integer~string~string~integer~integer~string\n (One line per record)
+IF type=groups
+	Reply fields:	1: Name
+			2: Time of creation
+			3: The FindUs profile.
+			4: How many members this group has.
+			5: A secret string needed for avatar JPG loading.
+	Reply format:	string~integer~string~integer~string\n (One line per record)
+
+
+
+subroutine=rc_creategroup_v1
+Description:	Creates a new RapidContact group with the given name as a unique group identifier.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The group name you want to use
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_editgroup_v1
+Description:	Edits a group. Every parameter is optional. Not transmitting a parameter name means not changing it. To clear a value, send "parameter=".
+		You need to own the group or have the "E"-Right.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of your group
+		findus=The full FindUs profile. Like your own personal FindMe profile, this was users can find your group.
+		pubprofile=The full public profile. Limited to 30.000 characters.
+		privprofile=The full private profile. Only group members can read this. Likited to 30.000 characters.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_renameordeletegroup_v1
+Description:	Renames or deletes your group.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of your group
+		newgroupname=A new name for your group (if action=rename)
+		action=rename or delete.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_downloadgroup_v1
+Description:	Downloads invormation about the respective group.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of the group you want to download
+Reply fields:	key~value\n
+Reply format:	ownername~string
+		addtime~integer
+		findus~string
+		pubprofile~string
+		privprofile~string
+		members~integer
+		avatarstring~string
+
+
+
+subroutine=rc_kickuser_v1
+Description:	Kicks a user from the group. You need to own the group or have the "K"-Right for kicking users.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of the group you want to invite the user to.
+		contact=The contact list add time of the user you want to kick or the RapidContact username, depending on ctype.
+		ctype=addtime or name.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_alertuser_v1
+Description:	By calling this function, RapidShare will send an e-mail to the respective user, alerting him/her that you want to talk to him/her.
+		Calling this function is only possible once per hour per contact.
+Parameters:	login=ID or username
+		password=Password of the login
+		addtime=The RapidContact addtime of the user.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_promoteuser_v1
+Description:	Adjusts the rank of a user in a group. You need to own the group or have the "P"-Right.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of the group.
+		contact=The contact list add time of the user or the RapidContact username, depending on ctype.
+		ctype=addtime or name.
+		newrank=0-9
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_changeuserrights_v1
+Description:	Changes the group privileges of a user.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of the group.
+		contact=The contact list add time of the user or the RapidContact username, depending on ctype.
+		ctype=addtime or name.
+		newrights=A concatenation of letters. I=Invite user, K=Kick user, N=Newsletter, P=Promote user, E=Edit group
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_sendnewsletter_v1
+Description:	Sends a newsletter out to all members of the group. They will receive the newsletter via e-mail only.
+		You need to own the group or have the "N"-Right to use this feature.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of the group.
+		newsletter=The text of the newsletter. Max. 10000 bytes.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_sendchatmsg_v1
+Description:	Sends an instant chat message to someone in your contact list. If your contact partner is not online, you will get a chat message
+		from the system telling you about it. Chat messages are instant and not saved in the system.
+Parameters:	login=ID or username
+		password=Password of the login
+		addtime=The addtime of the contact name you want to send a chat message to.
+		guestid=If given, addtime is ignored and the message will be sent to the guest having this ID.
+		message=The message to send. Max. 250 bytes.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_sendguestchatmsg_v1
+Description:	Users without having a RapidContact profile can use this to chat with users having a RapidContact profile. If your contact partner
+		is not online, you will get a chat message from the system telling you about it. Chat messages are instant and not saved in the system.
+Parameters:	guestid=A guest ID, 11 to 18 digits of your choice. Needed to receive replies.
+		pubid=The public ID of the RapidContact user.
+		message=The message to send. Max. 250 bytes.
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+subroutine=rc_admineditgroupreq_v1
+Description:	Edits an invite from a group admin to an unjoined user from the admin's view. You need rank 9 or the "I" right.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of the group.
+		action=add or del
+		contact=The contact list add time of the user or the RapidContact username, depending on ctype.
+		ctype=addtime, name or reqname.
+			If action=del, ctype is ignored and contact is the name found in rc_adminlistgroupreqs_v1.
+			addtime=The addtime in your contact list. name=The real username. reqname=The username the user had when requesting the invite.
+			When acknowledging an invite, use reqname, since the user could have changed the username in the meantime.)
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+
+subroutine=rc_usereditgroupreq_v1
+Description:	Edits an invite request from an unjoined user to a group from the user's view.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of the group.
+		action=add or del
+Reply fields:	1: OK
+Reply format:	string
+
+
+
+
+subroutine=rc_adminlistgroupreqs_v1
+Description:	Returns a list of all pending group invite requests for the respective group. You need rank 9 or the "I" right.
+Parameters:	login=ID or username
+		password=Password of the login
+		groupname=The name of the group.
+Reply fields:	1: Name
+		2: When the request was created
+		3: The name of the invitor. If empty, the user has requested an invite.
+		4: The "user accepts" flag.
+		5: The "group accepts" flag.
+Reply format:	string~integer~string~integer~integer\n (One line per request)
+
+
+
+subroutine=rc_getcontactmejs_v1
+Description:	Returns a HTML source you can use in your own webpage to implement an instant messenger. Users can instantly contact you, as long as you
+		are logged into RapidContact. If you are not logged in, users trying to contact you get an error message that you are offline.
+Parameters:	login=ID or username
+		password=Password of the login
+		name=Name to show to your users "Chat with $name".
+Reply fields:	1: A long page of JavaScript code. Copy & paste this into your HTML page.
+Reply format:	string
+
+
+
+The RapidContact Notification Bot
+===========================================================================================================================================
+To contact the bot, call http(s)://rcb$x.rapidshare.com/$arg1-$arg2-$arg3-$arg4
+
+$x = $accountid % 10
+$arg1 = Account ID (or guest ID, if it has 11-18 digits)
+$arg2 = Reply type parameter. (1=JS standard reply, 2=Application-style reply)
+$arg3 = rcbotauth
+$arg4 = application id string (Every app must use an unique app id string. 3-32 alphanumeric chars of your free choice.)
+
+Besides the description of the replies below, the following global things should be known:
+	- The bot tries to maintain a minimum HTTP standard. This means, after the GET header is complete, the bot will send a HTTP header back.
+	- The bot will send a "heartbeat" (just a plain \n) to the client every 60 seconds, but only if no other event has reached the client
+	in the last 60 seconds. In other words, you will get TCP data at least once per minute.
+
+The following reply stream appears if replytype is "1".
+You will get an endless stream of JavaScript function calls. The possible function calls, which might appear are listed below.
+
+	rcbot_go() (Called once after successful authentification.)
+	rcbot_cm('avatarstring', 'chatmessage') (cm = New chat message for you by avatarstring. If length(avatarstring) < 32, then it is a guest ID.)
+	rcbot_pm('avatarstring') (pm = New private message for you by avatarstring.)
+	rcbot_lc('avatarstring') (lc = Lost connection. We were unable to deliver the message. Your chat partner is not online.)
+	rcbot_dc(x) (dc = Disconnect. You lost the connection to the chat server. Try a reconnect in x seconds and NOT earlier.)
+	rcbot_ev('avatarstring', event) (ev = Event. 1=User came online. 2=User went offline.)
+	rcbot_addtocl('string') (Adds new contacts to your contact list. Same reply like rc_listcontacts_v1.)
+	rcbot_dupekick() (When you logged in twice, the first connection will be kicked.)
+	rcbot_logout() (Called when you initiate a graceful logout.)
+	rcbot_newgrouprights('grouprights') (Called when someone accepts your group join request. grouprights contains your new group rights string.)
+
+The following reply stream appears if replytype is "2".
+You will get an endless stream of text commands. The possible commands, which might appear are listed below. For explaination of
+the single commands refer to reply type 1. They are listed in the same order here.
+
+	go\n
+	cm,avatarstring,chatmessage\n
+	pm,avatarstring\n
+	lc,avatarstring\n
+	dc,x\n
+	ev,avatarstring,event\n
+	addtocl,string\n
+	dupekick\n
+	logout\n
+	newgrouprights,grouprights\n
+
+
+
+The different implemented TrafficShare types:
+===========================================================================================================================================
+1: Normal TrafficShare (supports an unprotected custom string)
+   Syntax without custom string: http://rapidshare.com/files/123/file.zip
+
+   Syntax with a custom string: http://rapidshare.com/files/123/c$customstring/file.zip (since there is no md5-sum, the downloader CAN manipulate your custom string!)
+   $custom = A string of your choice. Limited to 100 alphanumeric characters. Also allowed: "%", "-", and "."
+
+
+2: Secured TrafficShare (supports expiry date and custom string protection).
+   Syntax without custom string: http://rapidshare.com/files/123/t$timeout-$md5hex/file.zip
+   $timeout = unix-timestamp when the link will expire.
+   $md5hex = md5_hex("$owner,$fileid,$killcode,$timeout")
+
+   Syntax with a custom string: http://rapidshare.com/files/123/t$timeout-$md5hex/c$customstring/file.zip
+   $timeout = unix-timestamp when the link will expire.
+   $md5hex = md5_hex("$owner,$fileid,$killcode,$timeout,$custom")
+   $custom = A string of your choice. Limited to 100 alphanumeric characters. Also allowed: "%", "-", and "."
+
+3: Secured TrafficShare connected to a certain RapidShare account (supports expiry date and custom string protection).
+   Syntax without custom string: http://rapidshare.com/files/123/t$timeout-$md5hex/file.zip
+   $timeout = unix-timestamp when the link will expire.
+   $md5hex = md5_hex("$owner,$fileid,$killcode,$timeout,$accountid")
+
+   Syntax with a custom string: http://rapidshare.com/files/123/t$timeout-$md5hex/c$customstring/file.zip
+   $timeout = unix-timestamp when the link will expire.
+   $md5hex = md5_hex("$owner,$fileid,$killcode,$timeout,$accountid,$custom")
+   $custom = A string of your choice. Limited to 100 alphanumeric characters. Also allowed: "%", "-", and "."
+
+>100: If type is >100, it just means that download logging will be enabled. This is basically neccessary if you choose to attach
+a custom string, since an unsaved custom string is worthless. To know the real TrafficShare-type, you just need to subtract 100.
+So if you see 102, its a TrafficShare type 2 with logging enabled. You need a verified PremiumAccount to enable types >100.
+
+
+
+RapidShare-API Revision history (we reserve the right to remove old or obsolete entries at anytime)
+===========================================================================================================================================
+25.05.2009
+	- Introduction of the revision history.
+	- trafficsharelogs_v1,trafficsharebandwidth_v1: actually make them work as they should.
+	- trafficsharelogs_v1: range and custom parameter added.
+	- checkfiles_v1: status values re-formatted and value 6 added.
+
+30.05.2009
+	- getaccountdetails_v1: Possibility to earn money added. Thus, referers added, new parameter withrefstring added.
+
+01.06.2009
+	- getaccountdetails_v1: referers changed to refpoints. Possibility for collector's users to earn money added. refpoints and refstring added there as well.
+
+04.06.2009
+	- premiumzonelogs_v1: Function added.
+	- getapicpu_v1: Now permanent. MAX value added.
+
+05.06.2009
+	- filemigrator_v1: acceptfee added. File migrator not free anymore due to massive abuse.
+
+08.06.2009
+	- getaccountdetails_v1: withcookie added. If you need to set the new encrypted cookie, this string will include cookie=STRING in the reply.
+
+14.06.2009
+	- getreward_v1 and setreward_v1 added.
+
+22.06.2009
+	- global: Support for encrypted API login added via global override parameter cookie=HEXSTRING
+
+25.06.2009
+	- getaccountdetails_v1: reply field "type" added.
+
+01.07.2009
+	- getaccountdetails_v1: prempoints always returns 0. It will be removed shortly!
+
+06.07.2009
+	- getaccountdetails_v1: prempoints now removed. refrate added.
+	- getpointlogs_v1: added function.
+	- getreferrerlogs_v1: added function.
+
+15.07.2009
+	- listfiles_v1: killdeadline added.
+
+16.07.2009
+	- listfiles_v1: now takes new optional parameter "fileids"
+
+06.08.2009
+	- getlinklist_v1: Internal bug-fixes and changed reply separator from , to " and reply is no longer HTML encoded.
+
+11.08.2009
+	- getreward_v1: Reply changed. Points removed.
+
+17.08.2009
+	- filemigrator_v1: acceptfee removed. Fee removed completely.
+	- masspoll_v1: vote changed to a1...a5 to enable possibility of surveys.
+
+19.08.2009
+	- getaccountdetails_v1: points renamed to fpoints. ppoints added. "points=0" added to avoid broken applications.
+	- getpointlogs_v1: ppoints changed from integer to float.
+
+21.08.2009
+	- ppointstorefpoints_v1: added function.
+
+22.08.2009
+	- ppointstorefpoints_v1: changed reply.
+	- ppointstofpoints_v1: added function.
+
+24.08.2009
+	- getaccountdetails_v1: refrate changed to ppointrate, refpoints removed.
+	- getreferrerlogs_v1: refpoints changed to ppoints.
+	- ppointstorefpoints_v1: function removed.
+	- getreward_v1: refrate changed to ppointrate.
+
+05.10.2009
+	- getaccountdetails_v1: updated documentation to reality: points replaced by fpoints and ppoints, prempoints removed.
+
+06.10.2009
+	- Inserted missing RSAntiHack check routines in several api functions.
+	- renamefile_v1: changed function so that you need a login now to use it. No longer accepts killcode identification
+
+08.10.2009
+	- getreferrerlogs_v1: confirmed flag added.
+
+18.10.2009
+	- filemigrator_v1: Some design flaws fixed with RealFolders. Syntax has changed slightly. srcrealfolder removed.
+			   fileids now alternatively takes a RealFolder ID and no longer an "*".
+
+26.10.2009
+	- getaccountdetails_v1: mirror, mirror2, mirror3 and mirror4 replaced by "mirrors", a comma separated list of mirrors to use.
+
+05.11.2009
+	- checkfiles_v1: limit of files to check at once lowered from 10000 bytes to 3000 bytes.
+
+18.12.2009
+	- setaccountdetails_v1: "mirrors" added, old mirror behaviour removed.
+
+19.12.2009
+	- renamefile_v1: reply field is now the renamed file name. This might differ from the given file name, since the server removes invalid chars.
+
+17.01.2010
+	- enablersantihack_v1: noemail parameter added. Reply modified.
+
+21.01.2010
+	- remotegets_v1: Function added.
+
+05.03.2010
+	- buylots_v1: Function removed.
+	- getaccountdetails_v1: "lots" removed.
+	- getreward_v1 and setreward_v1: Functions removed.
+
+06.03.2010
+	- ppcforextension_v1: Function added.
+
+10.03.2010
+	- getaccountdetails_v1: ppointrate removed.
+	- getdonationprojects_v1: Function added.
+	- donate_v1: Function added.
+
+23.04.2010
+	- sendmail_v2: Function added.
+	- customdb_v1: Function added.
+
+05.05.2010
+	- ppointstofpoints_v1: Exchange rate changed from 1.25 to 1.0
+
+13.05.2010
+	- convertpoints_v1: Function added.
+	- newcolaccount_v1: Function added.
+
+20.05.2010
+	- newpremiumaccount_v1: Function added.
+
+25.05.2010
+	- getaccountdetails_v1: "validuntil" is now obsolete. Use "platinumuntil" instead. "spacetype" added. "premkbleft" is now obsolete. Use "dlkbleft" instead.
+	- setaccountdetails_v1: "spacetype" added. All parameters now optional. If not given, the respective old values are not changed.
+
+26.05.2010
+	- remotegets_v1: listjobs -> status=12 added.
+	- validateaccount_v1: Function added.
+
+05.06.2010
+	- convertcoltoprem_v1: Function added.
+
+28.06.2010
+	- getaccountdetails_v1: platinumuntil, validuntil, dlkbleft, premkbleft, plustrafficmode, spacetype removed.
+	- getaccountdetails_v1: bodkb changed to tskb. protectfiles changed to verified. rapids, rperday and autocleanup added,
+	- setaccountdetails_v1: spacetype removed. autocleanup and rperday added.
+	- ppcforextension_v1: reply changed from validuntil to rapids.
+	- wiretransfer_v1: Function added.
+	- donate_v1: Function removed.
+	- getdonationprojects_v1: Function removed.
+	- newcolaccount_v1: Function removed.
+
+30.06.2010
+	- getrapidpaylogs_v1: Function added.
+
+01.07.2010
+	- getaccountdetails_v1: withrefstring removed, withpublicid, minrperday, maxrperday, lastbilltime, happyhours added.
+	- setaccountdetails_v1: minrperday, maxrperday added.
+	- getreferrerlogs_v1: Function removed.
+	- giverapids_v1: Function added.
+	- getrapidgiftlogs_v1: Function added.
+	- convertcoltoprem_v1: Function removed.
+
+02.07.2010
+	- All functions: Removed "type". This parameter is from now on ignored.
+	- getpointlogs_v1: Function removed.
+
+03.07.2010
+	- licensemanager_v1: Function added.
+	- getaccountdetails_v1: lastbilltime changed to billeduntil to technically allow more flexible billing.
+
+06.07.2010
+	- giverapids_v1: Preserve limit of 450 Rapids removed.
+	- setaccountdetails_v1: rperday, minrperday, maxrperday removed. autoextend and autorefill added. autocleanup changed to keepfilesforever.
+	- getaccountdetails_v1: minrperday, maxrperday, rperday, ppoints, fpoints removed. autoextend and autorefill added. autocleanup changed to keepfilesforever.
+	- ppointstofpoints_v1: Function removed.
+	- convertpoints_v1: Function removed.
+	- buytraffic_v1: Function added.
+	- extendrapidpro_v1: Function added.
+	- trafficsharebandwidth_v1: Function removed.
+
+14.07.2010
+	- New global optional parameters "cbf" and "cbid" added to return JavaScript compatible outputs.
+
+15.07.2010
+	- moverealfolder_v1: Support for multiple targets added.
+
+16.07.2010
+	- delrealfolder_v1: Support for multiple targets added.
+	- checkfiles_v1: Return status values changed. Compatibility for normal downloads preserved.
+
+17.07.2010
+	- getlicenses_v1: Function renamed to getfilelicenses_v1.
+	- getpurchasedlicenses_v1: Function added.
+
+18.07.2010
+	- purchaselicense_v1: Function added.
+	- getrapidgiftlogs_v1: Function removed (Use getpendingcredits_v1 instead. This is a new global function for received Rapids.)
+	- getpendingcredits_v1: Function added.
+	- giverapids_v1: Delayed Rapids transfer lowered from 3 days to 5 hours. Rapids limit changed to 10-5000.
+
+20.07.2010
+	- New global optional parameter "rsantihack" added.
+	- filemigrator_v1: srcaccount and srcpassword now ignored. Source is always the api caller.
+
+02.08.2010
+	- listfilesinlicense_v1: Function added.
+
+05.08.2010
+	- resendauthcode_v1: Function added.
+	- paypalok_v1: Function added.
+
+08.08.2010
+	- download_v1: Function added.
+
+09.08.2010
+	- movefilestorealfolder_v1: "disabledownloads" and "enabledownloads" parameters added.
+	- newpremiumaccount_v1: Reply extended.
+
+12.08.2010
+	- viewlinklist_v1: Function added.
+	- movelinklistentries_v1: Function added.
+
+14.08.2010
+	- getrapidpaylogs_v1: Function marked as obsolete. Use getrapidtranslogs_v1 instead.
+	- getrapidtranslogs_v1: Function added.
+
+16.08.2010
+	- giverapids_v1: The recipient parameter now also accepts a file ID. The optional message to the recipient can now hold up to 100 characters.
+	- deletefreefile_v1: Function added.
+
+18.08.2010
+	- resendauthcode_v1: Now also accepts a username. Parameter "accountid" renamed to "login".
+	- getrapidpaylogs_v1: Function removed.
+	- forgotpw_v1: Function added.
+	- getaccountdetails_v1: Parameter "withpublicid" extended.
+
+19.08.2010
+	- giverapids_v1: Parameter "rtype" added.
+
+21.08.2010
+	- NEW FEATURE: Since some special institutions decide to invest more and more money in network sniffing hardware (and TCP data injection as well, just to mention it),
+		we now also offer fully encrypted SSL downloads. This is a beta feature, only available when using download_v1 to request your files and it doubles your
+		billed traffic as well. Its really painfully costy to encrypt high speed downloads. Feel free to test it out. Don't hesitate to analyze your network traffic.
+		When we have enough experience with this feature, we might lower the traffic cost factor.
+	- download_v1: Now in public beta stage. New parameter "withmd5hex" added. See function description for background information.
+	- setaccountdetails_v1: Parameter "onlyssldls" added. If enabled, you will get an error message if you download without a SSL connection. Only works with download_v1.
+	- getaccountdetails_v1: Reply key "onlyssldls" added.
+
+27.09.2010
+	- extendrapidpro_v1: Now also accept "months" parameter.
+	- getaccountdetails_v1: "newmsgs", "rcbotauth", "vipuntil" added.
+	- giverapids_v1: Parameter rtype now also supports "accountid" and "addtime".
+	- sendmailtosupport_v1: Function added.
+	- rc_contactuser_v1: Function added.
+	- rc_cfeedispute_v1: Function added.
+	- rc_listcontacts_v1: Function added.
+	- rc_comparecontacts_v1: Function added.
+	- rc_editcontact_v1: Function added.
+	- rc_editcontactcategories_v1: Function added.
+	- rc_setaccountdetails_v1: Function added.
+	- rc_downloadcontact_v1: Function added.
+	- rc_downloadmyprofile_v1: Function added.
+	- rc_listmessages_v1: Function added.
+	- rc_markmessages_v1: Function added.
+	- rc_deletecontact_v1: Function added.
+	- rc_searchcontacts_v1: Function added.
+	- rc_creategroup_v1: Function added.
+	- rc_editgroup_v1: Function added.
+	- rc_renamegroup_v1: Function added.
+	- rc_deletegroup_v1: Function added.
+	- rc_downloadgroup_v1: Function added.
+	- rc_kickuser_v1: Function added.
+	- rc_alertuser_v1: Function added.
+	- rc_promoteuser_v1: Function added.
+	- rc_changeuserrights_v1: Function added.
+	- rc_sendnewsletter_v1: Function added.
+	- rc_sendchatmsg_v1: Function added.
+	- rc_sendguestchatmsg_v1: Function added.
+	- rc_admineditgroupreq_v1: Function added.
+	- rc_usereditgroupreq_v1: Function added.
+	- rc_adminlistgroupreqs_v1: Function added.
+	- rc_getcontactmejs_v1: Function added.
+	- The RapidContact Notification Bot: Documentation added.
+	- ppcforextension_v1: Function now OBSOLETE! Use claimcoupon_v1 instead.
+	- claimcoupon_v1: Function added.
+	- paymentok_v1: Function added.
+
+10.10.2010
+	- rc_listcontacts_v1: Reply format adjusted to include "lastmsgfrom".
