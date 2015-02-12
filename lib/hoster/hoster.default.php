@@ -1,8 +1,8 @@
 <?php
 
 /*
-	Created @ 06.12.2010 by TheFox@fox21.at
-	Copyright (c) 2010 TheFox
+	Created @ 06.12.2010
+	Copyright (C) 2010 Christian Mayer <http://fox21.at>
 	
 	This file is part of PHPDL.
 	
@@ -49,5 +49,3 @@ function hosterExec($thisHoster, $packet, $packetDownloadDir, $file){
 	
 	return $retval;
 }
-
-?>

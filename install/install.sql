@@ -1,4 +1,4 @@
--- Created @ 2010/12/12 00:48:59 by TheFox@fox21.at
+-- Created @ 2010/12/12 00:48:59 by Christian Mayer <http://fox21.at>
 -- MySQL dump 10.13  Distrib 5.1.45, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: phpdl

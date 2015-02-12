@@ -1,9 +1,8 @@
 <?php
 
 /*
-	Created @ 04.04.2010 by TheFox@fox21.at
-	Version: 1
-	Copyright (c) 2010 TheFox
+	Created @ 04.04.2010
+	Copyright (C) 2010 Christian Mayer <http://fox21.at>
 	Copy from FCMS/stdlib.php, 16.10.2010.
 	
 	This file is part of PHPDL.
@@ -341,5 +340,3 @@ function trafficUpdate($dbh, $tday, $byte){
 	else
 		mysql_query("insert into traffic(tday, traffic, ctime) values ('$tday', '".(int)$byte."', '".mktime()."');");
 }
-
-?>

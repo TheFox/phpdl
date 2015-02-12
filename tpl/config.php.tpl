@@ -1,8 +1,8 @@
 <?php
 
 /*
-	Created @ 04.04.2010 by TheFox@fox21.at
-	Copyright (c) 2010 TheFox
+	Created @ 04.04.2010
+	Copyright (C) 2010 Christian Mayer <http://fox21.at>
 	
 	This file is part of PHPDL.
 	
@@ -59,5 +59,3 @@ if(file_exists($CONFIG['SITE_STYLE_INCLUDE']))
 	include_once($CONFIG['SITE_STYLE_INCLUDE']);
 else
 	die("FATAL ERROR in ".basename(__FILE__)." line ".__LINE__.": can't include ".$CONFIG['SITE_STYLE_INCLUDE']);
-
-?>

@@ -1,5 +1,5 @@
-#!/bin/sh
-# Created @ 29.10.2010 by TheFox@fox21.at
+#!/usr/bin/env bash
+# Created @ 29.10.2010 by Christian Mayer <http://fox21.at>
 
 export LOG DATE
 DATE=`date +"%Y/%m/%d %H:%M:%S"`
@@ -25,6 +25,3 @@ fi
 
 echo done
 echo now run install/install.php in your browser.
-
-
-# EOF

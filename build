@@ -1,5 +1,5 @@
-#!/bin/sh
-# Created @ 16.10.2010 by TheFox
+#!/usr/bin/env bash
+# Created @ 16.10.2010 by Christian Mayer <http://fox21.at>
 
 export LOG DATE
 #LOG=/var/log/scripts/.log
@@ -16,5 +16,3 @@ FILES="build stackstart index.php stack.php wget.php LICENSE README"
 rm -f $TARF $GZIPF
 tar -vcf $TARF $DIRS $FILES
 gzip $TARF
-
-# EOF
